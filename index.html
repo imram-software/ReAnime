@@ -15,9 +15,9 @@
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
+      transition: background 1s ease;
       padding-top: 60px;
       text-align: center;
-      transition: background 1s ease;
     }
     header {
       position: fixed;
@@ -30,21 +30,6 @@
       color: #ff4ecd;
       z-index: 1000;
     }
-    /* Transición y fade para mostrar/ocultar secciones */
-    .fade {
-      opacity: 1;
-      transition: opacity 0.5s ease;
-      will-change: opacity;
-    }
-    .fade.hidden {
-      opacity: 0;
-      pointer-events: none;
-      user-select: none;
-      height: 0;
-      overflow: hidden;
-      transition: opacity 0.5s ease, height 0.3s ease;
-    }
-
     .intro {
       height: 80vh;
       display: flex;
@@ -53,6 +38,7 @@
       justify-content: center;
       text-align: center;
       padding: 0 1rem;
+      transition: opacity 0.6s ease;
     }
     .intro h1 {
       font-family: 'Zen Tokyo Zoo', cursive;
@@ -79,11 +65,14 @@
       padding: 0.9rem 2rem;
       box-shadow: 0 0 15px #ff8fab80;
       transition: 0.3s;
-      user-select: none;
     }
     .btn:hover {
       background-color: #ff5e95;
       transform: scale(1.05);
+    }
+    .hidden {
+      display: none !important;
+      opacity: 0 !important;
     }
     /* Noticias */
     .news-section {
@@ -106,10 +95,6 @@
       display: flex;
       gap: 1rem;
       align-items: center;
-      transition: background 0.3s ease;
-    }
-    .news-item:hover {
-      background: #fff0fa;
     }
     .news-item img {
       width: 120px;
@@ -190,7 +175,7 @@
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       transition: transform 0.3s ease;
-      cursor: pointer;
+      cursor: pointer; /* changed to pointer so user knows it's clickable */
       text-align: center;
     }
     .anime-card:hover {
@@ -221,16 +206,7 @@
       padding: 1rem 1.5rem;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       text-align: left;
-      opacity: 1;
-      transition: opacity 0.5s ease;
-    }
-    #anime-details.hidden {
-      opacity: 0;
-      pointer-events: none;
-      user-select: none;
-      height: 0;
-      overflow: hidden;
-      transition: opacity 0.5s ease, height 0.3s ease;
+      display: none;
     }
     #anime-details h2 {
       font-family: 'Zen Tokyo Zoo', cursive;
@@ -257,171 +233,21 @@
       cursor: pointer;
       font-weight: 700;
       transition: background 0.3s;
-      user-select: none;
     }
     #episode-list button:hover,
     #episode-list button.active {
       background: #ff4ecd;
     }
     #video-player {
-      width: 100%;
-      max-width: 720px;
-      height: 450px;
-      margin: 0 auto;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 0 20px #ff4ecd88;
-      position: relative;
-    }
-
-    /* Player section */
-    #player-section {
-      max-width: 900px;
-      margin: 2rem auto 4rem;
-      text-align: center;
-      opacity: 1;
-      transition: opacity 0.5s ease;
-    }
-    #player-section.hidden {
-      opacity: 0;
-      pointer-events: none;
-      user-select: none;
-      height: 0;
-      overflow: hidden;
-      transition: opacity 0.5s ease, height 0.3s ease;
-    }
-    #episode-buttons button {
-      margin: 0.3rem;
-      background: #ff8fab;
-      border: none;
-      border-radius: 20px;
-      padding: 0.4rem 1rem;
-      color: white;
-      cursor: pointer;
-      font-weight: 700;
-      transition: background 0.3s;
-      user-select: none;
-    }
-    #episode-buttons button:hover,
-    #episode-buttons button.active {
-      background: #ff4ecd;
-    }
-
-    /* Login form */
-    #login-container {
-      max-width: 320px;
-      margin: 2rem auto;
-      background: white;
-      padding: 1.5rem 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      opacity: 1;
-      transition: opacity 0.5s ease;
-      text-align: left;
-    }
-    #login-container.hidden {
-      opacity: 0;
-      pointer-events: none;
-      user-select: none;
-      height: 0;
-      overflow: hidden;
-      transition: opacity 0.5s ease, height 0.3s ease;
-    }
-    #login-container h3 {
-      margin-bottom: 1rem;
-      color: #ff4ecd;
-      font-family: 'Zen Tokyo Zoo', cursive;
-      font-size: 1.8rem;
-      text-align: center;
-    }
-    #login-container label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 0.2rem;
-      color: #444;
-    }
-    #login-container input {
-      width: 100%;
-      padding: 0.5rem 0.8rem;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      font-size: 1rem;
-      outline: none;
-      transition: 0.3s;
-    }
-    #login-container input:focus {
-      border-color: #ff4ecd;
-      box-shadow: 0 0 8px #ff4ecd88;
-    }
-    #login-container button {
-      width: 48%;
-      margin-right: 4%;
-      background-color: #ff8fab;
-      border: none;
-      border-radius: 30px;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      padding: 0.7rem 0;
-      box-shadow: 0 0 15px #ff8fab80;
-      transition: 0.3s;
-      user-select: none;
-    }
-    #login-container button:last-child {
-      margin-right: 0;
-      background-color: #ff4ecd;
-    }
-    #login-container button:hover {
-      transform: scale(1.05);
-    }
-    #login-container button:active {
-      transform: scale(0.98);
-    }
-
-    /* User info panel */
-    #user-info {
-      max-width: 320px;
-      margin: 2rem auto;
-      background: white;
-      padding: 1rem 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      font-size: 1.1rem;
-      color: #ff4ecd;
-      text-align: center;
-      opacity: 1;
-      transition: opacity 0.5s ease;
-      user-select: none;
-    }
-    #user-info.hidden {
-      opacity: 0;
-      pointer-events: none;
-      user-select: none;
-      height: 0;
-      overflow: hidden;
-      transition: opacity 0.5s ease, height 0.3s ease;
-    }
-    #user-info button {
-      margin-top: 1rem;
-      background-color: #ff8fab;
-      border: none;
-      border-radius: 30px;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      padding: 0.7rem 1.5rem;
-      box-shadow: 0 0 15px #ff8fab80;
-      transition: 0.3s;
-      user-select: none;
-    }
-    #user-info button:hover {
-      background-color: #ff4ecd;
-      transform: scale(1.05);
-    }
-
+  width: 100%;
+  max-width: 720px;
+  height: 450px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 20px #ff4ecd88;
+  position: relative;
+}
     @keyframes glow {
       0%, 100% {
         text-shadow: 0 0 15px #ff9de5, 0 0 30px #ff4ecd;
@@ -436,58 +262,38 @@
 
   <header>Re:Anime</header>
 
-  <!-- LOGIN FORM -->
-  <section id="login-container" class="fade">
-    <h3>Login / Sign Up</h3>
-    <label for="username">Username</label>
-    <input type="text" id="username" placeholder="Enter username" autocomplete="username" />
-    <label for="email">Email</label>
-    <input type="email" id="email" placeholder="Enter email" autocomplete="email" />
-    <label for="password">Password</label>
-    <input type="password" id="password" placeholder="Enter password" autocomplete="current-password" />
-    <div style="display: flex; justify-content: space-between;">
-      <button id="signup-btn">Sign Up</button>
-      <button id="login-btn">Log In</button>
-    </div>
-  </section>
-
-  <!-- USER INFO -->
-  <section id="user-info" class="fade hidden">
-    <p>Welcome, <span id="display-username"></span></p>
-    <button id="logout-btn">Log Out</button>
-  </section>
-
-  <section class="intro fade" id="intro">
+  <section class="intro" id="intro">
     <h1>Re:Anime</h1>
     <p>Your ultimate anime world. Discover your next obsession, please note that this page is new and under development, we will be adding anime as we go along..</p>
-    <button class="btn" id="enter-btn" disabled>Enter the anime world.</button>
+    <button class="btn" id="enter-btn">Enter the anime world.</button>
   </section>
 
-  <section class="news-section fade hidden" id="news-section">
+  <section class="news-section" id="news-section" style="display:none;">
     <h2>Latest Anime News</h2>
     <div id="news-list">
       <!-- Noticias se cargarán aquí -->
     </div>
   </section>
 
-  <section class="filter-section fade hidden" id="filter-section">
+  <section class="filter-section" id="filter-section" style="display:none;">
     <input type="text" id="search-input" placeholder="Search anime by name..." />
     <div class="genre-filters" id="genre-filters">
       <!-- Checkboxes género cargados por JS -->
     </div>
   </section>
 
-  <section class="anime-directory fade hidden" id="anime-directory">
+  <section class="anime-directory" id="anime-directory" style="display:none;">
     <!-- Directorio anime aquí -->
   </section>
 
-  <section id="player-section" class="fade hidden">
-    <h2 style="margin-bottom: 1rem;">Episode Player</h2>
-    <div id="episode-buttons" style="margin-bottom:1rem;"></div>
-    <div id="video-container"></div>
-  </section>
+  <section id="player-section" class="hidden">
+  <h2 style="margin-bottom: 1rem;">Episode Player</h2>
+  <div id="episode-buttons" style="margin-bottom:1rem;"></div>
+  <div id="video-container"></div>
+</section>
 
-  <section id="anime-details" class="fade hidden">
+  <!-- Nueva sección detalles anime -->
+  <section id="anime-details">
     <button class="btn" id="back-to-list" style="margin-bottom:1rem;">← Back to list</button>
     <h2 id="detail-name"></h2>
     <p class="description" id="detail-description"></p>
@@ -495,185 +301,79 @@
     <div id="video-player"></div>
   </section>
 
-  <footer style="margin-top: 4rem; padding: 1rem; background: #fff0fa; color: #ff4ecd; font-size: 0.9rem;">
-    © 2025 Re:Anime - All Rights Reserved. <br />
-    A project by <a href="https://discord.com/users/781172416218136577" target="_blank" style="color: #ff79c6; text-decoration: none; font-weight: bold;">Ream</a>.
-  </footer>
-
-  <!-- Firebase + App code -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-
-    // TODO: Cambia esto por tu config Firebase real
-    const firebaseConfig = {
-    apiKey: "AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU",
-    authDomain: "reanime-1a781.firebaseapp.com",
-    projectId: "reanime-1a781",
-    storageBucket: "reanime-1a781.firebasestorage.app",
-    messagingSenderId: "129737601446",
-    appId: "1:129737601446:web:721e6601c2f5ba0bb35f67"
-  };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Elementos UI
-    const loginContainer = document.getElementById('login-container');
-    const userInfo = document.getElementById('user-info');
-    const displayUsername = document.getElementById('display-username');
-    const logoutBtn = document.getElementById('logout-btn');
-
-    const signupBtn = document.getElementById('signup-btn');
-    const loginBtn = document.getElementById('login-btn');
-
-    const usernameInput = document.getElementById('username');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-
-    // Botón enter de intro (bloqueado hasta login)
+  <script>
     const enterBtn = document.getElementById('enter-btn');
-
-    // Funciones de mostrar/ocultar con fade usando clases
-    function showSection(elem) {
-      elem.classList.remove('hidden');
-      // for display flex/grid, set inline style (si quieres)
-      if(elem === filterSection) elem.style.display = 'flex';
-      else if(elem === animeDirectory) elem.style.display = 'grid';
-      else elem.style.display = 'block';
-      setTimeout(() => { elem.style.opacity = '1'; }, 10);
-    }
-    function hideSection(elem) {
-      elem.style.opacity = '0';
-      setTimeout(() => {
-        elem.classList.add('hidden');
-        elem.style.display = 'none';
-      }, 500);
-    }
-
-    // Secciones que ya tienes
     const intro = document.getElementById('intro');
     const newsSection = document.getElementById('news-section');
     const filterSection = document.getElementById('filter-section');
     const animeDirectory = document.getElementById('anime-directory');
+    const searchInput = document.getElementById('search-input');
+    const genreFilters = document.getElementById('genre-filters');
 
-    // Datos para anime
-    let allAnimes = [];
+    // Nueva variables para detalles y reproducción
+    const animeDetails = document.getElementById('anime-details');
+    const backToListBtn = document.getElementById('back-to-list');
+    const detailName = document.getElementById('detail-name');
+    const detailDescription = document.getElementById('detail-description');
+    const episodeList = document.getElementById('episode-list');
+    const videoPlayer = document.getElementById('video-player');
 
-    // --- LOGIN / REGISTER --- //
+    const playerSection = document.getElementById('player-section');
+const videoContainer = document.getElementById('video-container');
+const episodeButtons = document.getElementById('episode-buttons');
 
-    signupBtn.onclick = async () => {
-      const username = usernameInput.value.trim();
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+function showEpisodes(episodes) {
+  playerSection.classList.remove('hidden');
+  episodeButtons.innerHTML = '';
+  videoContainer.innerHTML = '';
 
-      if (!username || !email || !password) {
-        alert("Please fill all fields");
-        return;
-      }
+  episodes.forEach(ep => {
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.textContent = `Episode ${ep.number}: ${ep.title}`;
+    btn.addEventListener('click', () => {
+  // Limpiar active
+  [...episodeList.children].forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  // Crear un contenedor temporal para el embed
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = ep.embed;
 
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+  const iframe = tempDiv.querySelector('iframe');
+  if (iframe) {
+    iframe.removeAttribute('width');
+    iframe.removeAttribute('height');
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
+    iframe.style.display = 'block'; // importante para que no se colapse
+  }
 
-        // Actualizar displayName en Firebase Auth
-        await updateProfile(user, { displayName: username });
+  // Vaciar y añadir solo el iframe (no el div contenedor)
+  videoPlayer.innerHTML = '';
+  if (iframe) {
+    videoPlayer.appendChild(iframe);
+  } else {
+    // En caso que no sea iframe, poner el embed tal cual
+    videoPlayer.innerHTML = ep.embed;
+  }
+});
 
-        // Crear documento usuario en Firestore con datos iniciales
-        await setDoc(doc(db, "users", user.uid), {
-          username: username,
-          email: email,
-          wishlist: [],
-          finished: [],
-          watching: [],
-          watchedEpisodes: {},
-          ratings: {}
-        });
+    episodeButtons.appendChild(btn);
+  });
 
-        alert("Sign up successful! Welcome " + username);
-        clearLoginFields();
-      } catch (err) {
-        alert("Sign up error: " + err.message);
-      }
-    };
+  // Mostrar primer episodio automáticamente
+  if (episodes[0]) {
+    videoContainer.innerHTML = episodes[0].embed;
+  }
 
-    loginBtn.onclick = async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+  // Scroll automático al reproductor
+  playerSection.scrollIntoView({ behavior: 'smooth' });
+}
 
-      if (!email || !password) {
-        alert("Please fill email and password");
-        return;
-      }
 
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        alert("Login successful! Welcome " + (userCredential.user.displayName || "user"));
-        clearLoginFields();
-      } catch (err) {
-        alert("Login error: " + err.message);
-      }
-    };
-
-    logoutBtn.onclick = () => {
-      signOut(auth);
-    };
-
-    function clearLoginFields() {
-      usernameInput.value = "";
-      emailInput.value = "";
-      passwordInput.value = "";
-    }
-
-    // Cuando cambia el estado de sesión
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Mostrar UI logueado
-        loginContainer.classList.add('hidden');
-        userInfo.classList.remove('hidden');
-        displayUsername.textContent = user.displayName || user.email || "User";
-        enterBtn.disabled = false;
-
-        // Al entrar, se puede clickear para mostrar la app
-        enterBtn.onclick = () => {
-          intro.classList.add('hidden');
-          showSection(newsSection);
-          showSection(filterSection);
-          showSection(animeDirectory);
-
-          loadNews();
-
-          fetch('animes.json')
-            .then(res => res.json())
-            .then(data => {
-              allAnimes = data;
-              loadGenres(allAnimes);
-              renderAnimes(allAnimes);
-            })
-            .catch(err => {
-              console.error('Failed to load animes.json', err);
-              animeDirectory.innerHTML = '<p>Failed to load anime data.</p>';
-            });
-        };
-      } else {
-        // Mostrar UI no logueado
-        loginContainer.classList.remove('hidden');
-        userInfo.classList.add('hidden');
-        enterBtn.disabled = true;
-
-        // Ocultar secciones
-        hideSection(newsSection);
-        hideSection(filterSection);
-        hideSection(animeDirectory);
-        intro.classList.remove('hidden');
-      }
-    });
-
-    // --- El resto de tu código sin cambios --- //
-
-    // Noticias hardcodeadas
+    // Noticias hardcodeadas (pueden cambiarse)
     const newsData = [
       {
         img: 'https://wallpapercave.com/wp/wp6320901.png',
@@ -684,8 +384,6 @@
 
     // Función para cargar noticias en el DOM
     function loadNews() {
-      const newsList = document.getElementById('news-list');
-      newsList.innerHTML = '';
       newsData.forEach(n => {
         const div = document.createElement('div');
         div.classList.add('news-item');
@@ -696,34 +394,38 @@
             <p>${n.desc}</p>
           </div>
         `;
-        newsList.appendChild(div);
+        document.getElementById('news-list').appendChild(div);
       });
     }
 
+    // Variables para animés
+    let allAnimes = [];
+
     // Crear tarjetas anime en directorio
     function renderAnimes(animes) {
-      animeDirectory.innerHTML = '';
-      if (animes.length === 0) {
-        animeDirectory.innerHTML = '<p>No anime found.</p>';
-        return;
-      }
-      animes.forEach(a => {
-        const card = document.createElement('div');
-        card.className = 'anime-card';
-        card.innerHTML = `
-          <img src="${a.cover}" alt="${a.name}" />
-          <h3>${a.name}</h3>
-          <div class="info">
-            <div><strong>Genres:</strong> ${a.genre.join(', ')}</div>
-            <div><strong>Year:</strong> ${a.year}</div>
-            <div><strong>Rating:</strong> ${a.rating}</div>
-            ${a.description ? `<div><em>${a.description}</em></div>` : ''}
-          </div>
-        `;
-        card.addEventListener('click', () => showAnimeDetails(a));
-        animeDirectory.appendChild(card);
-      });
-    }
+  animeDirectory.innerHTML = '';
+if (animes.length === 0) {
+  animeDirectory.innerHTML = '<p>No anime found.</p>';
+  return;
+}
+animes.forEach(a => {
+  const card = document.createElement('div');
+  card.className = 'anime-card';
+  card.innerHTML = `
+    <img src="${a.cover}" alt="${a.name}" />
+    <h3>${a.name}</h3>
+    <div class="info">
+      <div><strong>Genres:</strong> ${a.genre.join(', ')}</div>
+      <div><strong>Year:</strong> ${a.year}</div>
+      <div><strong>Rating:</strong> ${a.rating}</div>
+      ${a.description ? `<div><em>${a.description}</em></div>` : ''}
+    </div>
+  `;
+  // 👉 Evento para mostrar detalles al hacer clic en la tarjeta
+  card.addEventListener('click', () => showAnimeDetails(a));
+  animeDirectory.appendChild(card);
+});
+}
 
     // Cargar géneros únicos para filtros
     function loadGenres(animes) {
@@ -731,7 +433,6 @@
       animes.forEach(a => a.genre.forEach(g => genresSet.add(g)));
       const genres = Array.from(genresSet).sort();
 
-      genreFilters.innerHTML = '';
       genres.forEach(genre => {
         const id = 'genre-' + genre.toLowerCase().replace(/\s/g, '-');
         const checkbox = document.createElement('input');
@@ -764,25 +465,17 @@
       renderAnimes(filtered);
     }
 
+    // Evento búsqueda en vivo
     searchInput.addEventListener('input', filterAnimes);
 
-    // Mostrar detalles y episodios
-    const animeDetails = document.getElementById('anime-details');
-    const backToListBtn = document.getElementById('back-to-list');
-    const detailName = document.getElementById('detail-name');
-    const detailDescription = document.getElementById('detail-description');
-    const episodeList = document.getElementById('episode-list');
-    const videoPlayer = document.getElementById('video-player');
-
+    // Función para mostrar detalles y episodios del anime
     function showAnimeDetails(anime) {
-      // Ocultar otras secciones con fade
-      hideSection(newsSection);
-      hideSection(filterSection);
-      hideSection(animeDirectory);
-      hideSection(intro);
+      intro.style.display = 'none';
+      newsSection.style.display = 'none';
+      filterSection.style.display = 'none';
+      animeDirectory.style.display = 'none';
 
-      animeDetails.classList.remove('hidden');
-
+      animeDetails.style.display = 'block';
       detailName.textContent = anime.name;
       detailDescription.textContent = anime.description || 'No description available.';
       episodeList.innerHTML = '';
@@ -793,31 +486,32 @@
           const btn = document.createElement('button');
           btn.textContent = `${ep.number}. ${ep.title}`;
           btn.addEventListener('click', () => {
-            [...episodeList.children].forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+  [...episodeList.children].forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = ep.embed;
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = ep.embed;
 
-            const iframe = tempDiv.querySelector('iframe');
-            if (iframe) {
-              iframe.removeAttribute('width');
-              iframe.removeAttribute('height');
-              iframe.style.width = '100%';
-              iframe.style.height = '100%';
-              iframe.style.border = 'none';
-              iframe.style.display = 'block';
-            }
+  const iframe = tempDiv.querySelector('iframe');
+  if (iframe) {
+    iframe.removeAttribute('width');
+    iframe.removeAttribute('height');
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
+    iframe.style.display = 'block';
+  }
 
-            videoPlayer.innerHTML = '';
-            if (iframe) {
-              videoPlayer.appendChild(iframe);
-            } else {
-              videoPlayer.innerHTML = ep.embed;
-            }
-          });
+  videoPlayer.innerHTML = '';
+  if (iframe) {
+    videoPlayer.appendChild(iframe);
+  } else {
+    videoPlayer.innerHTML = ep.embed;
+  }
+});
 
           episodeList.appendChild(btn);
+          // Auto click al primer episodio
           if (idx === 0) btn.click();
         });
       } else {
@@ -825,14 +519,41 @@
       }
     }
 
+    // Botón para volver al listado
     backToListBtn.addEventListener('click', () => {
-      animeDetails.classList.add('hidden');
-      showSection(newsSection);
-      showSection(filterSection);
-      showSection(animeDirectory);
+      animeDetails.style.display = 'none';
+      intro.style.display = 'none';
+      newsSection.style.display = 'block';
+      filterSection.style.display = 'flex';
+      animeDirectory.style.display = 'grid';
+      videoPlayer.innerHTML = '';
     });
 
-  </script>
+    // Carga principal al entrar a la app
+    enterBtn.addEventListener('click', () => {
+      intro.classList.add('hidden');
+      newsSection.style.display = 'block';
+      filterSection.style.display = 'flex';
+      animeDirectory.style.display = 'grid';
 
+      loadNews();
+
+      fetch('animes.json')
+        .then(res => res.json())
+        .then(data => {
+          allAnimes = data;
+          loadGenres(allAnimes);
+          renderAnimes(allAnimes);
+        })
+        .catch(err => {
+          console.error('Failed to load animes.json', err);
+          animeDirectory.innerHTML = '<p>Failed to load anime data.</p>';
+        });
+    });
+  </script>
+ <footer style="margin-top: 4rem; padding: 1rem; background: #fff0fa; color: #ff4ecd; font-size: 0.9rem;">
+  © 2025 Re:Anime - All Rights Reserved. <br />
+  A project by <a href="https://discord.com/users/781172416218136577" target="_blank" style="color: #ff79c6; text-decoration: none; font-weight: bold;">Ream</a>.
+</footer>
 </body>
 </html>
