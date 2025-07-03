@@ -12,13 +12,12 @@
       background: linear-gradient(135deg, #ffe1f0, #caf0f8);
       min-height: 100vh;
       overflow-x: hidden;
-      position: relative;
-      transition: background 1s ease;
       padding-top: 60px;
       text-align: center;
     }
     header {
-      position: fixed; top: 0; left: 0; width: 100%;
+      position: fixed;
+      top: 0; left: 0; width: 100%;
       background: #fff0fa;
       padding: 0.8rem 2rem;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -28,11 +27,12 @@
       z-index: 1000;
     }
     .intro {
-      height: 80vh;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      text-align: center;
       padding: 0 1rem;
       transition: opacity 0.6s ease;
     }
@@ -67,37 +67,45 @@
       transform: scale(1.05);
     }
     .hidden { display: none !important; opacity: 0 !important; }
-
     .news-section, .filter-section, .anime-directory, .anime-details {
       max-width: 900px;
       margin: 2rem auto;
-      padding: 0 1rem;
       text-align: left;
+      padding: 0 1rem;
     }
     .news-item {
-      display: flex;
       background: white;
       border-radius: 12px;
       padding: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       margin-bottom: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
       gap: 1rem;
+      align-items: center;
     }
     .news-item img {
-      width: 120px; height: 80px; object-fit: cover; border-radius: 8px;
+      width: 120px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
     }
-    .news-item h3 { margin-bottom: 0.3rem; color: #333; }
-    .news-item p { font-size: 0.9rem; color: #666; }
-
-    .filter-section { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
     #search-input {
-      flex: 1 1 200px;
+      width: 100%;
       padding: 0.5rem 1rem;
       font-size: 1rem;
       border-radius: 30px;
       border: 1px solid #ddd;
+      margin-bottom: 1rem;
     }
-    .genre-filters { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .genre-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .genre-filters input[type="checkbox"] {
+      display: none;
+    }
     .genre-filters label {
       background: #ff8fab88;
       padding: 0.3rem 0.8rem;
@@ -106,44 +114,48 @@
       cursor: pointer;
     }
     .genre-filters input[type="checkbox"]:checked + label {
-      background: #ff4ecd; color: white;
+      background: #ff4ecd;
+      color: white;
     }
-
+    .anime-directory {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+    }
     .anime-card {
       background: white;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
       cursor: pointer;
       text-align: center;
+      transition: transform 0.3s;
     }
     .anime-card:hover { transform: scale(1.05); }
-    .anime-card img { width: 100%; height: 220px; object-fit: cover; }
-    .anime-card h3 { margin: 0.5rem 0; color: #333; }
-
+    .anime-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
     .anime-details {
       display: none;
       background: #fff;
+      padding: 1rem;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 1rem;
     }
-    .anime-details h2 { margin-bottom: 0.5rem; color: #ff4ecd; }
-    .anime-details p { margin-bottom: 1rem; }
-    .episode-list button {
-      margin: 0.3rem;
-      padding: 0.4rem 1rem;
+    .episodes button {
       background: #ff8fab;
       color: white;
       border: none;
-      border-radius: 10px;
+      margin: 0.3rem;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
       cursor: pointer;
     }
-    #video-player iframe, #video-player div {
-      width: 100%; max-width: 720px; margin-top: 1rem;
+    #video-player {
+      margin-top: 1rem;
     }
-
     @keyframes glow {
       0%, 100% { text-shadow: 0 0 15px #ff9de5, 0 0 30px #ff4ecd; }
       50% { text-shadow: 0 0 25px #ff79c6, 0 0 40px #ff2ea6; }
@@ -154,108 +166,109 @@
   <header>Re:Anime</header>
   <section class="intro" id="intro">
     <h1>Re:Anime</h1>
-    <p>Your ultimate anime world.</p>
+    <p>Your ultimate anime world. Discover your next obsession.</p>
     <button class="btn" id="enter-btn">Enter the anime world ✨</button>
   </section>
-  <section class="news-section" id="news-section" style="display:none;"><h2>Latest Anime News</h2><div id="news-list"></div></section>
-  <section class="filter-section" id="filter-section" style="display:none;">
+  <section class="news-section hidden" id="news-section">
+    <h2>Latest Anime News</h2>
+    <div id="news-list"></div>
+  </section>
+  <section class="filter-section hidden" id="filter-section">
     <input type="text" id="search-input" placeholder="Search anime by name..." />
     <div class="genre-filters" id="genre-filters"></div>
   </section>
-  <section class="anime-directory" id="anime-directory" style="display:none;"></section>
+  <section class="anime-directory hidden" id="anime-directory"></section>
   <section class="anime-details" id="anime-details"></section>
-  <div id="video-player"></div>
-
   <script>
     const intro = document.getElementById('intro');
     const newsSection = document.getElementById('news-section');
     const filterSection = document.getElementById('filter-section');
     const animeDirectory = document.getElementById('anime-directory');
     const animeDetails = document.getElementById('anime-details');
-    const videoPlayer = document.getElementById('video-player');
     const searchInput = document.getElementById('search-input');
     const genreFilters = document.getElementById('genre-filters');
-    let allAnimes = [];
-
-    document.getElementById('enter-btn').addEventListener('click', () => {
-      intro.classList.add('hidden');
-      newsSection.style.display = 'block';
-      filterSection.style.display = 'flex';
-      animeDirectory.style.display = 'grid';
-      loadNews();
-      fetch('animes.json')
-        .then(res => res.json())
-        .then(data => {
-          allAnimes = data;
-          loadGenres(data);
-          renderAnimes(data);
-        });
-    });
 
     const newsData = [
-      { img: 'https://cdn.myanimelist.net/images/anime/5/17407.jpg', title: 'Bleach 2025', desc: 'New arc announced.' },
-      { img: 'https://cdn.myanimelist.net/images/anime/1517/135944.jpg', title: 'Demon Slayer Final Arc', desc: 'Ufotable te rompe el alma.' }
+      { img: 'https://cdn.myanimelist.net/images/anime/5/17407.jpg', title: 'Bleach Returns', desc: 'Part 3 announced for fall.' },
+      { img: 'https://cdn.myanimelist.net/images/anime/1517/135944.jpg', title: 'Demon Slayer Movie', desc: 'Ufotable goes big again.' }
     ];
 
     function loadNews() {
-      const container = document.getElementById('news-list');
       newsData.forEach(n => {
         const div = document.createElement('div');
         div.className = 'news-item';
-        div.innerHTML = `<img src="${n.img}" alt="${n.title}"><div><h3>${n.title}</h3><p>${n.desc}</p></div>`;
-        container.appendChild(div);
+        div.innerHTML = `<img src="${n.img}" alt="${n.title}" /><div><h3>${n.title}</h3><p>${n.desc}</p></div>`;
+        document.getElementById('news-list').appendChild(div);
       });
     }
 
-    function renderAnimes(list) {
+    let allAnimes = [];
+
+    function renderAnimes(animes) {
       animeDirectory.innerHTML = '';
-      list.forEach(a => {
-        const div = document.createElement('div');
-        div.className = 'anime-card';
-        div.innerHTML = `<img src="${a.cover}" alt="${a.name}"><h3>${a.name}</h3>`;
-        div.addEventListener('click', () => showAnimeDetails(a));
-        animeDirectory.appendChild(div);
+      animes.forEach(a => {
+        const card = document.createElement('div');
+        card.className = 'anime-card';
+        card.innerHTML = `<img src="${a.cover}" alt="${a.name}" /><h3>${a.name}</h3>`;
+        card.addEventListener('click', () => showAnimeDetails(a));
+        animeDirectory.appendChild(card);
       });
     }
 
     function showAnimeDetails(anime) {
-      animeDetails.style.display = 'block';
-      videoPlayer.innerHTML = '';
       animeDetails.innerHTML = `
         <h2>${anime.name}</h2>
-        <p>${anime.description || 'No description available.'}</p>
-        <div class="episode-list">
-          ${anime.episodes ? anime.episodes.map(e => `<button onclick='playEpisode(${JSON.stringify(e.embed)})'>${e.title}</button>`).join('') : '<p>No episodes.</p>'}
-        </div>`;
+        <p><strong>Genres:</strong> ${anime.genre.join(', ')}</p>
+        <p><strong>Year:</strong> ${anime.year}</p>
+        <p><strong>Rating:</strong> ${anime.rating}</p>
+        <p>${anime.description || ''}</p>
+        <div class="episodes">${(anime.episodes || []).map(ep => `<button onclick='showEpisode(${JSON.stringify(ep.embed)})'>${ep.title}</button>`).join('')}</div>
+        <div id="video-player"></div>
+      `;
+      animeDetails.scrollIntoView({ behavior: 'smooth' });
+      animeDetails.style.display = 'block';
     }
 
-    function playEpisode(embed) {
-      videoPlayer.innerHTML = embed;
-      videoPlayer.scrollIntoView({ behavior: 'smooth' });
+    function showEpisode(embedCode) {
+      document.getElementById('video-player').innerHTML = embedCode;
     }
 
     function loadGenres(animes) {
-      const genres = [...new Set(animes.flatMap(a => a.genre))];
-      genres.forEach(g => {
-        const id = 'g-' + g.toLowerCase().replace(/\s/g, '-');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = id; checkbox.value = g;
-        const label = document.createElement('label');
-        label.htmlFor = id; label.textContent = g;
-        genreFilters.appendChild(checkbox);
-        genreFilters.appendChild(label);
-        checkbox.addEventListener('change', filterAnimes);
+      const allGenres = [...new Set(animes.flatMap(a => a.genre))].sort();
+      genreFilters.innerHTML = '';
+      allGenres.forEach(g => {
+        const id = `genre-${g.toLowerCase().replace(/\s+/g, '-')}`;
+        genreFilters.innerHTML += `<input type="checkbox" id="${id}" value="${g}" /><label for="${id}">${g}</label>`;
+      });
+      genreFilters.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', filterAnimes);
       });
     }
 
     function filterAnimes() {
-      const search = searchInput.value.toLowerCase();
-      const genres = [...genreFilters.querySelectorAll('input:checked')].map(i => i.value);
-      const filtered = allAnimes.filter(a => a.name.toLowerCase().includes(search) && (genres.length === 0 || genres.some(g => a.genre.includes(g))));
+      const term = searchInput.value.toLowerCase();
+      const selectedGenres = Array.from(genreFilters.querySelectorAll('input:checked')).map(cb => cb.value);
+      const filtered = allAnimes.filter(a => {
+        return a.name.toLowerCase().includes(term) && (selectedGenres.length === 0 || selectedGenres.some(g => a.genre.includes(g)));
+      });
       renderAnimes(filtered);
     }
+
     searchInput.addEventListener('input', filterAnimes);
+    document.getElementById('enter-btn').addEventListener('click', () => {
+      intro.classList.add('hidden');
+      newsSection.classList.remove('hidden');
+      filterSection.classList.remove('hidden');
+      animeDirectory.classList.remove('hidden');
+      loadNews();
+      fetch('animes.json')
+        .then(r => r.json())
+        .then(data => {
+          allAnimes = data;
+          loadGenres(allAnimes);
+          renderAnimes(allAnimes);
+        });
+    });
   </script>
 </body>
 </html>
