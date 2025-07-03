@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Re:Anime</title>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&family=Nunito:wght@300;700&family=Sacramento&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&family=Nunito:wght@300;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -16,17 +16,44 @@
       font-family: 'Nunito', sans-serif;
       background: linear-gradient(135deg, #ffe1f0, #caf0f8);
       min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      transition: background 1s ease;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #fff0fa;
+      padding: 0.8rem 2rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      font-family: 'Zen Tokyo Zoo', cursive;
+      font-size: 2rem;
+      color: #ff4ecd;
+      transform: translateY(-100%);
+      transition: transform 0.8s ease;
+      z-index: 1000;
+    }
+
+    header.show {
+      transform: translateY(0);
+    }
+
+    .intro {
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-      position: relative;
-      padding: 2rem;
       text-align: center;
+      transition: opacity 0.6s ease;
+      z-index: 10;
     }
 
-    h1 {
+    .intro h1 {
       font-family: 'Zen Tokyo Zoo', cursive;
       font-size: 4rem;
       color: #ff79c6;
@@ -34,11 +61,11 @@
       animation: glow 3s ease-in-out infinite;
     }
 
-    p {
-      font-size: 1.3rem;
-      max-width: 600px;
-      margin-top: 1.5rem;
+    .intro p {
+      font-size: 1.2rem;
       color: #444;
+      margin: 1rem auto;
+      max-width: 600px;
     }
 
     .btn {
@@ -57,32 +84,52 @@
 
     .btn:hover {
       background-color: #ff5e95;
-      box-shadow: 0 0 25px #ff8fab;
       transform: scale(1.05);
     }
 
-    footer {
-      margin-top: 3rem;
-      font-size: 0.9rem;
-      color: #666;
+    .anime-directory {
+      display: none;
+      padding: 6rem 2rem 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+      opacity: 0;
+      transition: opacity 1s ease;
     }
 
-    .petal {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/0b5e5900-19e6-4868-848a-0450a6ad8660/ddqm06r-400f18d7-1cd4-489e-9992-bcf7d6b239c6.png/v1/fill/w_839,h_953/sakura_petal_by_cryptickoi_ddqm06r-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9OTUzIiwicGF0aCI6IlwvZlwvMGI1ZTU5MDAtMTllNi00ODY4LTg0OGEtMDQ1MGE2YWQ4NjYwXC9kZHFtMDZyLTQwMGYxOGQ3LTFjZDQtNDg5ZS05OTkyLWJjZjdkNmIyMzljNi5wbmciLCJ3aWR0aCI6Ijw9ODM5In1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.aBsmucd991vidCDmlcjiWamsWIV0rVYa7Q76oK3U95A') no-repeat center/contain;
-      animation: fall linear infinite;
-      opacity: 0.6;
+    .anime-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+      text-align: center;
     }
 
-    @keyframes fall {
-      0% {
-        transform: translateY(-100px) rotate(0deg);
-      }
-      100% {
-        transform: translateY(110vh) rotate(360deg);
-      }
+    .anime-card:hover {
+      transform: scale(1.05);
+    }
+
+    .anime-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .anime-card h3 {
+      margin: 0.5rem 0;
+      font-size: 1rem;
+      padding: 0 0.5rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .visible {
+      opacity: 1 !important;
     }
 
     @keyframes glow {
@@ -97,28 +144,53 @@
 </head>
 <body>
 
-  <h1>Re:Anime</h1>
-  <p>Your anime world.</p>
+  <header id="main-header">Re:Anime</header>
 
-  <button class="btn">Enter the anime world ✨</button>
+  <section class="intro" id="intro">
+    <h1>Re:Anime</h1>
+    <p>Your ultimate anime world. Discover your next obsession.</p>
+    <button class="btn" onclick="startApp()">Enter the anime world ✨</button>
+  </section>
 
-  <footer>
-    © 2025 Re:Anime · Made with ♥ by fans for fans
-  </footer>
+  <section class="anime-directory" id="directory">
+    <!-- Example Anime Cards -->
+    <div class="anime-card">
+      <img src="https://cdn.myanimelist.net/images/anime/10/47347.jpg" alt="Naruto">
+      <h3>Naruto</h3>
+    </div>
+    <div class="anime-card">
+      <img src="https://cdn.myanimelist.net/images/anime/4/19644.jpg" alt="Death Note">
+      <h3>Death Note</h3>
+    </div>
+    <div class="anime-card">
+      <img src="https://cdn.myanimelist.net/images/anime/1915/135431.jpg" alt="Jujutsu Kaisen">
+      <h3>Jujutsu Kaisen</h3>
+    </div>
+    <div class="anime-card">
+      <img src="https://cdn.myanimelist.net/images/anime/1988/121518.jpg" alt="Chainsaw Man">
+      <h3>Chainsaw Man</h3>
+    </div>
+  </section>
 
   <script>
-  const isMobile = window.innerWidth < 768;
-  const total = isMobile ? 8 : 20;
+    function startApp() {
+      const header = document.getElementById("main-header");
+      const intro = document.getElementById("intro");
+      const directory = document.getElementById("directory");
 
-  for (let i = 0; i < total; i++) {
-    const petal = document.createElement("div");
-    petal.classList.add("petal");
-    petal.style.left = Math.random() * 100 + "vw";
-    petal.style.animationDuration = (5 + Math.random() * 5) + "s";
-    petal.style.animationDelay = Math.random() * 10 + "s";
-    document.body.appendChild(petal);
-  }
-</script>
+      // Mostrar header
+      header.classList.add("show");
+
+      // Ocultar intro con fade
+      intro.style.opacity = 0;
+      setTimeout(() => {
+        intro.classList.add("hidden");
+
+        // Mostrar directorio
+        directory.classList.add("visible");
+      }, 600);
+    }
+  </script>
 
 </body>
 </html>
