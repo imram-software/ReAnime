@@ -468,7 +468,22 @@ animes.forEach(a => {
             // Limpiar active
             [...episodeList.children].forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            videoPlayer.innerHTML = ep.embed;
+            // Limpiar y ajustar tamaño del iframe antes de insertar
+const tempDiv = document.createElement('div');
+tempDiv.innerHTML = ep.embed;
+
+const iframe = tempDiv.querySelector('iframe');
+if (iframe) {
+  iframe.removeAttribute('width');
+  iframe.removeAttribute('height');
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  iframe.style.border = 'none';
+}
+
+videoPlayer.innerHTML = '';
+videoPlayer.appendChild(tempDiv);
+
           });
           episodeList.appendChild(btn);
           // Auto click al primer episodio
