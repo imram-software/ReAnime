@@ -382,26 +382,27 @@ function showEpisodes(episodes) {
     // Crear tarjetas anime en directorio
     function renderAnimes(animes) {
   animeDirectory.innerHTML = '';
-  if(animes.length === 0) {
-    animeDirectory.innerHTML = '<p>No anime found.</p>';
-    return;
-  }
-  animes.forEach(a => {
-    const card = document.createElement('div');
-    card.className = 'anime-card';
-    card.innerHTML = `
-      <img src="${a.cover}" alt="${a.name}" />
-      <h3>${a.name}</h3>
-      <div class="info">
-        <div><strong>Genres:</strong> ${a.genre.join(', ')}</div>
-        <div><strong>Year:</strong> ${a.year}</div>
-        <div><strong>Rating:</strong> ${a.rating}</div>
-        ${a.description ? `<div><em>${a.description}</em></div>` : ''}
-        ${a.episodes ? `<button class="btn" onclick='showEpisodes(${JSON.stringify(a.episodes).replace(/'/g, "\\'")})'>Watch</button>` : ''}
-      </div>
-    `;
-    animeDirectory.appendChild(card);
-  });
+if (animes.length === 0) {
+  animeDirectory.innerHTML = '<p>No anime found.</p>';
+  return;
+}
+animes.forEach(a => {
+  const card = document.createElement('div');
+  card.className = 'anime-card';
+  card.innerHTML = `
+    <img src="${a.cover}" alt="${a.name}" />
+    <h3>${a.name}</h3>
+    <div class="info">
+      <div><strong>Genres:</strong> ${a.genre.join(', ')}</div>
+      <div><strong>Year:</strong> ${a.year}</div>
+      <div><strong>Rating:</strong> ${a.rating}</div>
+      ${a.description ? `<div><em>${a.description}</em></div>` : ''}
+    </div>
+  `;
+  // 👉 Evento para mostrar detalles al hacer clic en la tarjeta
+  card.addEventListener('click', () => showAnimeDetails(a));
+  animeDirectory.appendChild(card);
+});
 }
 
     // Cargar géneros únicos para filtros
