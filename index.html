@@ -332,8 +332,34 @@ function showEpisodes(episodes) {
     btn.className = 'btn';
     btn.textContent = `Episode ${ep.number}: ${ep.title}`;
     btn.addEventListener('click', () => {
-      videoContainer.innerHTML = ep.embed;
-    });
+  // Limpiar active
+  [...episodeList.children].forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  // Crear un contenedor temporal para el embed
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = ep.embed;
+
+  const iframe = tempDiv.querySelector('iframe');
+  if (iframe) {
+    iframe.removeAttribute('width');
+    iframe.removeAttribute('height');
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
+    iframe.style.display = 'block'; // importante para que no se colapse
+  }
+
+  // Vaciar y añadir solo el iframe (no el div contenedor)
+  videoPlayer.innerHTML = '';
+  if (iframe) {
+    videoPlayer.appendChild(iframe);
+  } else {
+    // En caso que no sea iframe, poner el embed tal cual
+    videoPlayer.innerHTML = ep.embed;
+  }
+});
+
     episodeButtons.appendChild(btn);
   });
 
