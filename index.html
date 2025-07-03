@@ -285,6 +285,12 @@
     <!-- Directorio anime aquí -->
   </section>
 
+  <section id="player-section" class="hidden">
+  <h2 style="margin-bottom: 1rem;">Episode Player</h2>
+  <div id="episode-buttons" style="margin-bottom:1rem;"></div>
+  <div id="video-container"></div>
+</section>
+
   <!-- Nueva sección detalles anime -->
   <section id="anime-details">
     <button class="btn" id="back-to-list" style="margin-bottom:1rem;">← Back to list</button>
@@ -310,6 +316,35 @@
     const detailDescription = document.getElementById('detail-description');
     const episodeList = document.getElementById('episode-list');
     const videoPlayer = document.getElementById('video-player');
+
+    const playerSection = document.getElementById('player-section');
+const videoContainer = document.getElementById('video-container');
+const episodeButtons = document.getElementById('episode-buttons');
+
+function showEpisodes(episodes) {
+  playerSection.classList.remove('hidden');
+  episodeButtons.innerHTML = '';
+  videoContainer.innerHTML = '';
+
+  episodes.forEach(ep => {
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.textContent = `Episode ${ep.number}: ${ep.title}`;
+    btn.addEventListener('click', () => {
+      videoContainer.innerHTML = ep.embed;
+    });
+    episodeButtons.appendChild(btn);
+  });
+
+  // Mostrar primer episodio automáticamente
+  if (episodes[0]) {
+    videoContainer.innerHTML = episodes[0].embed;
+  }
+
+  // Scroll automático al reproductor
+  playerSection.scrollIntoView({ behavior: 'smooth' });
+}
+
 
     // Noticias hardcodeadas (pueden cambiarse)
     const newsData = [
@@ -346,28 +381,28 @@
 
     // Crear tarjetas anime en directorio
     function renderAnimes(animes) {
-      animeDirectory.innerHTML = '';
-      if(animes.length === 0) {
-        animeDirectory.innerHTML = '<p>No anime found.</p>';
-        return;
-      }
-      animes.forEach(a => {
-        const card = document.createElement('div');
-        card.className = 'anime-card';
-        card.innerHTML = `
-          <img src="${a.cover}" alt="${a.name}" />
-          <h3>${a.name}</h3>
-          <div class="info">
-            <div><strong>Genres:</strong> ${a.genre.join(', ')}</div>
-            <div><strong>Year:</strong> ${a.year}</div>
-            <div><strong>Rating:</strong> ${a.rating}</div>
-          </div>
-        `;
-        // Al hacer clic en tarjeta, mostrar detalles
-        card.addEventListener('click', () => showAnimeDetails(a));
-        animeDirectory.appendChild(card);
-      });
-    }
+  animeDirectory.innerHTML = '';
+  if(animes.length === 0) {
+    animeDirectory.innerHTML = '<p>No anime found.</p>';
+    return;
+  }
+  animes.forEach(a => {
+    const card = document.createElement('div');
+    card.className = 'anime-card';
+    card.innerHTML = `
+      <img src="${a.cover}" alt="${a.name}" />
+      <h3>${a.name}</h3>
+      <div class="info">
+        <div><strong>Genres:</strong> ${a.genre.join(', ')}</div>
+        <div><strong>Year:</strong> ${a.year}</div>
+        <div><strong>Rating:</strong> ${a.rating}</div>
+        ${a.description ? `<div><em>${a.description}</em></div>` : ''}
+        ${a.episodes ? `<button class="btn" onclick='showEpisodes(${JSON.stringify(a.episodes).replace(/'/g, "\\'")})'>Watch</button>` : ''}
+      </div>
+    `;
+    animeDirectory.appendChild(card);
+  });
+}
 
     // Cargar géneros únicos para filtros
     function loadGenres(animes) {
