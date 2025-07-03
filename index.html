@@ -107,16 +107,18 @@
   </footer>
 
   <script>
-    const total = 20;
-    for (let i = 0; i < total; i++) {
-      const petal = document.createElement("div");
-      petal.classList.add("petal");
-      petal.style.left = Math.random() * 100 + "vw";
-      petal.style.animationDuration = (5 + Math.random() * 5) + "s";
-      petal.style.animationDelay = Math.random() * 10 + "s";
-      document.body.appendChild(petal);
-    }
-  </script>
+  const isMobile = window.innerWidth < 768;
+  const total = isMobile ? 8 : 20;
+
+  for (let i = 0; i < total; i++) {
+    const petal = document.createElement("div");
+    petal.classList.add("petal");
+    petal.style.left = Math.random() * 100 + "vw";
+    petal.style.animationDuration = (5 + Math.random() * 5) + "s";
+    petal.style.animationDelay = Math.random() * 10 + "s";
+    document.body.appendChild(petal);
+  }
+</script>
 
 </body>
 </html>
