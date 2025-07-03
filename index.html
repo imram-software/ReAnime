@@ -1,11 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Mi sitio</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Re:Anime</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&family=Nunito:wght@300;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #ffdee9, #b5fffc);
+      min-height: 100vh;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Zen Tokyo Zoo', cursive;
+      font-size: 3.5rem;
+      color: #ff4ecd;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      margin-top: 2rem;
+      padding: 0.8rem 1.5rem;
+      background-color: #ff4ecd;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0 4px 15px rgba(255, 78, 205, 0.3);
+    }
+
+    .btn:hover {
+      background-color: #e633b2;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+
+    footer {
+      margin-top: 4rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
-  <h1>¡ola, snoy!</h1>
-  <p>Ola Pages.</p>
+
+  <h1>Re:Anime</h1>
+  <p>Your anime world.</p>
+
+  <button class="btn">Enter to the anime world ✨</button>
+
+  <footer>
+    © 2025 Re:Anime · Made with ♥ for anime fans
+  </footer>
+
 </body>
 </html>
