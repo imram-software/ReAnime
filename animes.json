@@ -12,5 +12,18 @@
     "genre": ["Isekai", "Fantasy", "Adventure"],
     "year": 2016,
     "rating": 9.0
+    "description": "Suddenly, high school student Subaru Natsuki has been taken to another world the moment he was leaving a store. With the biggest crisis of his life in another world, and with no sign of who called him, things get even worse when he is attacked by thugs. But when he is saved by a mysterious, silver-haired girl with a spirit cat, Subaru cooperates with her to return the favor.",
+    "episodes": [
+      {
+        "number": 1,
+        "title": "Episode 1",
+        "embed": "<iframe src='https://hqq.ac/e/NXFtRGN2YWtzRVBBVE9vRlI0UERLZz09' height='450' width='720' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 2,
+        "title": "Meeting with the witch",
+        "embed": "<div id='07b02207602203a02204305204e07806805406403006305907904d02207d' style='height:450px;width:720px'></div><script src='data:text/javascript;base64,...'></script>"
+      }
+    ]
   }
 ]
