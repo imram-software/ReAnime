@@ -2,15 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Re:Anime</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&family=Nunito:wght@300;700&display=swap" rel="stylesheet" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
     body {
       font-family: 'Nunito', sans-serif;
       background: linear-gradient(135deg, #ffe1f0, #caf0f8);
       min-height: 100vh;
+      overflow-x: hidden;
       padding-top: 60px;
       text-align: center;
     }
@@ -25,218 +28,144 @@
       color: #ff4ecd;
       z-index: 1000;
     }
-    .intro { height: 80vh; display: flex; flex-direction: column; justify-content: center; }
+    .hidden { display: none; }
+    .intro {
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
     .intro h1 {
       font-family: 'Zen Tokyo Zoo', cursive;
       font-size: 4rem;
       color: #ff79c6;
-      animation: glow 3s ease-in-out infinite;
+      text-shadow: 0 0 15px #ff9de5;
     }
     .btn {
-      background-color: #ff8fab;
-      border: none;
-      border-radius: 30px;
+      background: #ff8fab;
       color: white;
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
       padding: 0.9rem 2rem;
-      margin-top: 2rem;
-    }
-    .hidden { display: none; }
-
-    .news-section, .filter-section, .anime-directory, .anime-detail {
-      max-width: 900px; margin: 2rem auto;
-      padding: 0 1rem; text-align: left;
-    }
-
-    .news-item {
-      display: flex; gap: 1rem; background: white;
-      border-radius: 10px; padding: 1rem; margin-bottom: 1rem;
+      border-radius: 30px;
+      font-weight: bold;
+      border: none;
       cursor: pointer;
     }
-    .news-item img { width: 120px; height: 80px; border-radius: 8px; object-fit: cover; }
-    .news-item h3 { margin-bottom: 0.3rem; }
-
-    .filter-section {
-      display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+    .section {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
     }
-    #search-input {
-      flex: 1; padding: 0.5rem 1rem; font-size: 1rem;
-      border-radius: 30px; border: 1px solid #ccc;
-    }
-    .genre-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    .genre-filters label {
-      background: #ff8fab88;
-      padding: 0.3rem 0.8rem; border-radius: 20px;
-      cursor: pointer;
-    }
-    input[type="checkbox"]:checked + label {
-      background: #ff4ecd; color: white;
-    }
-
-    .anime-directory {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem;
-    }
-    .anime-card {
-      background: white; border-radius: 12px; overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      cursor: pointer; text-align: center;
-    }
-    .anime-card img { width: 100%; height: 220px; object-fit: cover; }
-    .anime-card h3 { padding: 0.5rem; }
-
-    .anime-detail {
+    .news-item, .anime-card, .anime-details, .episode-player {
       background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
       padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    .anime-detail h2 { color: #ff4ecd; }
-    .anime-detail .info { margin: 1rem 0; }
-    .anime-detail button {
-      margin: 0.3rem;
-      padding: 0.5rem 1rem;
-      background: #caf0f8;
+    .news-item img {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .anime-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .anime-card:hover { cursor: pointer; background: #fff7fc; }
+    .episode-list button {
+      margin: 0.2rem;
+      padding: 0.4rem 1rem;
       border: none;
       border-radius: 20px;
+      background: #ff8fab;
+      color: white;
       cursor: pointer;
-    }
-    .video-player { margin-top: 1rem; text-align: center; }
-    @keyframes glow {
-      0%,100% { text-shadow: 0 0 15px #ff9de5, 0 0 30px #ff4ecd; }
-      50% { text-shadow: 0 0 25px #ff79c6, 0 0 40px #ff2ea6; }
     }
   </style>
 </head>
 <body>
-
   <header>Re:Anime</header>
 
   <section class="intro" id="intro">
     <h1>Re:Anime</h1>
-    <p>Your ultimate anime world</p>
+    <p>Your ultimate anime world. Discover your next obsession.</p>
     <button class="btn" id="enter-btn">Enter the anime world ✨</button>
   </section>
 
-  <section class="news-section hidden" id="news-section">
-    <h2>Latest News</h2>
+  <section class="section hidden" id="news-section">
+    <h2>Latest Anime News</h2>
     <div id="news-list"></div>
   </section>
 
-  <section class="filter-section hidden" id="filter-section">
-    <input type="text" id="search-input" placeholder="Search anime...">
-    <div class="genre-filters" id="genre-filters"></div>
-  </section>
-
-  <section class="anime-directory hidden" id="anime-directory"></section>
-
-  <section class="anime-detail hidden" id="anime-detail"></section>
+  <section class="section hidden" id="anime-directory"></section>
+  <section class="section hidden" id="anime-details"></section>
+  <section class="section hidden" id="episode-player"></section>
 
   <script>
-    const intro = document.getElementById('intro');
-    const enterBtn = document.getElementById('enter-btn');
-    const newsSection = document.getElementById('news-section');
-    const filterSection = document.getElementById('filter-section');
-    const directory = document.getElementById('anime-directory');
-    const detail = document.getElementById('anime-detail');
-    const searchInput = document.getElementById('search-input');
-    const genreFilters = document.getElementById('genre-filters');
-
     const newsData = [
-      {
-        img: 'https://cdn.myanimelist.net/images/anime/5/17407.jpg',
-        title: 'Bleach: Thousand-Year Blood War Part 3 announced',
-        desc: 'The war continues this fall with new intense battles and secrets revealed.'
-      }
+      { img: 'https://cdn.myanimelist.net/images/anime/5/17407.jpg', title: 'Bleach Part 3', desc: 'Continues this fall with intense battles.' },
+      { img: 'https://cdn.myanimelist.net/images/anime/1517/135944.jpg', title: 'Demon Slayer Arc', desc: 'New arc confirmed with movie visuals.' }
     ];
 
-    let allAnimes = [];
+    const intro = document.getElementById('intro');
+    const newsSection = document.getElementById('news-section');
+    const animeDirectory = document.getElementById('anime-directory');
+    const animeDetails = document.getElementById('anime-details');
+    const episodePlayer = document.getElementById('episode-player');
 
-    enterBtn.onclick = () => {
+    document.getElementById('enter-btn').onclick = () => {
       intro.classList.add('hidden');
       newsSection.classList.remove('hidden');
-      filterSection.classList.remove('hidden');
-      directory.classList.remove('hidden');
+      animeDirectory.classList.remove('hidden');
       loadNews();
-
-      fetch('animes.json')
-        .then(res => res.json())
-        .then(data => {
-          allAnimes = data;
-          loadGenres(allAnimes);
-          renderAnimes(allAnimes);
-        });
+      fetch('animes.json').then(res => res.json()).then(data => renderAnimes(data));
     };
 
     function loadNews() {
-      const newsList = document.getElementById('news-list');
+      const list = document.getElementById('news-list');
       newsData.forEach(n => {
         const div = document.createElement('div');
         div.className = 'news-item';
-        div.innerHTML = `<img src="${n.img}"><div><h3>${n.title}</h3><p>${n.desc}</p></div>`;
-        div.onclick = () => alert(n.desc);
-        newsList.appendChild(div);
+        div.innerHTML = `<img src="${n.img}" alt=""><h3>${n.title}</h3><p>${n.desc}</p>`;
+        list.appendChild(div);
       });
     }
 
-    function renderAnimes(animes) {
-      directory.innerHTML = '';
-      animes.forEach(a => {
+    function renderAnimes(data) {
+      animeDirectory.innerHTML = '';
+      data.forEach(a => {
         const card = document.createElement('div');
         card.className = 'anime-card';
         card.innerHTML = `<img src="${a.cover}" alt=""><h3>${a.name}</h3>`;
-        card.onclick = () => showDetail(a);
-        directory.appendChild(card);
+        card.onclick = () => showAnimeDetails(a);
+        animeDirectory.appendChild(card);
       });
     }
 
-    function showDetail(a) {
-      detail.classList.remove('hidden');
-      detail.innerHTML = `
-        <h2>${a.name}</h2>
-        <div class="info">
-          <strong>Genres:</strong> ${a.genre.join(', ')}<br>
-          <strong>Year:</strong> ${a.year} |
-          <strong>Rating:</strong> ${a.rating}
-        </div>
-        <div><strong>Episodes:</strong></div>
-        ${a.episodes.map(ep => `<button onclick="showPlayer('${ep.video}')">${ep.title}</button>`).join('')}
-        <div class="video-player" id="video-player"></div>
-      `;
+    function showAnimeDetails(anime) {
+      animeDetails.innerHTML = `
+        <div class="anime-details">
+          <h2>${anime.name}</h2>
+          <p><strong>Genres:</strong> ${anime.genre.join(', ')}</p>
+          <p><strong>Year:</strong> ${anime.year}</p>
+          <p><strong>Rating:</strong> ${anime.rating}</p>
+          <p>${anime.description || ''}</p>
+          <div class="episode-list">
+            ${anime.episodes ? anime.episodes.map(e => `<button onclick='playEpisode(${JSON.stringify(e.embed)})'>${e.title}</button>`).join('') : ''}
+          </div>
+        </div>`;
+      animeDetails.classList.remove('hidden');
+      window.scrollTo(0, animeDetails.offsetTop - 60);
     }
 
-    function showPlayer(link) {
-      const player = document.getElementById('video-player');
-      player.innerHTML = `
-        <iframe src="${link}" width="720" height="450" frameborder="0" allowfullscreen></iframe>
-      `;
+    function playEpisode(embedCode) {
+      episodePlayer.innerHTML = `<div class="episode-player">${embedCode}</div>`;
+      episodePlayer.classList.remove('hidden');
+      window.scrollTo(0, episodePlayer.offsetTop - 60);
     }
-
-    function loadGenres(animes) {
-      const set = new Set();
-      animes.forEach(a => a.genre.forEach(g => set.add(g)));
-      set.forEach(g => {
-        const id = 'g-' + g;
-        genreFilters.innerHTML += `
-          <input type="checkbox" id="${id}" value="${g}" onchange="filterAnimes()">
-          <label for="${id}">${g}</label>
-        `;
-      });
-    }
-
-    function filterAnimes() {
-      const search = searchInput.value.toLowerCase();
-      const checked = Array.from(genreFilters.querySelectorAll('input:checked')).map(i => i.value);
-      const filtered = allAnimes.filter(a =>
-        a.name.toLowerCase().includes(search) &&
-        (checked.length === 0 || checked.some(g => a.genre.includes(g)))
-      );
-      renderAnimes(filtered);
-    }
-
-    searchInput.addEventListener('input', filterAnimes);
   </script>
-
 </body>
 </html>
