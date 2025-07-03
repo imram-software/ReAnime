@@ -4,14 +4,27 @@
     "cover": "https://cdn.myanimelist.net/images/anime/1565/111305.jpg",
     "genre": ["Action", "Adventure", "Shounen"],
     "year": 2007,
-    "rating": 8.2
+    "rating": 8.2,
+    "description": "Naruto returns to the village after two and a half years of training with Jiraiya to protect his home and friends from new threats.",
+    "episodes": [
+      {
+        "number": 1,
+        "title": "Homecoming",
+        "embed": "<iframe src='https://hqq.ac/e/sample1' height='450' width='720' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 2,
+        "title": "The Akatsuki's Threat",
+        "embed": "<iframe src='https://hqq.ac/e/sample2' height='450' width='720' frameborder='0' allowfullscreen></iframe>"
+      }
+    ]
   },
   {
     "name": "Re:Zero kara Hajimeru Isekai Seikatsu",
     "cover": "https://cdn.myanimelist.net/images/anime/1522/128039.jpg",
     "genre": ["Isekai", "Fantasy", "Adventure"],
     "year": 2016,
-    "rating": 9.0
+    "rating": 9.0,
     "description": "Suddenly, high school student Subaru Natsuki has been taken to another world the moment he was leaving a store. With the biggest crisis of his life in another world, and with no sign of who called him, things get even worse when he is attacked by thugs. But when he is saved by a mysterious, silver-haired girl with a spirit cat, Subaru cooperates with her to return the favor.",
     "episodes": [
       {
