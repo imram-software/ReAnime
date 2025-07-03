@@ -151,15 +151,15 @@
     }
 
     .petal {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      background: url('https://i.imgur.com/84ZyN4M.png') no-repeat center/contain;
-      animation: fall linear infinite;
-      opacity: 0.6;
-      pointer-events: none;
-      z-index: 1;
-    }
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: url('https://i.imgur.com/84ZyN4M.png') no-repeat center/contain;
+  animation: fall linear infinite;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 2000;
+}
 
     @keyframes fall {
       0% {
@@ -221,18 +221,24 @@
     }
 
     function startApp() {
-      const header = document.getElementById("main-header");
-      const intro = document.getElementById("intro");
-      const directory = document.getElementById("directory");
+  const header = document.getElementById("main-header");
+  const intro = document.getElementById("intro");
+  const directory = document.getElementById("directory");
+  const petals = document.querySelectorAll(".petal");
 
-      header.classList.add("show");
-      intro.style.opacity = 0;
+  header.classList.add("show");
+  intro.style.opacity = 0;
 
-      setTimeout(() => {
-        intro.classList.add("hidden");
-        directory.classList.add("visible");
-      }, 600);
-    }
+  // Bajamos z-index de pétalos para que queden detrás del header
+  petals.forEach(petal => {
+    petal.style.zIndex = "500";  // menos que el header(1000)
+  });
+
+  setTimeout(() => {
+    intro.classList.add("hidden");
+    directory.classList.add("visible");
+  }, 600);
+}
   </script>
 
 </body>
