@@ -2,24 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Re:Anime</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&family=Nunito:wght@300;700&display=swap" rel="stylesheet" />
   <style>
-    * {
-      margin: 0; padding: 0; box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Nunito', sans-serif;
       background: linear-gradient(135deg, #ffe1f0, #caf0f8);
       min-height: 100vh;
       overflow-x: hidden;
+      position: relative;
+      transition: background 1s ease;
       padding-top: 60px;
       text-align: center;
     }
     header {
-      position: fixed;
-      top: 0; left: 0; width: 100%;
+      position: fixed; top: 0; left: 0; width: 100%;
       background: #fff0fa;
       padding: 0.8rem 2rem;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -28,144 +27,235 @@
       color: #ff4ecd;
       z-index: 1000;
     }
-    .hidden { display: none; }
     .intro {
       height: 80vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      text-align: center;
+      padding: 0 1rem;
+      transition: opacity 0.6s ease;
     }
     .intro h1 {
       font-family: 'Zen Tokyo Zoo', cursive;
       font-size: 4rem;
       color: #ff79c6;
-      text-shadow: 0 0 15px #ff9de5;
+      text-shadow: 0 0 15px #ff9de5, 0 0 30px #ff4ecd;
+      animation: glow 3s ease-in-out infinite;
+      margin-bottom: 0.5rem;
+    }
+    .intro p {
+      font-size: 1.2rem;
+      color: #444;
+      margin-bottom: 2rem;
+      max-width: 600px;
     }
     .btn {
-      background: #ff8fab;
-      color: white;
-      padding: 0.9rem 2rem;
-      border-radius: 30px;
-      font-weight: bold;
+      background-color: #ff8fab;
       border: none;
+      border-radius: 30px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: bold;
       cursor: pointer;
+      padding: 0.9rem 2rem;
+      box-shadow: 0 0 15px #ff8fab80;
+      transition: 0.3s;
     }
-    .section {
+    .btn:hover {
+      background-color: #ff5e95;
+      transform: scale(1.05);
+    }
+    .hidden { display: none !important; opacity: 0 !important; }
+
+    .news-section, .filter-section, .anime-directory, .anime-details {
       max-width: 900px;
       margin: 2rem auto;
       padding: 0 1rem;
+      text-align: left;
     }
-    .news-item, .anime-card, .anime-details, .episode-player {
+    .news-item {
+      display: flex;
       background: white;
       border-radius: 12px;
+      padding: 1rem;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       margin-bottom: 1rem;
-      padding: 1rem;
+      gap: 1rem;
     }
     .news-item img {
-      width: 100%;
-      border-radius: 8px;
+      width: 120px; height: 80px; object-fit: cover; border-radius: 8px;
     }
-    .anime-card img {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-      border-radius: 8px;
+    .news-item h3 { margin-bottom: 0.3rem; color: #333; }
+    .news-item p { font-size: 0.9rem; color: #666; }
+
+    .filter-section { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+    #search-input {
+      flex: 1 1 200px;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 30px;
+      border: 1px solid #ddd;
     }
-    .anime-card:hover { cursor: pointer; background: #fff7fc; }
-    .episode-list button {
-      margin: 0.2rem;
-      padding: 0.4rem 1rem;
-      border: none;
+    .genre-filters { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .genre-filters label {
+      background: #ff8fab88;
+      padding: 0.3rem 0.8rem;
       border-radius: 20px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .genre-filters input[type="checkbox"]:checked + label {
+      background: #ff4ecd; color: white;
+    }
+
+    .anime-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      text-align: center;
+    }
+    .anime-card:hover { transform: scale(1.05); }
+    .anime-card img { width: 100%; height: 220px; object-fit: cover; }
+    .anime-card h3 { margin: 0.5rem 0; color: #333; }
+
+    .anime-details {
+      display: none;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 1rem;
+    }
+    .anime-details h2 { margin-bottom: 0.5rem; color: #ff4ecd; }
+    .anime-details p { margin-bottom: 1rem; }
+    .episode-list button {
+      margin: 0.3rem;
+      padding: 0.4rem 1rem;
       background: #ff8fab;
       color: white;
+      border: none;
+      border-radius: 10px;
       cursor: pointer;
+    }
+    #video-player iframe, #video-player div {
+      width: 100%; max-width: 720px; margin-top: 1rem;
+    }
+
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 15px #ff9de5, 0 0 30px #ff4ecd; }
+      50% { text-shadow: 0 0 25px #ff79c6, 0 0 40px #ff2ea6; }
     }
   </style>
 </head>
 <body>
   <header>Re:Anime</header>
-
   <section class="intro" id="intro">
     <h1>Re:Anime</h1>
-    <p>Your ultimate anime world. Discover your next obsession.</p>
+    <p>Your ultimate anime world.</p>
     <button class="btn" id="enter-btn">Enter the anime world ✨</button>
   </section>
-
-  <section class="section hidden" id="news-section">
-    <h2>Latest Anime News</h2>
-    <div id="news-list"></div>
+  <section class="news-section" id="news-section" style="display:none;"><h2>Latest Anime News</h2><div id="news-list"></div></section>
+  <section class="filter-section" id="filter-section" style="display:none;">
+    <input type="text" id="search-input" placeholder="Search anime by name..." />
+    <div class="genre-filters" id="genre-filters"></div>
   </section>
-
-  <section class="section hidden" id="anime-directory"></section>
-  <section class="section hidden" id="anime-details"></section>
-  <section class="section hidden" id="episode-player"></section>
+  <section class="anime-directory" id="anime-directory" style="display:none;"></section>
+  <section class="anime-details" id="anime-details"></section>
+  <div id="video-player"></div>
 
   <script>
-    const newsData = [
-      { img: 'https://cdn.myanimelist.net/images/anime/5/17407.jpg', title: 'Bleach Part 3', desc: 'Continues this fall with intense battles.' },
-      { img: 'https://cdn.myanimelist.net/images/anime/1517/135944.jpg', title: 'Demon Slayer Arc', desc: 'New arc confirmed with movie visuals.' }
-    ];
-
     const intro = document.getElementById('intro');
     const newsSection = document.getElementById('news-section');
+    const filterSection = document.getElementById('filter-section');
     const animeDirectory = document.getElementById('anime-directory');
     const animeDetails = document.getElementById('anime-details');
-    const episodePlayer = document.getElementById('episode-player');
+    const videoPlayer = document.getElementById('video-player');
+    const searchInput = document.getElementById('search-input');
+    const genreFilters = document.getElementById('genre-filters');
+    let allAnimes = [];
 
-    document.getElementById('enter-btn').onclick = () => {
+    document.getElementById('enter-btn').addEventListener('click', () => {
       intro.classList.add('hidden');
-      newsSection.classList.remove('hidden');
-      animeDirectory.classList.remove('hidden');
+      newsSection.style.display = 'block';
+      filterSection.style.display = 'flex';
+      animeDirectory.style.display = 'grid';
       loadNews();
-      fetch('animes.json').then(res => res.json()).then(data => renderAnimes(data));
-    };
+      fetch('animes.json')
+        .then(res => res.json())
+        .then(data => {
+          allAnimes = data;
+          loadGenres(data);
+          renderAnimes(data);
+        });
+    });
+
+    const newsData = [
+      { img: 'https://cdn.myanimelist.net/images/anime/5/17407.jpg', title: 'Bleach 2025', desc: 'New arc announced.' },
+      { img: 'https://cdn.myanimelist.net/images/anime/1517/135944.jpg', title: 'Demon Slayer Final Arc', desc: 'Ufotable te rompe el alma.' }
+    ];
 
     function loadNews() {
-      const list = document.getElementById('news-list');
+      const container = document.getElementById('news-list');
       newsData.forEach(n => {
         const div = document.createElement('div');
         div.className = 'news-item';
-        div.innerHTML = `<img src="${n.img}" alt=""><h3>${n.title}</h3><p>${n.desc}</p>`;
-        list.appendChild(div);
+        div.innerHTML = `<img src="${n.img}" alt="${n.title}"><div><h3>${n.title}</h3><p>${n.desc}</p></div>`;
+        container.appendChild(div);
       });
     }
 
-    function renderAnimes(data) {
+    function renderAnimes(list) {
       animeDirectory.innerHTML = '';
-      data.forEach(a => {
-        const card = document.createElement('div');
-        card.className = 'anime-card';
-        card.innerHTML = `<img src="${a.cover}" alt=""><h3>${a.name}</h3>`;
-        card.onclick = () => showAnimeDetails(a);
-        animeDirectory.appendChild(card);
+      list.forEach(a => {
+        const div = document.createElement('div');
+        div.className = 'anime-card';
+        div.innerHTML = `<img src="${a.cover}" alt="${a.name}"><h3>${a.name}</h3>`;
+        div.addEventListener('click', () => showAnimeDetails(a));
+        animeDirectory.appendChild(div);
       });
     }
 
     function showAnimeDetails(anime) {
+      animeDetails.style.display = 'block';
+      videoPlayer.innerHTML = '';
       animeDetails.innerHTML = `
-        <div class="anime-details">
-          <h2>${anime.name}</h2>
-          <p><strong>Genres:</strong> ${anime.genre.join(', ')}</p>
-          <p><strong>Year:</strong> ${anime.year}</p>
-          <p><strong>Rating:</strong> ${anime.rating}</p>
-          <p>${anime.description || ''}</p>
-          <div class="episode-list">
-            ${anime.episodes ? anime.episodes.map(e => `<button onclick='playEpisode(${JSON.stringify(e.embed)})'>${e.title}</button>`).join('') : ''}
-          </div>
+        <h2>${anime.name}</h2>
+        <p>${anime.description || 'No description available.'}</p>
+        <div class="episode-list">
+          ${anime.episodes ? anime.episodes.map(e => `<button onclick='playEpisode(${JSON.stringify(e.embed)})'>${e.title}</button>`).join('') : '<p>No episodes.</p>'}
         </div>`;
-      animeDetails.classList.remove('hidden');
-      window.scrollTo(0, animeDetails.offsetTop - 60);
     }
 
-    function playEpisode(embedCode) {
-      episodePlayer.innerHTML = `<div class="episode-player">${embedCode}</div>`;
-      episodePlayer.classList.remove('hidden');
-      window.scrollTo(0, episodePlayer.offsetTop - 60);
+    function playEpisode(embed) {
+      videoPlayer.innerHTML = embed;
+      videoPlayer.scrollIntoView({ behavior: 'smooth' });
     }
+
+    function loadGenres(animes) {
+      const genres = [...new Set(animes.flatMap(a => a.genre))];
+      genres.forEach(g => {
+        const id = 'g-' + g.toLowerCase().replace(/\s/g, '-');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = id; checkbox.value = g;
+        const label = document.createElement('label');
+        label.htmlFor = id; label.textContent = g;
+        genreFilters.appendChild(checkbox);
+        genreFilters.appendChild(label);
+        checkbox.addEventListener('change', filterAnimes);
+      });
+    }
+
+    function filterAnimes() {
+      const search = searchInput.value.toLowerCase();
+      const genres = [...genreFilters.querySelectorAll('input:checked')].map(i => i.value);
+      const filtered = allAnimes.filter(a => a.name.toLowerCase().includes(search) && (genres.length === 0 || genres.some(g => a.genre.includes(g))));
+      renderAnimes(filtered);
+    }
+    searchInput.addEventListener('input', filterAnimes);
   </script>
 </body>
 </html>
