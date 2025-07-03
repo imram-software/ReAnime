@@ -82,6 +82,16 @@
       box-shadow: 0 0 15px #ff8fab80;
     }
 
+    .petal {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/0b5e5900-19e6-4868-848a-0450a6ad8660/ddqm06r-400f18d7-1cd4-489e-9992-bcf7d6b239c6.png/v1/fill/w_839,h_953/sakura_petal_by_cryptickoi_ddqm06r-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9OTUzIiwicGF0aCI6IlwvZlwvMGI1ZTU5MDAtMTllNi00ODY4LTg0OGEtMDQ1MGE2YWQ4NjYwXC9kZHFtMDZyLTQwMGYxOGQ3LTFjZDQtNDg5ZS05OTkyLWJjZjdkNmIyMzljNi5wbmciLCJ3aWR0aCI6Ijw9ODM5In1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.aBsmucd991vidCDmlcjiWamsWIV0rVYa7Q76oK3U95A') no-repeat center/contain;
+  animation: fall linear infinite;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
     .btn:hover {
       background-color: #ff5e95;
       transform: scale(1.05);
@@ -146,16 +156,39 @@
 
   <header id="main-header">Re:Anime</header>
 
+  <!-- Intro con botón -->
   <section class="intro" id="intro">
     <h1>Re:Anime</h1>
-    <p>Your ultimate anime world. Discover your next obsession.</p>
+    <p>Your ultimate anime world.</p>
     <button class="btn" onclick="startApp()">Enter the anime world ✨</button>
   </section>
+
+  <!-- Contenido después de la intro -->
+  <section class="anime-directory" id="directory">...</section>
+
+  <!-- Footer (fuera de .intro) -->
+  <footer>
+    © 2025 Re:Anime · Made with ♥ by fans for fans
+  </footer>
+
+  <!-- Pétalos flotando -->
+  <script>
+    const isMobile = window.innerWidth < 768;
+    const total = isMobile ? 8 : 20;
+    for (let i = 0; i < total; i++) {
+      const petal = document.createElement("div");
+      petal.classList.add("petal");
+      petal.style.left = Math.random() * 100 + "vw";
+      petal.style.animationDuration = (6 + Math.random() * 5) + "s";
+      petal.style.animationDelay = Math.random() * 10 + "s";
+      document.body.appendChild(petal);
+    }
+  </script>
 
   <section class="anime-directory" id="directory">
     <!-- Example Anime Cards -->
     <div class="anime-card">
-      <img src="https://cdn.myanimelist.net/images/anime/10/47347.jpg" alt="Naruto">
+      <img src="https://cdn.myanimelist.net/images/anime/1565/111305.jpg" alt="Naruto: Shippuuden">
       <h3>Naruto</h3>
     </div>
     <div class="anime-card">
