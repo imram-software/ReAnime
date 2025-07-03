@@ -175,7 +175,7 @@
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       transition: transform 0.3s ease;
-      cursor: default;
+      cursor: pointer; /* changed to pointer so user knows it's clickable */
       text-align: center;
     }
     .anime-card:hover {
@@ -195,6 +195,57 @@
       font-size: 0.85rem;
       color: #666;
       padding-bottom: 0.8rem;
+    }
+
+    /* Sección detalles anime */
+    #anime-details {
+      max-width: 900px;
+      margin: 2rem auto 4rem;
+      background: white;
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: left;
+      display: none;
+    }
+    #anime-details h2 {
+      font-family: 'Zen Tokyo Zoo', cursive;
+      color: #ff4ecd;
+      margin-bottom: 0.5rem;
+    }
+    #anime-details p.description {
+      margin-bottom: 1rem;
+      color: #444;
+      font-size: 1rem;
+    }
+    #episode-list {
+      margin-bottom: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    #episode-list button {
+      background: #ff8fab;
+      border: none;
+      border-radius: 20px;
+      padding: 0.4rem 1rem;
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 0.3s;
+    }
+    #episode-list button:hover,
+    #episode-list button.active {
+      background: #ff4ecd;
+    }
+    #video-player {
+      width: 100%;
+      max-width: 720px;
+      height: 450px;
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 20px #ff4ecd88;
     }
     @keyframes glow {
       0%, 100% {
@@ -234,6 +285,15 @@
     <!-- Directorio anime aquí -->
   </section>
 
+  <!-- Nueva sección detalles anime -->
+  <section id="anime-details">
+    <button class="btn" id="back-to-list" style="margin-bottom:1rem;">← Back to list</button>
+    <h2 id="detail-name"></h2>
+    <p class="description" id="detail-description"></p>
+    <div id="episode-list"></div>
+    <div id="video-player"></div>
+  </section>
+
   <script>
     const enterBtn = document.getElementById('enter-btn');
     const intro = document.getElementById('intro');
@@ -243,7 +303,15 @@
     const searchInput = document.getElementById('search-input');
     const genreFilters = document.getElementById('genre-filters');
 
-    // Ejemplo de noticias hardcodeadas (podés cambiar o ampliar)
+    // Nueva variables para detalles y reproducción
+    const animeDetails = document.getElementById('anime-details');
+    const backToListBtn = document.getElementById('back-to-list');
+    const detailName = document.getElementById('detail-name');
+    const detailDescription = document.getElementById('detail-description');
+    const episodeList = document.getElementById('episode-list');
+    const videoPlayer = document.getElementById('video-player');
+
+    // Noticias hardcodeadas (pueden cambiarse)
     const newsData = [
       {
         img: 'https://cdn.myanimelist.net/images/anime/5/17407.jpg',
@@ -273,10 +341,10 @@
       });
     }
 
-    // Variables para animés (se cargarán de animes.json)
+    // Variables para animés
     let allAnimes = [];
 
-    // Función para crear tarjetas de anime en el directorio
+    // Crear tarjetas anime en directorio
     function renderAnimes(animes) {
       animeDirectory.innerHTML = '';
       if(animes.length === 0) {
@@ -295,11 +363,13 @@
             <div><strong>Rating:</strong> ${a.rating}</div>
           </div>
         `;
+        // Al hacer clic en tarjeta, mostrar detalles
+        card.addEventListener('click', () => showAnimeDetails(a));
         animeDirectory.appendChild(card);
       });
     }
 
-    // Función para cargar géneros únicos y crear filtros
+    // Cargar géneros únicos para filtros
     function loadGenres(animes) {
       const genresSet = new Set();
       animes.forEach(a => a.genre.forEach(g => genresSet.add(g)));
@@ -319,7 +389,6 @@
         genreFilters.appendChild(checkbox);
         genreFilters.appendChild(label);
 
-        // Evento para filtrar al cambiar filtros
         checkbox.addEventListener('change', filterAnimes);
       });
     }
@@ -341,17 +410,57 @@
     // Evento búsqueda en vivo
     searchInput.addEventListener('input', filterAnimes);
 
-    // Carga principal cuando entra a la app
+    // Función para mostrar detalles y episodios del anime
+    function showAnimeDetails(anime) {
+      intro.style.display = 'none';
+      newsSection.style.display = 'none';
+      filterSection.style.display = 'none';
+      animeDirectory.style.display = 'none';
+
+      animeDetails.style.display = 'block';
+      detailName.textContent = anime.name;
+      detailDescription.textContent = anime.description || 'No description available.';
+      episodeList.innerHTML = '';
+      videoPlayer.innerHTML = '';
+
+      if (anime.episodes && anime.episodes.length > 0) {
+        anime.episodes.forEach((ep, idx) => {
+          const btn = document.createElement('button');
+          btn.textContent = `${ep.number}. ${ep.title}`;
+          btn.addEventListener('click', () => {
+            // Limpiar active
+            [...episodeList.children].forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            videoPlayer.innerHTML = ep.embed;
+          });
+          episodeList.appendChild(btn);
+          // Auto click al primer episodio
+          if (idx === 0) btn.click();
+        });
+      } else {
+        episodeList.innerHTML = '<p>No episodes available.</p>';
+      }
+    }
+
+    // Botón para volver al listado
+    backToListBtn.addEventListener('click', () => {
+      animeDetails.style.display = 'none';
+      intro.style.display = 'none';
+      newsSection.style.display = 'block';
+      filterSection.style.display = 'flex';
+      animeDirectory.style.display = 'grid';
+      videoPlayer.innerHTML = '';
+    });
+
+    // Carga principal al entrar a la app
     enterBtn.addEventListener('click', () => {
       intro.classList.add('hidden');
       newsSection.style.display = 'block';
       filterSection.style.display = 'flex';
       animeDirectory.style.display = 'grid';
 
-      // Cargar noticias
       loadNews();
 
-      // Cargar animes desde JSON externo (debes subir animes.json en el mismo directorio)
       fetch('animes.json')
         .then(res => res.json())
         .then(data => {
