@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Naruto: Shippuuden",
+    "cover": "https://cdn.myanimelist.net/images/anime/1565/111305.jpg",
+    "genre": ["Action", "Adventure", "Shounen"],
+    "year": 2007,
+    "rating": 8.2
+  },
+  {
+    "name": "Re:Zero kara Hajimeru Isekai Seikatsu",
+    "cover": "https://cdn.myanimelist.net/images/anime/1522/128039.jpg",
+    "genre": ["Isekai", "Fantasy", "Adventure"],
+    "year": 2016,
+    "rating": 9.0
+  }
+]
