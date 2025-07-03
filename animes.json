@@ -1,20 +1,5 @@
 [
   {
-    "name": "Naruto: Shippuuden",
-    "cover": "https://cdn.myanimelist.net/images/anime/1565/111305.jpg",
-    "genre": ["Action", "Adventure", "Shounen"],
-    "year": 2007,
-    "rating": 8.2,
-    "description": "Naruto returns to the village after training to protect his home and friends.",
-    "episodes": [
-      {
-        "number": 1,
-        "title": "Homecoming",
-        "embed": "<iframe src='https://hqq.ac/e/sample1' height='800' width='600' frameborder='0' allowfullscreen></iframe>"
-      }
-    ]
-  },
-  {
     "name": "Re:Zero kara Hajimeru Isekai Seikatsu",
     "cover": "https://cdn.myanimelist.net/images/anime/1522/128039.jpg",
     "genre": ["Isekai", "Fantasy", "Adventure"],
@@ -25,7 +10,22 @@
       {
         "number": 1,
         "title": "Episode 1",
+        "embed": "<iframe src='https://streamtape.com/e/1jpB3aOw7dheOZm/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 2,
+        "title": "Episode 2",
         "embed": "<iframe src='https://streamtape.com/e/D0oOOY6yQRHkXY9/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 3,
+        "title": "Episode 3",
+        "embed": "<iframe src='https://streamtape.com/e/dV1ax3dJyBuQz4/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 4,
+        "title": "Episode 4",
+        "embed": "<iframe src='https://streamtape.com/e/84YGoYDjbWc6jX/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
       }
     ]
   }
