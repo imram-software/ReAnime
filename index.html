@@ -74,6 +74,44 @@
       display: none !important;
       opacity: 0 !important;
     }
+    /* Nueva estructura contenedora */
+.main-content {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  padding: 0 1rem;
+  gap: 1.5rem;
+}
+
+/* Filtro lateral */
+.sidebar {
+  width: 200px;
+  max-height: 500px;
+  overflow-y: auto;
+  background: #fff0fa;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Caja de búsqueda + directorio */
+.content-area {
+  flex: 1;
+}
+
+/* Ajustes a los filtros */
+.genre-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* Ajustar anime-directory para más columnas */
+.anime-directory {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
     /* Noticias */
     .news-section {
       max-width: 900px;
@@ -300,16 +338,20 @@
     </div>
   </section>
 
-  <section class="filter-section" id="filter-section" style="display:none;">
-    <input type="text" id="search-input" placeholder="Search anime by name..." />
+  <div class="main-content" id="filter-section" style="display:none;">
+  <aside class="sidebar">
+    <h3 style="margin-bottom: 0.5rem; color: #ff4ecd;">Genres</h3>
     <div class="genre-filters" id="genre-filters">
-      <!-- Checkboxes género cargados por JS -->
+      <!-- Géneros aquí -->
     </div>
+  </aside>
+  <section class="content-area">
+    <input type="text" id="search-input" placeholder="Search anime by name..." style="width: 100%; margin-bottom: 1rem;" />
+    <section class="anime-directory" id="anime-directory">
+      <!-- Animes aquí -->
+    </section>
   </section>
-
-  <section class="anime-directory" id="anime-directory" style="display:none;">
-    <!-- Directorio anime aquí -->
-  </section>
+</div>
 
   <script>
   const enterBtn = document.getElementById('enter-btn');
