@@ -444,17 +444,22 @@
 
     genres.forEach(genre => {
       const id = 'genre-' + genre.toLowerCase().replace(/\s/g, '-');
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.id = id;
-      checkbox.value = genre;
+      const wrapper = document.createElement('label');
+wrapper.className = 'genre-item';
 
-      const label = document.createElement('label');
-      label.htmlFor = id;
-      label.textContent = genre;
+const checkbox = document.createElement('input');
+checkbox.type = 'checkbox';
+checkbox.value = genre;
 
-      genreFilters.appendChild(checkbox);
-      genreFilters.appendChild(label);
+const span = document.createElement('span');
+span.textContent = genre;
+
+wrapper.appendChild(checkbox);
+wrapper.appendChild(span);
+genreFilters.appendChild(wrapper);
+
+checkbox.addEventListener('change', filterAnimes);
+
 
       checkbox.addEventListener('change', filterAnimes);
     });
