@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Redirecting...</title></head>
+<body>
+<p>Processing login...</p>
+<script>
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
+  const token = params.get("access_token");
+
+  if (token) {
+    fetch("https://discord.com/api/users/@me", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(user => {
+      // Guardar usuario en localStorage
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token);
+      window.location.href = "index.html";
+    })
+    .catch(() => {
+      alert("Falló el login con Discord.");
+      window.location.href = "index.html";
+    });
+  } else {
+    alert("No se recibió token.");
+    window.location.href = "index.html";
+  }
+</script>
+</body>
+</html>
