@@ -25,6 +25,9 @@
           return;
         }
 
+        // ✅ Cambiar el título del documento
+        document.title = anime.name;
+
         const container = document.getElementById('anime-detail');
         container.innerHTML = `
           <h1>${anime.name}</h1>
