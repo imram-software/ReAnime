@@ -387,6 +387,38 @@
 
   <header>Re:Anime</header>
 
+  <a id="login-btn" href="#">Login with Discord</a>
+
+<script>
+  const clientId = "1390810180823945350";
+  const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
+  const scope = "identify";
+  
+  document.getElementById("login-btn").href =
+    `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}`;
+</script>
+
+  <div id="user-info"></div>
+
+<script>
+  const userInfo = document.getElementById("user-info");
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (user) {
+    const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+    userInfo.innerHTML = `
+      <img src="${avatarUrl}" width="40" style="border-radius:50%;" />
+      <span>${user.username}#${user.discriminator}</span>
+      <button onclick="logout()">Cerrar sesión</button>
+    `;
+  }
+
+  function logout() {
+    localStorage.removeItem("user");
+    location.reload();
+  }
+</script>
+
   <section class="intro" id="intro">
     <h1>Re:Anime</h1>
     <p>Your ultimate anime world. Discover your next obsession, please note that this page is new and under development, we will be adding anime as we go along..</p>
