@@ -32,13 +32,29 @@
       transition: background 0.5s, color 0.5s;
     }
     footer {
-      margin-top: 4rem;
-      padding: 1rem;
-      background: #fff0fa;
-      color: #ff4ecd;
-      font-size: 0.9rem;
-      transition: background 0.5s, color 0.5s;
-    }
+  margin-top: 4rem;
+  padding: 1rem;
+  background: #fff0fa; /* color claro base */
+  color: #ff4ecd;
+  font-size: 0.9rem;
+  transition: background 0.5s, color 0.5s;
+}
+
+footer .footer-link {
+  color: #ff79c6;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.5s;
+}
+
+body.dark footer {
+  background: #1e1e1e;
+  color: #eee;
+}
+
+body.dark footer .footer-link {
+  color: #ff79c6; /* puedes cambiar si quieres otro color para links en oscuro */
+}
     body.dark {
       background: linear-gradient(135deg, #2b2b2b, #444);
       color: #eee;
@@ -863,9 +879,9 @@ function renderAnimes(animes) {
   }
 </script>
 
- <footer style="margin-top: 4rem; padding: 1rem; background: #fff0fa; color: #ff4ecd; font-size: 0.9rem;">
+ <footer>
   © 2025 Re:Anime - All Rights Reserved. <br />
-  A project by <a href="https://discord.com/users/781172416218136577" target="_blank" style="color: #ff79c6; text-decoration: none; font-weight: bold;">Ream</a>.
+  A project by <a href="https://discord.com/users/781172416218136577" target="_blank" class="footer-link">Ream</a>.
 </footer>
 </body>
 </html>
