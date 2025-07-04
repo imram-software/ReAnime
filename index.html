@@ -441,6 +441,11 @@
     const data = await res.json();
 
     newsList.innerHTML = '';
+
+    if (!data || !Array.isArray(data.data)) {
+      throw new Error("No news data found");
+    }
+
     data.data.slice(0, 5).forEach(n => {
       const div = document.createElement('div');
       div.classList.add('news-item');
