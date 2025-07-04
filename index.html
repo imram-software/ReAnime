@@ -428,29 +428,30 @@
     renderAnimes(filtered);
   }
 
-  // Renderizado del directorio de animes
-  function renderAnimes(animes) {
-    animeDirectory.innerHTML = '';
-    if (animes.length === 0) {
-      animeDirectory.innerHTML = '<p>No anime found.</p>';
-      return;
-    }
+ <!-- Dentro del script ya incluido -->
+function renderAnimes(animes) {
+  animeDirectory.innerHTML = '';
+  if (animes.length === 0) {
+    animeDirectory.innerHTML = '<p>No anime found.</p>';
+    return;
+  }
 
-    animes.forEach(a => {
-      const card = document.createElement('div');
-      card.className = 'anime-card';
-      card.innerHTML = `
-        <div class="image-container">
-          <img src="${a.cover}" alt="${a.name}" />
-          <div class="anime-title-overlay">${a.name}</div>
-        </div>
-      `;
-      card.addEventListener('click', () => {
-        showAnimeDetails(a);
-      });
-
-      animeDirectory.appendChild(card);
+  animes.forEach(a => {
+    const card = document.createElement('div');
+    card.className = 'anime-card';
+    card.innerHTML = `
+      <div class="image-container">
+        <img src="${a.cover}" alt="${a.name}" />
+        <div class="anime-title-overlay">${a.name}</div>
+      </div>
+    `;
+    card.addEventListener('click', () => {
+      // Redirige a anime.html
+      window.location.href = `anime.html?id=${encodeURIComponent(a.id)}`;
     });
+
+    animeDirectory.appendChild(card);
+  });
   }
 
   // Mostrar detalles de un anime y su lista de episodios
