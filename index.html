@@ -186,6 +186,31 @@
       height: 220px;
       object-fit: cover;
     }
+    .anime-card .image-container {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.anime-card .image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.anime-card .anime-title-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 0.5rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.95rem;
+  text-shadow: 0 0 5px rgba(0,0,0,0.6);
+}
     .anime-card h3 {
       margin: 0.5rem 0 0.3rem;
       font-size: 1rem;
@@ -412,15 +437,11 @@ animes.forEach(a => {
   const card = document.createElement('div');
   card.className = 'anime-card';
   card.innerHTML = `
+  <div class="image-container">
     <img src="${a.cover}" alt="${a.name}" />
-    <h3>${a.name}</h3>
-    <div class="info">
-      <div><strong>Genres:</strong> ${a.genre.join(', ')}</div>
-      <div><strong>Year:</strong> ${a.year}</div>
-      <div><strong>Rating:</strong> ${a.rating}</div>
-      ${a.description ? `<div><em>${a.description}</em></div>` : ''}
-    </div>
-  `;
+    <div class="anime-title-overlay">${a.name}</div>
+  </div>
+`;
   // 👉 Evento para mostrar detalles al hacer clic en la tarjeta
   card.addEventListener('click', () => showAnimeDetails(a));
   animeDirectory.appendChild(card);
