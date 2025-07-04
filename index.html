@@ -502,16 +502,19 @@ function renderAnimes(animes) {
         loadGenres(allAnimes);
 
         // Si hay id de anime en URL, mostrar detalles directo
-        if (animeIdFromURL) {
-          const anime = allAnimes.find(a => a.id === animeIdFromURL);
-          if (anime) {
-            showAnimeDetails(anime);
-          } else {
-            renderAnimes(allAnimes);
-          }
-        } else {
-          renderAnimes(allAnimes);
-        }
+       if (animeIdFromURL) {
+  const anime = allAnimes.find(a => a.id === animeIdFromURL);
+  if (anime) {
+    showAnimeDetails(anime);
+  } else {
+    renderAnimes(allAnimes);
+  }
+} else if (genreFromURL) {
+  // Ya se marcaron los checkboxes en loadGenres, solo aplicamos el filtro
+  filterAnimes();
+} else {
+  renderAnimes(allAnimes);
+}
 
         // Si hay género en URL y no hay id, se filtró en loadGenres
       })
