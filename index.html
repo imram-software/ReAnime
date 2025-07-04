@@ -327,78 +327,36 @@
   </section>
 
   <script>
-    const enterBtn = document.getElementById('enter-btn');
-    const intro = document.getElementById('intro');
-    const newsSection = document.getElementById('news-section');
-    const filterSection = document.getElementById('filter-section');
-    const animeDirectory = document.getElementById('anime-directory');
-    const searchInput = document.getElementById('search-input');
-    const genreFilters = document.getElementById('genre-filters');
+  const enterBtn = document.getElementById('enter-btn');
+  const intro = document.getElementById('intro');
+  const newsSection = document.getElementById('news-section');
+  const filterSection = document.getElementById('filter-section');
+  const animeDirectory = document.getElementById('anime-directory');
+  const searchInput = document.getElementById('search-input');
+  const genreFilters = document.getElementById('genre-filters');
 
-    // Nueva variables para detalles y reproducción
-    const animeDetails = document.getElementById('anime-details');
-    const backToListBtn = document.getElementById('back-to-list');
-    const detailName = document.getElementById('detail-name');
-    const detailDescription = document.getElementById('detail-description');
-    const episodeList = document.getElementById('episode-list');
-    const videoPlayer = document.getElementById('video-player');
+  // Variables para detalles y reproducción
+  const animeDetails = document.getElementById('anime-details');
+  const backToListBtn = document.getElementById('back-to-list');
+  const detailName = document.getElementById('detail-name');
+  const detailDescription = document.getElementById('detail-description');
+  const episodeList = document.getElementById('episode-list');
+  const videoPlayer = document.getElementById('video-player');
 
-    const playerSection = document.getElementById('player-section');
-const videoContainer = document.getElementById('video-container');
-const episodeButtons = document.getElementById('episode-buttons');
+  // Variables para el reproductor y botones episodios
+  const playerSection = document.getElementById('player-section');
+  const videoContainer = document.getElementById('video-container');
+  const episodeButtons = document.getElementById('episode-buttons');
 
-function showEpisodes(episodes) {
-  playerSection.classList.remove('hidden');
-  episodeButtons.innerHTML = '';
-  videoContainer.innerHTML = '';
+  // Parámetros URL para filtrar género o id anime
+  const urlParams = new URLSearchParams(window.location.search);
+  const genreFromURL = urlParams.get('genre');
+  const animeIdFromURL = urlParams.get('id');
 
-  episodes.forEach(ep => {
-    const btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.textContent = `Episode ${ep.number}: ${ep.title}`;
-    btn.addEventListener('click', () => {
-  // Limpiar active
-  [...episodeList.children].forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  
-  // Crear un contenedor temporal para el embed
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = ep.embed;
+  let allAnimes = [];
 
-  const iframe = tempDiv.querySelector('iframe');
-  if (iframe) {
-    iframe.removeAttribute('width');
-    iframe.removeAttribute('height');
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.style.border = 'none';
-    iframe.style.display = 'block'; // importante para que no se colapse
-  }
-
-  // Vaciar y añadir solo el iframe (no el div contenedor)
-  videoPlayer.innerHTML = '';
-  if (iframe) {
-    videoPlayer.appendChild(iframe);
-  } else {
-    // En caso que no sea iframe, poner el embed tal cual
-    videoPlayer.innerHTML = ep.embed;
-  }
-});
-
-    episodeButtons.appendChild(btn);
-  });
-
-  // Mostrar primer episodio automáticamente
-  if (episodes[0]) {
-    videoContainer.innerHTML = episodes[0].embed;
-  }
-
-  // Scroll automático al reproductor
-  playerSection.scrollIntoView({ behavior: 'smooth' });
-}
-
-
-    // Noticias hardcodeadas (pueden cambiarse)
+  // Carga de noticias hardcodeadas
+  function loadNews() {
     const newsData = [
       {
         img: 'https://wallpapercave.com/wp/wp6320901.png',
@@ -406,176 +364,208 @@ function showEpisodes(episodes) {
         desc: 'Re:Anime is open for everyone, this page to watch anime without ads opens its doors!'
       }
     ];
-
-    // Función para cargar noticias en el DOM
-    function loadNews() {
-      newsData.forEach(n => {
-        const div = document.createElement('div');
-        div.classList.add('news-item');
-        div.innerHTML = `
-          <img src="${n.img}" alt="${n.title}" />
-          <div>
-            <h3>${n.title}</h3>
-            <p>${n.desc}</p>
-          </div>
-        `;
-        document.getElementById('news-list').appendChild(div);
-      });
-    }
-
-    // Variables para animés
-    let allAnimes = [];
-
-    // Crear tarjetas anime en directorio
-    function renderAnimes(animes) {
-  animeDirectory.innerHTML = '';
-  if (animes.length === 0) {
-    animeDirectory.innerHTML = '<p>No anime found.</p>';
-    return;
+    const newsList = document.getElementById('news-list');
+    newsList.innerHTML = '';
+    newsData.forEach(n => {
+      const div = document.createElement('div');
+      div.classList.add('news-item');
+      div.innerHTML = `
+        <img src="${n.img}" alt="${n.title}" />
+        <div>
+          <h3>${n.title}</h3>
+          <p>${n.desc}</p>
+        </div>
+      `;
+      newsList.appendChild(div);
+    });
   }
 
-  animes.forEach(a => {
-    const card = document.createElement('div');
-    card.className = 'anime-card';
-    card.innerHTML = `
-      <div class="image-container">
-        <img src="${a.cover}" alt="${a.name}" />
-        <div class="anime-title-overlay">${a.name}</div>
-      </div>
-    `;
-    card.addEventListener('click', () => {
-      window.location.href = `anime.html?id=${encodeURIComponent(a.id)}`;
+  // Carga y renderizado de géneros únicos en filtro
+  function loadGenres(animes) {
+    genreFilters.innerHTML = '';
+    const genresSet = new Set();
+    animes.forEach(a => a.genre.forEach(g => genresSet.add(g)));
+    const genres = Array.from(genresSet).sort();
+
+    genres.forEach(genre => {
+      const id = 'genre-' + genre.toLowerCase().replace(/\s/g, '-');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = id;
+      checkbox.value = genre;
+
+      const label = document.createElement('label');
+      label.htmlFor = id;
+      label.textContent = genre;
+
+      genreFilters.appendChild(checkbox);
+      genreFilters.appendChild(label);
+
+      checkbox.addEventListener('change', filterAnimes);
     });
 
-    animeDirectory.appendChild(card);
-  });
-
-}
-
-    // Cargar géneros únicos para filtros
-    function loadGenres(animes) {
-      const genresSet = new Set();
-      animes.forEach(a => a.genre.forEach(g => genresSet.add(g)));
-      const genres = Array.from(genresSet).sort();
-
-      genres.forEach(genre => {
-        const id = 'genre-' + genre.toLowerCase().replace(/\s/g, '-');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = id;
-        checkbox.value = genre;
-
-        const label = document.createElement('label');
-        label.htmlFor = id;
-        label.textContent = genre;
-
-        genreFilters.appendChild(checkbox);
-        genreFilters.appendChild(label);
-
-        checkbox.addEventListener('change', filterAnimes);
-      });
-    }
-
-    // Filtrado por búsqueda y géneros
-    function filterAnimes() {
-      const searchTerm = searchInput.value.toLowerCase();
-      const checkedGenres = Array.from(genreFilters.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
-
-      const filtered = allAnimes.filter(a => {
-        const matchName = a.name.toLowerCase().includes(searchTerm);
-        const matchGenre = checkedGenres.length === 0 || checkedGenres.some(g => a.genre.includes(g));
-        return matchName && matchGenre;
-      });
-
-      renderAnimes(filtered);
-    }
-
-    // Evento búsqueda en vivo
-    searchInput.addEventListener('input', filterAnimes);
-
-    // Función para mostrar detalles y episodios del anime
-    function showAnimeDetails(anime) {
-      intro.style.display = 'none';
-      newsSection.style.display = 'none';
-      filterSection.style.display = 'none';
-      animeDirectory.style.display = 'none';
-
-      animeDetails.style.display = 'block';
-      detailName.textContent = anime.name;
-      detailDescription.textContent = anime.description || 'No description available.';
-      episodeList.innerHTML = '';
-      videoPlayer.innerHTML = '';
-
-      if (anime.episodes && anime.episodes.length > 0) {
-        anime.episodes.forEach((ep, idx) => {
-          const btn = document.createElement('button');
-          btn.textContent = `${ep.number}. ${ep.title}`;
-          btn.addEventListener('click', () => {
-  [...episodeList.children].forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = ep.embed;
-
-  const iframe = tempDiv.querySelector('iframe');
-  if (iframe) {
-    iframe.removeAttribute('width');
-    iframe.removeAttribute('height');
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.style.border = 'none';
-    iframe.style.display = 'block';
-  }
-
-  videoPlayer.innerHTML = '';
-  if (iframe) {
-    videoPlayer.appendChild(iframe);
-  } else {
-    videoPlayer.innerHTML = ep.embed;
-  }
-});
-
-          episodeList.appendChild(btn);
-          // Auto click al primer episodio
-          if (idx === 0) btn.click();
-        });
-      } else {
-        episodeList.innerHTML = '<p>No episodes available.</p>';
+    // Si venimos desde la URL con un género, marcarlo y filtrar
+    if (genreFromURL) {
+      const cb = [...genreFilters.querySelectorAll('input')].find(el => el.value.toLowerCase() === decodeURIComponent(genreFromURL).toLowerCase());
+      if (cb) {
+        cb.checked = true;
+        filterAnimes();
       }
     }
+  }
 
-    // Botón para volver al listado
-    backToListBtn.addEventListener('click', () => {
-      animeDetails.style.display = 'none';
-      intro.style.display = 'none';
-      newsSection.style.display = 'block';
-      filterSection.style.display = 'flex';
-      animeDirectory.style.display = 'grid';
-      videoPlayer.innerHTML = '';
+  // Filtrado por búsqueda y géneros
+  function filterAnimes() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const checkedGenres = Array.from(genreFilters.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+
+    const filtered = allAnimes.filter(a => {
+      const matchName = a.name.toLowerCase().includes(searchTerm);
+      const matchGenre = checkedGenres.length === 0 || checkedGenres.some(g => a.genre.includes(g));
+      return matchName && matchGenre;
     });
 
-    // Carga principal al entrar a la app
-    enterBtn.addEventListener('click', () => {
-      intro.classList.add('hidden');
-      newsSection.style.display = 'block';
-      filterSection.style.display = 'flex';
-      animeDirectory.style.display = 'grid';
+    renderAnimes(filtered);
+  }
 
-      loadNews();
+  // Renderizado del directorio de animes
+  function renderAnimes(animes) {
+    animeDirectory.innerHTML = '';
+    if (animes.length === 0) {
+      animeDirectory.innerHTML = '<p>No anime found.</p>';
+      return;
+    }
 
-      fetch('animes.json')
-        .then(res => res.json())
-        .then(data => {
-          allAnimes = data;
-          loadGenres(allAnimes);
-          renderAnimes(allAnimes);
-        })
-        .catch(err => {
-          console.error('Failed to load animes.json', err);
-          animeDirectory.innerHTML = '<p>Failed to load anime data.</p>';
+    animes.forEach(a => {
+      const card = document.createElement('div');
+      card.className = 'anime-card';
+      card.innerHTML = `
+        <div class="image-container">
+          <img src="${a.cover}" alt="${a.name}" />
+          <div class="anime-title-overlay">${a.name}</div>
+        </div>
+      `;
+      card.addEventListener('click', () => {
+        showAnimeDetails(a);
+      });
+
+      animeDirectory.appendChild(card);
+    });
+  }
+
+  // Mostrar detalles de un anime y su lista de episodios
+  function showAnimeDetails(anime) {
+    intro.style.display = 'none';
+    newsSection.style.display = 'none';
+    filterSection.style.display = 'none';
+    animeDirectory.style.display = 'none';
+
+    animeDetails.style.display = 'block';
+    detailName.textContent = anime.name;
+    detailDescription.textContent = anime.description || 'No description available.';
+    episodeList.innerHTML = '';
+    videoPlayer.innerHTML = '';
+
+    if (anime.episodes && anime.episodes.length > 0) {
+      anime.episodes.forEach((ep, idx) => {
+        const btn = document.createElement('button');
+        btn.textContent = `${ep.number}. ${ep.title}`;
+        btn.addEventListener('click', () => {
+          // Limpiar active
+          [...episodeList.children].forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = ep.embed;
+
+          const iframe = tempDiv.querySelector('iframe');
+          if (iframe) {
+            iframe.removeAttribute('width');
+            iframe.removeAttribute('height');
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            iframe.style.display = 'block';
+          }
+
+          videoPlayer.innerHTML = '';
+          if (iframe) {
+            videoPlayer.appendChild(iframe);
+          } else {
+            videoPlayer.innerHTML = ep.embed;
+          }
         });
+
+        episodeList.appendChild(btn);
+        // Auto click al primer episodio
+        if (idx === 0) btn.click();
+      });
+    } else {
+      episodeList.innerHTML = '<p>No episodes available.</p>';
+    }
+  }
+
+  // Botón para volver al listado principal
+  backToListBtn.addEventListener('click', () => {
+    animeDetails.style.display = 'none';
+    intro.style.display = 'none';
+    newsSection.style.display = 'block';
+    filterSection.style.display = 'flex';
+    animeDirectory.style.display = 'grid';
+    videoPlayer.innerHTML = '';
+  });
+
+  // Carga inicial de la app
+  function loadApp(skipIntro = false) {
+    if (!skipIntro) {
+      intro.classList.add('hidden');
+    } else {
+      intro.style.display = 'none';
+    }
+    newsSection.style.display = 'block';
+    filterSection.style.display = 'flex';
+    animeDirectory.style.display = 'grid';
+
+    loadNews();
+
+    fetch('animes.json')
+      .then(res => res.json())
+      .then(data => {
+        allAnimes = data;
+        loadGenres(allAnimes);
+
+        // Si hay id de anime en URL, mostrar detalles directo
+        if (animeIdFromURL) {
+          const anime = allAnimes.find(a => a.id === animeIdFromURL);
+          if (anime) {
+            showAnimeDetails(anime);
+          } else {
+            renderAnimes(allAnimes);
+          }
+        } else {
+          renderAnimes(allAnimes);
+        }
+
+        // Si hay género en URL y no hay id, se filtró en loadGenres
+      })
+      .catch(err => {
+        console.error('Failed to load animes.json', err);
+        animeDirectory.innerHTML = '<p>Failed to load anime data.</p>';
+      });
+  }
+
+  // Eventos
+  searchInput.addEventListener('input', filterAnimes);
+
+  if (genreFromURL || animeIdFromURL) {
+    loadApp(true);
+  } else {
+    enterBtn.addEventListener('click', () => {
+      loadApp();
     });
-  </script>
+  }
+</script>
+
  <footer style="margin-top: 4rem; padding: 1rem; background: #fff0fa; color: #ff4ecd; font-size: 0.9rem;">
   © 2025 Re:Anime - All Rights Reserved. <br />
   A project by <a href="https://discord.com/users/781172416218136577" target="_blank" style="color: #ff79c6; text-decoration: none; font-weight: bold;">Ream</a>.
