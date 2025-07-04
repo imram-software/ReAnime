@@ -102,6 +102,28 @@
       font-size: 1rem;
       color: #333;
     }
+    @media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-height: none;
+    border-right: none;
+    border-top: 2px solid #ffe0ef;
+    padding-top: 1rem;
+    padding-right: 0;
+  }
+
+  #video-container {
+    width: 100%;
+  }
+
+  iframe {
+    height: 250px;
+  }
+}
   </style>
 </head>
 <body>
