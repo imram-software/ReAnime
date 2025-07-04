@@ -1,0 +1,5 @@
+const userId = user.id;
+let userData = JSON.parse(localStorage.getItem(`userdata_${userId}`)) || {
+  watching: [],
+  ratings: {},
+};
