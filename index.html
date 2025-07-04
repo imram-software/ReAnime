@@ -437,16 +437,17 @@ animes.forEach(a => {
   const card = document.createElement('div');
   card.className = 'anime-card';
   card.innerHTML = `
-  <div class="image-container">
-    <img src="${a.cover}" alt="${a.name}" />
-    <div class="anime-title-overlay">${a.name}</div>
-  </div>
-`;
-  // 👉 Evento para mostrar detalles al hacer clic en la tarjeta
+    <div class="image-container">
+      <img src="${a.cover}" alt="${a.name}" />
+      <div class="anime-title-overlay">${a.name}</div>
+    </div>
+  `;
   card.addEventListener('click', () => {
-  window.location.href = `anime.html?id=${encodeURIComponent(a.id)}`;
+    window.location.href = `anime.html?id=${encodeURIComponent(a.id)}`;
+  });
+
+  animeDirectory.appendChild(card); // también asegurate de agregarlo al DOM
 });
-}
 
     // Cargar géneros únicos para filtros
     function loadGenres(animes) {
