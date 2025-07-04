@@ -381,70 +381,6 @@
     justify-content: flex-start;
   }
 }
-    .hero-news-carousel {
-  position: relative;
-  max-width: 100%;
-  height: 360px;
-  overflow: hidden;
-  border-radius: 12px;
-  margin: 2rem auto;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
-}
-
-.hero-news-carousel .slide {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-size: cover;
-  background-position: center;
-  transition: opacity 1s ease;
-  opacity: 0;
-}
-
-.hero-news-carousel .slide.active {
-  opacity: 1;
-  z-index: 1;
-}
-
-.hero-news-carousel .overlay {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  padding: 2rem;
-  background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
-  color: white;
-  text-align: center;
-}
-
-.hero-news-carousel .overlay h3 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-}
-
-.hero-news-carousel .overlay p {
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  max-width: 700px;
-  margin: 0 auto 1rem;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
-}
-
-.hero-news-carousel .overlay a {
-  display: inline-block;
-  background: #ff4ecd;
-  color: white;
-  font-weight: bold;
-  padding: 0.6rem 1.5rem;
-  border-radius: 30px;
-  text-decoration: none;
-  transition: background 0.3s;
-}
-
-.hero-news-carousel .overlay a:hover {
-  background: #ff79c6;
-}
   </style>
 </head>
 <body>
@@ -457,9 +393,12 @@
     <button class="btn" id="enter-btn">Enter the anime world.</button>
   </section>
 
-  <section class="hero-news-carousel" id="news-carousel" style="display: none;">
-  <!-- Los slides se insertarán por JS -->
-</section>
+  <section class="news-section" id="news-section" style="display:none;">
+    <h2>Latest Anime News</h2>
+    <div id="news-list">
+      <!-- Noticias se cargarán aquí -->
+    </div>
+  </section>
 
   <div class="main-content" id="filter-section" style="display:none;">
   <aside class="sidebar">
@@ -493,65 +432,72 @@
   let allAnimes = [];
 
   async function loadAniListNews() {
-  const carousel = document.getElementById('news-carousel');
-  carousel.innerHTML = '<p style="color:white;">Cargando noticias...</p>';
+  const newsList = document.getElementById('news-list');
+  newsList.innerHTML = '<p>Loading AniList news...</p>';
 
   const query = `
-    query ($page: Int, $perPage: Int) {
-      Page(page: $page, perPage: $perPage) {
-        media(sort: START_DATE_DESC, type: ANIME) {
-          id
-          title { romaji english }
-          coverImage { large }
-          description(asHtml: false)
-          siteUrl
+  query ($page: Int, $perPage: Int) {
+    Page(page: $page, perPage: $perPage) {
+      media(sort: START_DATE_DESC, type: ANIME) {
+        id
+        title {
+          romaji
+          english
         }
+        coverImage {
+          large
+        }
+        startDate {
+          year
+          month
+          day
+        }
+        description(asHtml: false)
+        siteUrl
       }
     }
+  }
   `;
 
   try {
     const res = await fetch('https://graphql.anilist.co', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, variables: { page: 1, perPage: 6 } })
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        query: query,
+        variables: { page: 1, perPage: 3 }
+      })
     });
 
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
     const data = await res.json();
-    carousel.innerHTML = '';
+    newsList.innerHTML = '';
 
-    data.data.Page.media.forEach((anime, idx) => {
-      const slide = document.createElement('div');
-      slide.className = 'news-slide';
-      if (idx === 0) slide.classList.add('active');
-
-      slide.style.backgroundImage = `url(${anime.coverImage.large})`;
-      slide.innerHTML = `
-        <h2>${anime.title.english || anime.title.romaji}</h2>
-        <p>${anime.description ? anime.description.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 180) + '...' : 'No description available.'}</p>
-        <a href="${anime.siteUrl}" target="_blank">Read more</a>
+    data.data.Page.media.forEach(anime => {
+      const div = document.createElement('div');
+      div.classList.add('news-item');
+      div.innerHTML = `
+        <a href="${anime.siteUrl}" target="_blank" rel="noopener noreferrer" style="display:flex; gap:1rem; align-items:center; text-decoration:none; color:inherit;">
+          <img src="${anime.coverImage.large}" alt="${anime.title.romaji}" />
+          <div>
+            <h3>${anime.title.english || anime.title.romaji}</h3>
+            <p>${anime.description ? anime.description.slice(0, 120) + '...' : 'No description.'}</p>
+            <small>Start Date: ${anime.startDate.year || '?'}-${anime.startDate.month || '?'}-${anime.startDate.day || '?'}</small>
+          </div>
+        </a>
       `;
-
-      carousel.appendChild(slide);
+      newsList.appendChild(div);
     });
-
-    // Activar carrusel
-    let index = 0;
-    const slides = document.querySelectorAll('.news-slide');
-    setInterval(() => {
-      slides[index].classList.remove('active');
-      index = (index + 1) % slides.length;
-      slides[index].classList.add('active');
-    }, 7000);
-
-    carousel.style.display = 'block';
   } catch (err) {
-    console.error('Error al cargar noticias AniList:', err);
-    carousel.innerHTML = '<p>No se pudieron cargar las noticias.</p>';
+    console.error('Failed to load AniList news', err);
+    newsList.innerHTML = '<p>Could not load AniList news at the moment.</p>';
   }
 }
+
 
   // Carga y renderizado de géneros únicos en filtro
   function loadGenres(animes) {
@@ -695,7 +641,7 @@ function renderAnimes(animes) {
     } else {
       intro.style.display = 'none';
     }
-    document.getElementById('news-carousel').style.display = 'block';
+    newsSection.style.display = 'block';
     filterSection.style.display = 'flex';
     animeDirectory.style.display = 'grid';
 
