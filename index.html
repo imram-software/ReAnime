@@ -443,8 +443,8 @@ animes.forEach(a => {
   </div>
 `;
   // 👉 Evento para mostrar detalles al hacer clic en la tarjeta
-  card.addEventListener('click', () => showAnimeDetails(a));
-  animeDirectory.appendChild(card);
+  card.addEventListener('click', () => {
+  window.location.href = `anime.html?id=${encodeURIComponent(a.id)}`;
 });
 }
 
