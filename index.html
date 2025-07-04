@@ -319,20 +319,7 @@
   const animeDirectory = document.getElementById('anime-directory');
   const searchInput = document.getElementById('search-input');
   const genreFilters = document.getElementById('genre-filters');
-
-  // Variables para detalles y reproducción
-  const animeDetails = document.getElementById('anime-details');
-  const backToListBtn = document.getElementById('back-to-list');
-  const detailName = document.getElementById('detail-name');
-  const detailDescription = document.getElementById('detail-description');
-  const episodeList = document.getElementById('episode-list');
-  const videoPlayer = document.getElementById('video-player');
-
-  // Variables para el reproductor y botones episodios
-  const playerSection = document.getElementById('player-section');
-  const videoContainer = document.getElementById('video-container');
-  const episodeButtons = document.getElementById('episode-buttons');
-
+    
   // Parámetros URL para filtrar género o id anime
   const urlParams = new URLSearchParams(window.location.search);
   const genreFromURL = urlParams.get('genre');
