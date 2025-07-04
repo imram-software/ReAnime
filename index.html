@@ -383,56 +383,67 @@
 }
     .hero-news-carousel {
   position: relative;
-  height: 350px;
   max-width: 100%;
+  height: 360px;
   overflow: hidden;
-  margin: 2rem auto;
   border-radius: 12px;
+  margin: 2rem auto;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
 }
 
-.news-slide {
+.hero-news-carousel .slide {
   position: absolute;
   top: 0; left: 0;
   width: 100%; height: 100%;
   background-size: cover;
   background-position: center;
-  color: white;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   transition: opacity 1s ease;
   opacity: 0;
-  z-index: 0;
 }
 
-.news-slide.active {
+.hero-news-carousel .slide.active {
   opacity: 1;
   z-index: 1;
 }
 
-.news-slide h2 {
-  font-size: 2rem;
+.hero-news-carousel .overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 2rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
+  color: white;
+  text-align: center;
+}
+
+.hero-news-carousel .overlay h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
   margin-bottom: 0.5rem;
-  text-shadow: 0 0 10px black;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
 }
 
-.news-slide p {
-  max-width: 600px;
+.hero-news-carousel .overlay p {
   font-size: 1rem;
-  text-shadow: 0 0 6px black;
+  margin-bottom: 1rem;
+  max-width: 700px;
+  margin: 0 auto 1rem;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
 }
 
-.news-slide a {
-  margin-top: 1rem;
+.hero-news-carousel .overlay a {
   display: inline-block;
   background: #ff4ecd;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
   color: white;
-  text-decoration: none;
   font-weight: bold;
-  box-shadow: 0 0 10px #ff4ecd88;
+  padding: 0.6rem 1.5rem;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.hero-news-carousel .overlay a:hover {
+  background: #ff79c6;
 }
   </style>
 </head>
