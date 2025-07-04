@@ -431,40 +431,71 @@
 
   let allAnimes = [];
 
-  async function loadNews() {
+  async function loadAniListNews() {
   const newsList = document.getElementById('news-list');
-  newsList.innerHTML = '';
+  newsList.innerHTML = '<p>Loading AniList news...</p>';
 
-  const fallbackNews = [
-    {
-      title: "New season of Re:Zero announced!",
-      image: "https://cdn.myanimelist.net/images/anime/11/79410.jpg",
-      excerpt: "Fans rejoice as Re:Zero gets a third season set to release in Fall 2025."
-    },
-    {
-      title: "Demon Slayer: Final arc confirmed",
-      image: "https://cdn.myanimelist.net/images/anime/1286/99889.jpg",
-      excerpt: "Ufotable confirms adaptation of the final arc of Kimetsu no Yaiba."
-    },
-    {
-      title: "Attack on Titan wraps up 10-year journey",
-      image: "https://cdn.myanimelist.net/images/anime/10/47347.jpg",
-      excerpt: "The epic saga of humanity vs titans comes to a close with its emotional finale."
+  const query = `
+  query ($page: Int, $perPage: Int) {
+    Page(page: $page, perPage: $perPage) {
+      media(sort: START_DATE_DESC, type: ANIME) {
+        id
+        title {
+          romaji
+          english
+        }
+        coverImage {
+          large
+        }
+        startDate {
+          year
+          month
+          day
+        }
+        description(asHtml: false)
+        siteUrl
+      }
     }
-  ];
+  }
+  `;
 
-  fallbackNews.forEach(n => {
-    const div = document.createElement('div');
-    div.classList.add('news-item');
-    div.innerHTML = `
-      <img src="${n.image}" alt="${n.title}" />
-      <div>
-        <h3>${n.title}</h3>
-        <p>${n.excerpt}</p>
-      </div>
-    `;
-    newsList.appendChild(div);
-  });
+  try {
+    const res = await fetch('https://graphql.anilist.co', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        query: query,
+        variables: { page: 1, perPage: 3 }
+      })
+    });
+
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+    const data = await res.json();
+    newsList.innerHTML = '';
+
+    data.data.Page.media.forEach(anime => {
+      const div = document.createElement('div');
+      div.classList.add('news-item');
+      div.innerHTML = `
+        <a href="${anime.siteUrl}" target="_blank" rel="noopener noreferrer" style="display:flex; gap:1rem; align-items:center; text-decoration:none; color:inherit;">
+          <img src="${anime.coverImage.large}" alt="${anime.title.romaji}" />
+          <div>
+            <h3>${anime.title.english || anime.title.romaji}</h3>
+            <p>${anime.description ? anime.description.slice(0, 120) + '...' : 'No description.'}</p>
+            <small>Start Date: ${anime.startDate.year || '?'}-${anime.startDate.month || '?'}-${anime.startDate.day || '?'}</small>
+          </div>
+        </a>
+      `;
+      newsList.appendChild(div);
+    });
+  } catch (err) {
+    console.error('Failed to load AniList news', err);
+    newsList.innerHTML = '<p>Could not load AniList news at the moment.</p>';
+  }
 }
 
 
@@ -614,7 +645,7 @@ function renderAnimes(animes) {
     filterSection.style.display = 'flex';
     animeDirectory.style.display = 'grid';
 
-    loadNews();
+    loadAniListNews();
 
     fetch('animes.json')
       .then(res => res.json())
