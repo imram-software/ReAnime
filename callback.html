@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>Redirecting...</title></head>
+<head><title>Login in...</title></head>
 <body>
-<p>Processing login...</p>
 <script>
   const hash = window.location.hash.substring(1);
   const params = new URLSearchParams(hash);
@@ -10,21 +9,22 @@
 
   if (token) {
     fetch("https://discord.com/api/users/@me", {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
     .then(res => res.json())
     .then(user => {
-      // Guardar usuario en localStorage
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("token", token);
-      window.location.href = "index.html";
-    })
-    .catch(() => {
-      alert("Falló el login con Discord.");
+      const userData = {
+        id: user.id,
+        username: user.username,
+        discriminator: user.discriminator,
+        avatar: user.avatar
+      };
+      localStorage.setItem("user", JSON.stringify(userData));
       window.location.href = "index.html";
     });
   } else {
-    alert("No se recibió token.");
     window.location.href = "index.html";
   }
 </script>
