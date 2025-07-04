@@ -109,5 +109,21 @@
         "embed": "<iframe src='https://streamtape.com/e/j4MdpDopKdszWYP/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
       }
     ]
+  },
+  {
+    "id": "kobayashi-san-chi-no-maid-dragon",
+    "name": "Kobayashi-san Chi no Maid Dragon",
+    "cover": "https://cdn.myanimelist.net/images/anime/5/85434.jpg",
+    "genre": ["Comedy", "Fantasy", "Slice of Life"],
+    "year": 2017,
+    "rating": 7.9,
+    "description": "Miss Kobayashi is your average office worker living a boring life—until she saves the life of a female dragon in distress. The dragon, named Tohru, has the ability to transform into a human girl (with horns and a tail!) and decides to repay her debt by becoming Kobayashi's maid. Despite being efficient in some ways, Tohru's idea of housekeeping is a little... unconventional. As more dragon friends show up, Kobayashi’s once mundane life becomes a hilarious and magical adventure.",
+    "episodes": [
+      {
+        "number": 1,
+        "title": "None",
+        "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      }
+    ]
   }
 ]
