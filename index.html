@@ -381,43 +381,147 @@
     justify-content: flex-start;
   }
 }
+#login-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #ff8fab;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 0 10px #ff8fab80;
+      transition: 0.3s;
+      z-index: 1001;
+    }
+    #login-btn:hover {
+      background-color: #ff4ecd;
+    }
+    #user-info {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 1001;
+      cursor: pointer;
+    }
+    #user-info img {
+      width: 40px;
+      border-radius: 50%;
+    }
+    #user-popup {
+      position: fixed;
+      top: 60px;
+      right: 10px;
+      background: #fff0fa;
+      color: #333;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      padding: 1rem;
+      min-width: 200px;
+      z-index: 1002;
+      display: none;
+      text-align: left;
+    }
+    #user-popup button {
+      margin-top: 1rem;
+      background: #ff4ecd;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .theme-toggle {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: #ff8fab;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px #ff8fab80;
+      z-index: 1001;
+    }
+    body.dark {
+      background: linear-gradient(135deg, #2b2b2b, #444);
+      color: #eee;
+    }
+    body.dark .news-item,
+    body.dark .anime-card,
+    body.dark #anime-details,
+    body.dark .sidebar {
+      background: #333;
+      color: #eee;
+    }
+    body.dark header,
+    body.dark footer {
+      background: #1e1e1e;
+      color: #ff4ecd;
+    }
   </style>
 </head>
 <body>
-
   <header>Re:Anime</header>
-
   <a id="login-btn" href="#">Login with Discord</a>
+  <div id="user-info" class="hidden"></div>
+  <div id="user-popup"></div>
+  <button class="theme-toggle" onclick="toggleTheme()">🌓 Tema</button>
 
-<script>
-  const clientId = "1390810180823945350";
-  const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
-  const scope = "identify";
-  
-  document.getElementById("login-btn").href =
-    `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}`;
-</script>
+  <script>
+    const clientId = "1390810180823945350";
+    const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
+    const scope = "identify";
+    const loginBtn = document.getElementById("login-btn");
+    loginBtn.href = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}`;
 
-  <div id="user-info"></div>
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userInfo = document.getElementById("user-info");
+    const userPopup = document.getElementById("user-popup");
 
-<script>
-  const userInfo = document.getElementById("user-info");
-  const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      loginBtn.style.display = "none";
+      const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+      userInfo.classList.remove("hidden");
+      userInfo.innerHTML = `
+        <img src="${avatarUrl}" />
+        <span>${user.username}</span>
+      `;
 
-  if (user) {
-    const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-    userInfo.innerHTML = `
-      <img src="${avatarUrl}" width="40" style="border-radius:50%;" />
-      <span>${user.username}#${user.discriminator}</span>
-      <button onclick="logout()">Cerrar sesión</button>
-    `;
-  }
+      userInfo.onclick = () => {
+        userPopup.style.display = userPopup.style.display === "block" ? "none" : "block";
+        userPopup.innerHTML = `
+          <strong>${user.username}#${user.discriminator}</strong><br>
+          <img src="${avatarUrl}" width="80" style="border-radius:50%; margin-top: 0.5rem;"><br>
+          <button onclick=\"logout()\">Cerrar sesión</button>
+        `;
+      };
+    }
 
-  function logout() {
-    localStorage.removeItem("user");
-    location.reload();
-  }
-</script>
+    function logout() {
+      localStorage.removeItem("user");
+      localStorage.removeItem("user_data");
+      location.reload();
+    }
+
+    // Modo oscuro / claro
+    const theme = localStorage.getItem("theme") || "light";
+    document.body.classList.add(theme);
+
+    function toggleTheme() {
+      const current = localStorage.getItem("theme") || "light";
+      const next = current === "light" ? "dark" : "light";
+      document.body.classList.remove(current);
+      document.body.classList.add(next);
+      localStorage.setItem("theme", next);
+    }
+  </script>
 
   <section class="intro" id="intro">
     <h1>Re:Anime</h1>
