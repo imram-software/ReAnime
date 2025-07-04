@@ -432,29 +432,32 @@
   let allAnimes = [];
 
   // Carga de noticias hardcodeadas
-  function loadNews() {
-    const newsData = [
-      {
-        img: 'https://wallpapercave.com/wp/wp6320901.png',
-        title: 'Re:Anime Opened',
-        desc: 'Re:Anime is open for everyone, this page to watch anime without ads opens its doors!'
-      }
-    ];
-    const newsList = document.getElementById('news-list');
+  async function loadNews() {
+  const newsList = document.getElementById('news-list');
+  newsList.innerHTML = '<p>Loading news...</p>';
+
+  try {
+    const res = await fetch('https://api.jikan.moe/v4/news/anime');
+    const data = await res.json();
+
     newsList.innerHTML = '';
-    newsData.forEach(n => {
+    data.data.slice(0, 5).forEach(n => {
       const div = document.createElement('div');
       div.classList.add('news-item');
       div.innerHTML = `
-        <img src="${n.img}" alt="${n.title}" />
+        <img src="${n.images.jpg.image_url}" alt="${n.title}" />
         <div>
           <h3>${n.title}</h3>
-          <p>${n.desc}</p>
+          <p>${n.excerpt}</p>
         </div>
       `;
       newsList.appendChild(div);
     });
+  } catch (err) {
+    console.error("Failed to fetch news", err);
+    newsList.innerHTML = '<p>Could not load anime news.</p>';
   }
+}
 
   // Carga y renderizado de géneros únicos en filtro
   function loadGenres(animes) {
