@@ -117,17 +117,41 @@
   font-size: 0.95rem;
   color: #333;
   cursor: pointer;
-  transition: background 0.3s;
-}
-
-.genre-item:hover {
-  background: #ff8fab;
+  transition: background 0.3s, color 0.3s;
+  user-select: none;
 }
 
 .genre-item input[type="checkbox"] {
-  accent-color: #ff4ecd;
-  width: 18px;
-  height: 18px;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ff4ecd;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  background: white;
+  margin: 0;
+}
+
+.genre-item input[type="checkbox"]:checked {
+  background-color: #ff4ecd;
+}
+
+.genre-item input[type="checkbox"]::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+}
+
+.genre-item input[type="checkbox"]:checked::before {
+  opacity: 1;
 }
 
 /* Ajustar anime-directory para más columnas */
