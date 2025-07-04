@@ -1,63 +1,111 @@
-[
-  {
-    "id": "re-zero-kara-hajjimeru-isekai-seikatsu",
-    "name": "Re:Zero kara Hajimeru Isekai Seikatsu",
-    "cover": "https://cdn.myanimelist.net/images/anime/1522/128039.jpg",
-    "genre": ["Isekai", "Fantasy", "Adventure"],
-    "year": 2016,
-    "rating": 9.0,
-    "description": "High school student Subaru is transported to another world...",
-    "episodes": [
-      {
-        "number": 1,
-        "title": "The End of the Beginning and the Beginning of the End",
-        "embed": "<iframe src='https://streamtape.com/e/1jpB3aOw7dheOZm/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 2,
-        "title": "The Truth of Zero",
-        "embed": "<iframe src='https://streamtape.com/e/D0oOOY6yQRHkXY9/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 3,
-        "title": "Starting Life from Zero in Another World",
-        "embed": "<iframe src='https://streamtape.com/e/dV1ax3dJyBuQz4/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 4,
-        "title": "The Happy Roswaal Mansion Family",
-        "embed": "<iframe src='https://streamtape.com/e/84YGoYDjbWc6jX/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 5,
-        "title": "The Morning of Our Promise Is Still Distant",
-        "embed": "<iframe src='https://streamtape.com/e/0z926Dzjx8Cb3x1/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 6,
-        "title": "The Sound of Chains",
-        "embed": "<iframe src='https://streamtape.com/e/1WdX2mBB37Ue4pb/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 7,
-        "title": "Natsuki Subaru’s Restart",
-        "embed": "<iframe src='https://streamtape.com/e/AP7ROpeQkRtXkKY/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 8,
-        "title": "I Cried, Cried My Lungs Out, and Stopped Crying",
-        "embed": "<iframe src='https://streamtape.com/e/qD88gQ00b3cz8p0/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 9,
-        "title": "The Meaning of Courage",
-        "embed": "<iframe src='https://streamtape.com/e/ogm3kzqAvgcJqL7/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 10,
-        "title": "A Wager That Defies the Gods",
-        "embed": "<iframe src='https://streamtape.com/e/LVPeP20GKdfRlYB/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      }
-    ]
-  }
-]
+{
+  "id": "re-zero-kara-hajjimeru-isekai-seikatsu",
+  "name": "Re:Zero kara Hajimeru Isekai Seikatsu",
+  "cover": "https://cdn.myanimelist.net/images/anime/1522/128039.jpg",
+  "genre": ["Isekai", "Fantasy", "Adventure"],
+  "year": 2016,
+  "rating": 9.0,
+  "description": "High school student Subaru is transported to another world...",
+  "episodes": [
+    {
+      "number": 1,
+      "title": "The End of the Beginning and the Beginning of the End",
+      "embed": "<iframe src='https://streamtape.com/e/1jpB3aOw7dheOZm/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 2,
+      "title": "The Truth of Zero",
+      "embed": "<iframe src='https://streamtape.com/e/D0oOOY6yQRHkXY9/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 3,
+      "title": "Starting Life from Zero in Another World",
+      "embed": "<iframe src='https://streamtape.com/e/dV1ax3dJyBuQz4/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 4,
+      "title": "The Happy Roswaal Mansion Family",
+      "embed": "<iframe src='https://streamtape.com/e/84YGoYDjbWc6jX/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 5,
+      "title": "The Morning of Our Promise Is Still Distant",
+      "embed": "<iframe src='https://streamtape.com/e/0z926Dzjx8Cb3x1/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 6,
+      "title": "The Sound of Chains",
+      "embed": "<iframe src='https://streamtape.com/e/1WdX2mBB37Ue4pb/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 7,
+      "title": "Natsuki Subaru’s Restart",
+      "embed": "<iframe src='https://streamtape.com/e/AP7ROpeQkRtXkKY/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 8,
+      "title": "I Cried, Cried My Lungs Out, and Stopped Crying",
+      "embed": "<iframe src='https://streamtape.com/e/qD88gQ00b3cz8p0/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 9,
+      "title": "The Meaning of Courage",
+      "embed": "<iframe src='https://streamtape.com/e/ogm3kzqAvgcJqL7/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 10,
+      "title": "A Wager That Defies the Gods",
+      "embed": "<iframe src='https://streamtape.com/e/LVPeP20GKdfRlYB/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 11,
+      "title": "Rem",
+      "embed": "<iframe src='https://streamtape.com/e/dLeQl0lwk4ikpAR/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 12,
+      "title": "Return to the Capital",
+      "embed": "<iframe src='https://streamtape.com/e/ar2xmyX3YgIxXm7/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 13,
+      "title": "Self-Proclaimed Knight Natsuki Subaru",
+      "embed": "<iframe src='https://streamtape.com/e/Y8mD70W7bmuv9W4/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 14,
+      "title": "The Sickness Called Despair",
+      "embed": "<iframe src='https://streamtape.com/e/BALzmQekWYFyxxM/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 15,
+      "title": "The Outside of Madness",
+      "embed": "<iframe src='https://streamtape.com/e/Bzp9QdrylXTyD02/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 16,
+      "title": "The Greed of a Pig",
+      "embed": "<iframe src='https://streamtape.com/e/JDA1M4kKXDtjlm6/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 17,
+      "title": "Disgrace in the Extreme",
+      "embed": "<iframe src='https://streamtape.com/e/dQyJzamLd1sZGl/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 18,
+      "title": "From Zero",
+      "embed": "<iframe src='https://streamtape.com/e/K4gdeWLOX6u01Mo/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 19,
+      "title": "Battle Against the White Whale",
+      "embed": "<iframe src='https://streamtape.com/e/691ykj2143S9aoV/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 20,
+      "title": "Wilhelm van Astrea",
+      "embed": "<iframe src='https://streamtape.com/e/j4MdpDopKdszWYP/' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    }
+  ]
+}
