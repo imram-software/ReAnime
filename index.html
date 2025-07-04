@@ -354,9 +354,13 @@
 
   // Carga y renderizado de géneros únicos en filtro
   function loadGenres(animes) {
-    genreFilters.innerHTML = '';
-    const genresSet = new Set();
-    animes.forEach(a => a.genre.forEach(g => genresSet.add(g)));
+  if (!Array.isArray(animes)) {
+    console.error("loadGenres fue llamado con un valor no válido:", animes);
+    return;
+  }
+  genreFilters.innerHTML = '';
+  const genresSet = new Set();
+  animes.forEach(a => a.genre.forEach(g => genresSet.add(g)));
     const genres = Array.from(genresSet).sort();
 
     genres.forEach(genre => {
