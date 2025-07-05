@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <title>Anime Detail</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: sans-serif;
       margin: 0;
       padding: 0;
       transition: background 0.5s, color 0.5s;
+      position: relative;
     }
     header {
       display: flex;
@@ -21,17 +22,63 @@
       font-size: 2rem;
       background: #fff0fa;
       color: #ff4ecd;
+      position: relative;
     }
-    .discord-user {
+    #login-btn {
       font-family: sans-serif;
-      font-size: 0.8rem;
-      text-align: right;
-    }
-    header a {
       font-size: 1rem;
       text-decoration: none;
       color: #ff79c6;
+      cursor: pointer;
+      margin-right: 1rem;
+    }
+    #user-info {
       font-family: sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #ff79c6;
+    }
+    #user-info img {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      vertical-align: middle;
+    }
+    #user-popup {
+      display: none;
+      position: absolute;
+      background: #fff0fa;
+      padding: 1rem;
+      border-radius: 12px;
+      right: 2rem;
+      top: 3.5rem;
+      box-shadow: 0 0 10px #ff79c6;
+      width: 200px;
+      font-family: sans-serif;
+      color: #ff4ecd;
+      z-index: 100;
+    }
+    #user-popup button {
+      margin-top: 0.8rem;
+      background: #ff8fab;
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+    }
+    .theme-toggle {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #ff79c6;
+      font-family: 'Zen Tokyo Zoo', cursive;
     }
     .container {
       max-width: 1200px;
@@ -143,6 +190,7 @@
         height: 250px;
       }
     }
+    /* Temas */
     body.light {
       background: #f9f9f9;
       color: #000;
@@ -187,30 +235,88 @@
       color: #ffb6d9;
     }
   </style>
-  <script src="user_data.js"></script>
 </head>
 <body>
   <header>
     <div>Re:Anime</div>
-    <div class="discord-user" id="user-info">Checking login...</div>
+    <nav style="display:flex; align-items:center; gap:1rem;">
+      <a id="login-btn" href="#">Login with Discord</a>
+      <div id="user-info" class="hidden"></div>
+      <div id="user-popup"></div>
+      <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+    </nav>
   </header>
   <div class="container" id="anime-detail">Loading...</div>
+
   <script>
+    const clientId = "1390810180823945350";
+    const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
+    const scope = "identify";
+
+    // Modo tema
     const theme = localStorage.getItem('theme');
-  document.body.classList.add(theme === 'dark' ? 'dark' : 'light');
+    document.body.classList.add(theme === 'dark' ? 'dark' : 'light');
 
-  const userInfo = document.getElementById('user-info');
+    function toggleTheme() {
+      if (document.body.classList.contains('dark')) {
+        document.body.classList.replace('dark', 'light');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.body.classList.replace('light', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
 
-  if (typeof userData !== 'undefined' && userData.discord && userData.discord.username) {
-    const avatarUrl = userData.discord.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'; // placeholder si no hay avatar
-    userInfo.innerHTML = `
-      <img src="${avatarUrl}" alt="Avatar" style="width:24px; height:24px; border-radius:50%; vertical-align:middle; margin-right: 8px;">
-      <strong>${userData.discord.username}</strong>
-    `;
-  } else {
-    userInfo.innerHTML = '<a href="callback.html">Login with Discord</a>';
-  }
+    // Login con Discord y mostrar usuario
+    const loginBtn = document.getElementById("login-btn");
+    const userInfo = document.getElementById("user-info");
+    const userPopup = document.getElementById("user-popup");
 
+    loginBtn.href = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}`;
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (user) {
+      loginBtn.style.display = "none";
+      userInfo.classList.remove("hidden");
+      const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+      userInfo.innerHTML = `
+        <img src="${avatarUrl}" alt="Avatar" />
+        <span>${user.username}</span>
+      `;
+
+      userInfo.onclick = () => {
+        if (userPopup.style.display === "block") {
+          userPopup.style.display = "none";
+        } else {
+          userPopup.style.display = "block";
+          userPopup.innerHTML = `
+            <strong>${user.username}#${user.discriminator}</strong><br>
+            <img src="${avatarUrl}" width="80" style="border-radius:50%; margin-top: 0.5rem;"><br>
+            <button onclick="logout()">Cerrar sesión</button>
+          `;
+        }
+      };
+
+      // Ocultar popup si clic afuera
+      window.addEventListener('click', e => {
+        if (!userInfo.contains(e.target) && !userPopup.contains(e.target)) {
+          userPopup.style.display = 'none';
+        }
+      });
+    } else {
+      loginBtn.style.display = "inline-block";
+      userInfo.classList.add("hidden");
+      userPopup.style.display = "none";
+    }
+
+    function logout() {
+      localStorage.removeItem("user");
+      localStorage.removeItem("user_data");
+      location.reload();
+    }
+
+    // Cargar datos anime y episodios
     const params = new URLSearchParams(window.location.search);
     const animeId = params.get('id');
 
