@@ -188,6 +188,7 @@
     }
   </style>
 </head>
+  <script src="user_data.js"></script>
 <body>
   <header>
     <div>Re:Anime</div>
@@ -195,18 +196,18 @@
   </header>
   <div class="container" id="anime-detail">Loading...</div>
   <script>
-    const theme = localStorage.getItem('theme');
-    document.body.classList.add(theme === 'dark' ? 'dark' : 'light');
+    <script>
+  const theme = localStorage.getItem('theme');
+  document.body.classList.add(theme === 'dark' ? 'dark' : 'light');
 
-    // Mostrar usuario si está logueado
-    const userInfo = document.getElementById('user-info');
-    const discordUser = localStorage.getItem('discord_user');
-    if (discordUser) {
-      const user = JSON.parse(discordUser);
-      userInfo.innerHTML = `<strong>${user.username}</strong><br><small>${user.email || 'Discord Login'}</small>`;
-    } else {
-      userInfo.innerHTML = '<a href="callback.html">Login with Discord</a>';
-    }
+  const userInfo = document.getElementById('user-info');
+
+  if (typeof userData !== 'undefined' && userData.discord && userData.discord.username) {
+    userInfo.innerHTML = `<strong>${userData.discord.username}</strong><br><small>${userData.discord.email || 'Discord Login'}</small>`;
+  } else {
+    userInfo.innerHTML = '<a href="callback.html">Login with Discord</a>';
+  }
+</script>
 
     const params = new URLSearchParams(window.location.search);
     const animeId = params.get('id');
