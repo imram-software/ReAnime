@@ -197,14 +197,19 @@
   <div class="container" id="anime-detail">Loading...</div>
   <script>
     const theme = localStorage.getItem('theme');
-    document.body.classList.add(theme === 'dark' ? 'dark' : 'light');
+  document.body.classList.add(theme === 'dark' ? 'dark' : 'light');
 
-    const userInfo = document.getElementById('user-info');
-    if (typeof userData !== 'undefined' && userData.discord && userData.discord.username) {
-      userInfo.innerHTML = `<strong>${userData.discord.username}</strong><br><small>${userData.discord.email || 'Discord Login'}</small>`;
-    } else {
-      userInfo.innerHTML = '<a href="callback.html">Login with Discord</a>';
-    }
+  const userInfo = document.getElementById('user-info');
+
+  if (typeof userData !== 'undefined' && userData.discord && userData.discord.username) {
+    const avatarUrl = userData.discord.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'; // placeholder si no hay avatar
+    userInfo.innerHTML = `
+      <img src="${avatarUrl}" alt="Avatar" style="width:24px; height:24px; border-radius:50%; vertical-align:middle; margin-right: 8px;">
+      <strong>${userData.discord.username}</strong>
+    `;
+  } else {
+    userInfo.innerHTML = '<a href="callback.html">Login with Discord</a>';
+  }
 
     const params = new URLSearchParams(window.location.search);
     const animeId = params.get('id');
