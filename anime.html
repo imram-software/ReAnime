@@ -3,20 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <title>Anime Detail</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: sans-serif;
-      background: #f9f9f9;
       margin: 0;
       padding: 0;
+      transition: background 0.5s, color 0.5s;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      font-family: 'Zen Tokyo Zoo', cursive;
+      font-size: 2rem;
+      background: #fff0fa;
+      color: #ff4ecd;
+    }
+    .discord-user {
+      font-family: sans-serif;
+      font-size: 0.8rem;
+      text-align: right;
+    }
+    header a {
+      font-size: 1rem;
+      text-decoration: none;
+      color: #ff79c6;
+      font-family: sans-serif;
     }
     .container {
       max-width: 1200px;
       margin: 2rem auto;
-      background: white;
       padding: 1.5rem;
       border-radius: 12px;
       box-shadow: 0 0 10px #ccc;
+      transition: background 0.5s, color 0.5s;
     }
     .top-bar {
       display: flex;
@@ -100,36 +123,91 @@
     .description {
       margin-top: 1rem;
       font-size: 1rem;
-      color: #333;
     }
     @media (max-width: 768px) {
-  .layout {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    max-height: none;
-    border-right: none;
-    border-top: 2px solid #ffe0ef;
-    padding-top: 1rem;
-    padding-right: 0;
-  }
-
-  #video-container {
-    width: 100%;
-  }
-
-  iframe {
-    height: 250px;
-  }
-}
+      .layout {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        max-height: none;
+        border-right: none;
+        border-top: 2px solid #ffe0ef;
+        padding-top: 1rem;
+        padding-right: 0;
+      }
+      #video-container {
+        width: 100%;
+      }
+      iframe {
+        height: 250px;
+      }
+    }
+    body.light {
+      background: #f9f9f9;
+      color: #000;
+    }
+    body.light .container {
+      background: white;
+      color: #000;
+    }
+    body.light header {
+      background: #fff0fa;
+      color: #ff4ecd;
+    }
+    body.dark {
+      background: #1e1e1e;
+      color: #eee;
+    }
+    body.dark .container {
+      background: #2b2b2b;
+      box-shadow: 0 0 10px #000;
+    }
+    body.dark .anime-title {
+      color: #ffb6d9;
+    }
+    body.dark .genres span {
+      background: #333;
+      color: #ff79c6;
+    }
+    body.dark .sidebar {
+      border-right: 2px solid #444;
+    }
+    body.dark .sidebar button {
+      background: #333;
+      color: #ff79c6;
+    }
+    body.dark .sidebar button:hover,
+    body.dark .sidebar button.active {
+      background: #ff79c6;
+      color: #fff;
+    }
+    body.dark header {
+      background: #2a2a2a;
+      color: #ffb6d9;
+    }
   </style>
 </head>
 <body>
+  <header>
+    <div>Re:Anime</div>
+    <div class="discord-user" id="user-info">Checking login...</div>
+  </header>
   <div class="container" id="anime-detail">Loading...</div>
-
   <script>
+    const theme = localStorage.getItem('theme');
+    document.body.classList.add(theme === 'dark' ? 'dark' : 'light');
+
+    // Mostrar usuario si está logueado
+    const userInfo = document.getElementById('user-info');
+    const discordUser = localStorage.getItem('discord_user');
+    if (discordUser) {
+      const user = JSON.parse(discordUser);
+      userInfo.innerHTML = `<strong>${user.username}</strong><br><small>${user.email || 'Discord Login'}</small>`;
+    } else {
+      userInfo.innerHTML = '<a href="callback.html">Login with Discord</a>';
+    }
+
     const params = new URLSearchParams(window.location.search);
     const animeId = params.get('id');
 
@@ -186,7 +264,6 @@
               videoContainer.innerHTML = ep.embed;
             }
 
-            // Guardar historial (para el historial que querés usar)
             localStorage.setItem('lastWatched', JSON.stringify({ id: anime.id, name: anime.name }));
           });
           epButtons.appendChild(btn);
