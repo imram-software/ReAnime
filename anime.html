@@ -24,10 +24,15 @@
       color: #ff4ecd;
       position: relative;
     }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: sans-serif; /* Aquí forzamos fuente normal para contenido del nav */
+      font-size: 1rem;
+      color: #ff79c6;
+    }
     #login-btn {
-      position: fixed;
-      top: 10px;
-      right: 10px;
       background-color: #ff8fab;
       color: white;
       padding: 0.5rem 1rem;
@@ -36,24 +41,27 @@
       font-weight: bold;
       box-shadow: 0 0 10px #ff8fab80;
       transition: 0.3s;
-      z-index: 1001;
+      cursor: pointer;
     }
     #login-btn:hover {
       background-color: #ff4ecd;
     }
     #user-info {
-      position: fixed;
-      top: 10px;
-      right: 10px;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      z-index: 1001;
       cursor: pointer;
     }
     #user-info img {
       width: 40px;
       border-radius: 50%;
+    }
+    #user-name {
+      font-family: sans-serif;
+      font-weight: normal;
+      font-size: 1rem;
+      color: #ff79c6;
+      user-select: none;
     }
     #user-popup {
       position: fixed;
@@ -238,7 +246,7 @@
 <body>
   <header>
     <div>Re:Anime</div>
-    <nav style="display:flex; align-items:center; gap:1rem;">
+    <nav>
       <a id="login-btn" href="#">Login with Discord</a>
       <div id="user-info" class="hidden"></div>
       <div id="user-popup"></div>
@@ -251,7 +259,7 @@
     const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
     const scope = "identify";
 
-    // Modo tema
+    // Tema
     const theme = localStorage.getItem('theme');
     document.body.classList.add(theme === 'dark' ? 'dark' : 'light');
 
@@ -265,7 +273,7 @@
       }
     }
 
-    // Login con Discord y mostrar usuario
+    // Login con Discord
     const loginBtn = document.getElementById("login-btn");
     const userInfo = document.getElementById("user-info");
     const userPopup = document.getElementById("user-popup");
@@ -280,7 +288,7 @@
       const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
       userInfo.innerHTML = `
         <img src="${avatarUrl}" alt="Avatar" />
-        <span>${user.username}</span>
+        <span id="user-name">${user.username}</span>
       `;
 
       userInfo.onclick = () => {
@@ -296,7 +304,6 @@
         }
       };
 
-      // Ocultar popup si clic afuera
       window.addEventListener('click', e => {
         if (!userInfo.contains(e.target) && !userPopup.contains(e.target)) {
           userPopup.style.display = 'none';
@@ -314,7 +321,7 @@
       location.reload();
     }
 
-    // Cargar datos anime y episodios
+    // Cargar anime y episodios
     const params = new URLSearchParams(window.location.search);
     const animeId = params.get('id');
 
