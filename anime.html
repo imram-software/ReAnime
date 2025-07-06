@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Anime Detail</title>
+  <title>Detalle de Anime</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap" rel="stylesheet" />
   <style>
@@ -28,7 +28,7 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-      font-family: sans-serif; /* Aquí forzamos fuente normal para contenido del nav */
+      font-family: sans-serif;
       font-size: 1rem;
       color: #ff79c6;
     }
@@ -61,7 +61,6 @@
       font-weight: normal;
       font-size: 1rem;
       color: #ff79c6;
-      user-select: none;
     }
     #user-popup {
       position: fixed;
@@ -93,7 +92,6 @@
       padding: 1.5rem;
       border-radius: 12px;
       box-shadow: 0 0 10px #ccc;
-      transition: background 0.5s, color 0.5s;
     }
     .top-bar {
       display: flex;
@@ -130,9 +128,9 @@
       border-radius: 20px;
       margin-right: 0.4rem;
       font-size: 0.85rem;
-      cursor: pointer;
       display: inline-block;
       margin-top: 0.5rem;
+      cursor: pointer;
     }
     .layout {
       display: flex;
@@ -157,7 +155,6 @@
       cursor: pointer;
       font-weight: bold;
       color: #ff2ea6;
-      transition: background 0.2s;
     }
     .sidebar button:hover,
     .sidebar button.active {
@@ -178,68 +175,21 @@
       margin-top: 1rem;
       font-size: 1rem;
     }
-    @media (max-width: 768px) {
-      .layout {
-        flex-direction: column;
-      }
-      .sidebar {
-        width: 100%;
-        max-height: none;
-        border-right: none;
-        border-top: 2px solid #ffe0ef;
-        padding-top: 1rem;
-        padding-right: 0;
-      }
-      #video-container {
-        width: 100%;
-      }
-      iframe {
-        height: 250px;
-      }
+    #anime-actions {
+      margin: 1rem 0;
     }
-    /* Temas */
-    body.light {
-      background: #f9f9f9;
-      color: #000;
+    #anime-actions button {
+      margin-right: 0.5rem;
+      background: #ff8fab;
+      color: white;
+      padding: 0.4rem 1rem;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
     }
-    body.light .container {
-      background: white;
-      color: #000;
-    }
-    body.light header {
-      background: #fff0fa;
-      color: #ff4ecd;
-    }
-    body.dark {
-      background: #1e1e1e;
-      color: #eee;
-    }
-    body.dark .container {
-      background: #2b2b2b;
-      box-shadow: 0 0 10px #000;
-    }
-    body.dark .anime-title {
-      color: #ffb6d9;
-    }
-    body.dark .genres span {
-      background: #333;
-      color: #ff79c6;
-    }
-    body.dark .sidebar {
-      border-right: 2px solid #444;
-    }
-    body.dark .sidebar button {
-      background: #333;
-      color: #ff79c6;
-    }
-    body.dark .sidebar button:hover,
-    body.dark .sidebar button.active {
-      background: #ff79c6;
-      color: #fff;
-    }
-    body.dark header {
-      background: #2a2a2a;
-      color: #ffb6d9;
+    #anime-actions button:hover {
+      background: #ff4ecd;
     }
   </style>
 </head>
@@ -247,39 +197,25 @@
   <header>
     <div>Re:Anime</div>
     <nav>
-      <a id="login-btn" href="#">Login with Discord</a>
+      <a id="login-btn" href="#">Iniciar sesion con Discord</a>
       <div id="user-info" class="hidden"></div>
       <div id="user-popup"></div>
     </nav>
   </header>
-  <div class="container" id="anime-detail">Loading...</div>
+  <div class="container" id="anime-detail">Cargando...</div>
 
   <script>
     const clientId = "1390810180823945350";
     const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
     const scope = "identify";
 
-    // Tema
     const theme = localStorage.getItem('theme');
     document.body.classList.add(theme === 'dark' ? 'dark' : 'light');
 
-    function toggleTheme() {
-      if (document.body.classList.contains('dark')) {
-        document.body.classList.replace('dark', 'light');
-        localStorage.setItem('theme', 'light');
-      } else {
-        document.body.classList.replace('light', 'dark');
-        localStorage.setItem('theme', 'dark');
-      }
-    }
-
-    // Login con Discord
     const loginBtn = document.getElementById("login-btn");
     const userInfo = document.getElementById("user-info");
     const userPopup = document.getElementById("user-popup");
-
     loginBtn.href = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}`;
-
     const user = JSON.parse(localStorage.getItem("user"));
 
     if (user) {
@@ -290,38 +226,26 @@
         <img src="${avatarUrl}" alt="Avatar" />
         <span id="user-name">${user.username}</span>
       `;
-
       userInfo.onclick = () => {
-        if (userPopup.style.display === "block") {
-          userPopup.style.display = "none";
-        } else {
-          userPopup.style.display = "block";
-          userPopup.innerHTML = `
-            <strong>${user.username}#${user.discriminator}</strong><br>
-            <img src="${avatarUrl}" width="80" style="border-radius:50%; margin-top: 0.5rem;"><br>
-            <button onclick="logout()">Cerrar sesión</button>
-          `;
-        }
+        userPopup.style.display = userPopup.style.display === "block" ? "none" : "block";
+        userPopup.innerHTML = `
+          <strong>${user.username}#${user.discriminator}</strong><br>
+          <img src="${avatarUrl}" width="80" style="border-radius:50%; margin-top: 0.5rem;"><br>
+          <button onclick="logout()">Cerrar sesión</button>
+        `;
       };
-
       window.addEventListener('click', e => {
         if (!userInfo.contains(e.target) && !userPopup.contains(e.target)) {
           userPopup.style.display = 'none';
         }
       });
-    } else {
-      loginBtn.style.display = "inline-block";
-      userInfo.classList.add("hidden");
-      userPopup.style.display = "none";
     }
 
     function logout() {
       localStorage.removeItem("user");
-      localStorage.removeItem("user_data");
       location.reload();
     }
 
-    // Cargar anime y episodios
     const params = new URLSearchParams(window.location.search);
     const animeId = params.get('id');
 
@@ -335,13 +259,19 @@
         }
 
         document.title = anime.name;
-
         const container = document.getElementById('anime-detail');
         container.innerHTML = `
           <button class="back-btn" onclick="window.location.href='index.html'">← Back</button>
           <div class="top-bar">
             <img class="cover" src="${anime.cover}" alt="${anime.name}">
-            <div class="anime-title">${anime.name}</div>
+            <div>
+              <div class="anime-title">${anime.name}</div>
+              <div id="anime-actions">
+                <button id="fav-btn">Favorito</button>
+                <button id="watchlist-btn">Ver después</button>
+                <button id="watched-btn">Visto</button>
+              </div>
+            </div>
           </div>
           <div class="genres">
             ${anime.genre.map(g => `<span onclick="goToGenre('${encodeURIComponent(g)}')">${g}</span>`).join('')}
@@ -363,7 +293,6 @@
           btn.addEventListener('click', () => {
             document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
             const temp = document.createElement('div');
             temp.innerHTML = ep.embed;
             const iframe = temp.querySelector('iframe');
@@ -377,19 +306,47 @@
             } else {
               videoContainer.innerHTML = ep.embed;
             }
-
             localStorage.setItem('lastWatched', JSON.stringify({ id: anime.id, name: anime.name }));
           });
           epButtons.appendChild(btn);
         });
 
-        if (anime.episodes.length > 0) {
-          epButtons.children[0].click();
-        }
+        if (anime.episodes.length > 0) epButtons.children[0].click();
+        updateActionButtons(anime.id);
       });
 
     function goToGenre(genre) {
       window.location.href = `index.html?genre=${genre}`;
+    }
+
+    function getUserList(type) {
+      if (!user) return [];
+      const all = JSON.parse(localStorage.getItem(type) || '{}');
+      return all[user.id] || [];
+    }
+
+    function toggleList(type, animeId) {
+      if (!user) return;
+      const all = JSON.parse(localStorage.getItem(type) || '{}');
+      const list = new Set(all[user.id] || []);
+      if (list.has(animeId)) list.delete(animeId);
+      else list.add(animeId);
+      all[user.id] = Array.from(list);
+      localStorage.setItem(type, JSON.stringify(all));
+    }
+
+    function updateActionButtons(animeId) {
+      const favBtn = document.getElementById("fav-btn");
+      const watchlistBtn = document.getElementById("watchlist-btn");
+      const watchedBtn = document.getElementById("watched-btn");
+
+      favBtn.textContent = getUserList("favorites").includes(animeId) ? "En favoritos" : "Favorito";
+      watchlistBtn.textContent = getUserList("watchlist").includes(animeId) ? "En ver después" : "Ver después";
+      watchedBtn.textContent = getUserList("watched").includes(animeId) ? "Visto" : "Marcar como visto";
+
+      favBtn.onclick = () => { toggleList("favorites", animeId); updateActionButtons(animeId); };
+      watchlistBtn.onclick = () => { toggleList("watchlist", animeId); updateActionButtons(animeId); };
+      watchedBtn.onclick = () => { toggleList("watched", animeId); updateActionButtons(animeId); };
     }
   </script>
 </body>
