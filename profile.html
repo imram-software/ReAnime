@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mi Perfil - Re:Anime</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&family=Nunito:wght@300;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
   <style>
@@ -27,6 +27,11 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       overflow: hidden;
       text-align: center;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    .anime-card:hover {
+      transform: scale(1.05);
     }
     .anime-card img {
       width: 100%;
@@ -42,6 +47,9 @@
       align-items: center;
       gap: 1rem;
       margin-bottom: 2rem;
+      background: #fff0fa;
+      padding: 1rem;
+      border-radius: 12px;
     }
     .user-info img {
       border-radius: 50%;
@@ -51,57 +59,80 @@
       color: #777;
       font-style: italic;
     }
+    .logout-btn {
+      background: #ff4ecd;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: auto;
+    }
+    .logout-btn:hover {
+      background: #ff2ea6;
+    }
   </style>
 </head>
 <body>
-  <div class="perfil-container">
-    <div class="user-info" id="user-info">
-      <!-- Info de usuario -->
-    </div>
-
-    <h2>⭐ Favoritos</h2>
-    <div id="favorites" class="anime-grid"></div>
-
-    <h2>👁️ Por ver</h2>
-    <div id="watchlist" class="anime-grid"></div>
-
-    <h2>✅ Vistos</h2>
-    <div id="watched" class="anime-grid"></div>
+  <div class="perfil-container" id="profile-content">
+    <!-- Aquí se cargará el perfil -->
   </div>
 
   <script>
     const user = JSON.parse(localStorage.getItem("user"));
-    const allAnimes = []; // cargaremos desde animes.json
     const userId = user?.id;
 
     if (!userId) {
-      document.body.innerHTML = "<p style='text-align:center; margin-top:5rem;'>Debes iniciar sesión con Discord para ver tu perfil.</p>";
+      document.getElementById('profile-content').innerHTML = `
+        <p style='text-align:center; margin-top:5rem;'>Debes iniciar sesión con Discord para ver tu perfil.</p>
+        <div style="text-align:center; margin-top:1rem;">
+          <a href="index.html" style="text-decoration:none; font-weight:bold; color:#ff4ecd;">← Volver al inicio</a>
+        </div>
+      `;
       throw new Error("No user");
     }
 
-    document.getElementById("user-info").innerHTML = `
-      <img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" alt="Avatar" />
-      <div>
-        <strong>${user.username}#${user.discriminator}</strong><br>
-        <small>ID: ${user.id}</small>
-      </div>
-    `;
-
     fetch("animes.json")
       .then(res => res.json())
-      .then(data => {
-        data.forEach(anime => allAnimes.push(anime));
-        renderSection("favorites");
-        renderSection("watchlist");
-        renderSection("watched");
-      });
+      .then(data => renderProfile(data));
+
+    function renderProfile(allAnimes) {
+      const container = document.getElementById("profile-content");
+
+      const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+
+      container.innerHTML = `
+        <div class="user-info">
+          <img src="${avatarUrl}" alt="Avatar" />
+          <div>
+            <strong>${user.username}#${user.discriminator}</strong><br>
+            <small>ID: ${user.id}</small>
+          </div>
+          <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
+        </div>
+
+        <h2>⭐ Favoritos</h2>
+        <div id="favorites" class="anime-grid"></div>
+
+        <h2>👁️ Ver después</h2>
+        <div id="watchlist" class="anime-grid"></div>
+
+        <h2>✅ Vistos</h2>
+        <div id="watched" class="anime-grid"></div>
+      `;
+
+      renderSection("favorites", allAnimes);
+      renderSection("watchlist", allAnimes);
+      renderSection("watched", allAnimes);
+    }
 
     function getUserList(type) {
       const allData = JSON.parse(localStorage.getItem(type) || "{}");
-      return allData[userId] || [];
+      return allData[user.id] || [];
     }
 
-    function renderSection(type) {
+    function renderSection(type, allAnimes) {
       const container = document.getElementById(type);
       const ids = getUserList(type);
       if (!ids.length) {
@@ -110,11 +141,17 @@
       }
       const filtered = allAnimes.filter(a => ids.includes(a.id));
       container.innerHTML = filtered.map(anime => `
-        <div class="anime-card">
+        <div class="anime-card" onclick="window.location.href='anime.html?id=${anime.id}'">
           <img src="${anime.cover}" alt="${anime.name}" />
-          <p>${anime.name}</p>
+          <p style="padding: 0.5rem">${anime.name}</p>
         </div>
       `).join('');
+    }
+
+    function logout() {
+      localStorage.removeItem("user");
+      localStorage.removeItem("user_data");
+      location.href = "index.html";
     }
   </script>
 </body>
