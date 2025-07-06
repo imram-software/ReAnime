@@ -526,6 +526,17 @@ body.dark .intro p {
       color: #ff4ecd;
     }
   </style>
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: 'en,es',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+      autoDisplay: false
+    }, 'google_translate_element');
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
 <body>
   <header>Re:Anime</header>
@@ -533,6 +544,12 @@ body.dark .intro p {
   <div id="user-info" class="hidden"></div>
   <div id="user-popup"></div>
   <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+
+  <div id="language-switcher" style="position: fixed; top: 60px; left: 10px; z-index: 1001;">
+  <button id="language-btn" class="theme-toggle">🌐 Español?</button>
+</div>
+<div id="google_translate_element" style="display: none;"></div>
+
 
   <script>
     const clientId = "1390810180823945350";
@@ -882,6 +899,19 @@ function renderAnimes(animes) {
       loadApp();
     });
   }
+    let currentLang = 'en';
+
+document.getElementById("language-btn").addEventListener("click", () => {
+  const select = document.querySelector("select.goog-te-combo");
+  if (!select) return;
+
+  currentLang = currentLang === 'en' ? 'es' : 'en';
+  select.value = currentLang;
+  select.dispatchEvent(new Event("change"));
+
+  document.getElementById("language-btn").textContent = currentLang === 'en' ? "🌐 Español?" : "🌐 English?";
+});
+
 </script>
 
  <footer>
