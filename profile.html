@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mi Perfil - Re:Anime</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&family=Nunito:wght@300;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #ffe1f0, #caf0f8);
+      padding: 2rem;
+    }
+    .perfil-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .anime-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+    .anime-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      text-align: center;
+    }
+    .anime-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+    h2 {
+      color: #ff4ecd;
+      margin-top: 2rem;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .user-info img {
+      border-radius: 50%;
+      width: 80px;
+    }
+    .no-data {
+      color: #777;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="perfil-container">
+    <div class="user-info" id="user-info">
+      <!-- Info de usuario -->
+    </div>
+
+    <h2>⭐ Favoritos</h2>
+    <div id="favorites" class="anime-grid"></div>
+
+    <h2>👁️ Por ver</h2>
+    <div id="watchlist" class="anime-grid"></div>
+
+    <h2>✅ Vistos</h2>
+    <div id="watched" class="anime-grid"></div>
+  </div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem("user"));
+    const allAnimes = []; // cargaremos desde animes.json
+    const userId = user?.id;
+
+    if (!userId) {
+      document.body.innerHTML = "<p style='text-align:center; margin-top:5rem;'>Debes iniciar sesión con Discord para ver tu perfil.</p>";
+      throw new Error("No user");
+    }
+
+    document.getElementById("user-info").innerHTML = `
+      <img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" alt="Avatar" />
+      <div>
+        <strong>${user.username}#${user.discriminator}</strong><br>
+        <small>ID: ${user.id}</small>
+      </div>
+    `;
+
+    fetch("animes.json")
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(anime => allAnimes.push(anime));
+        renderSection("favorites");
+        renderSection("watchlist");
+        renderSection("watched");
+      });
+
+    function getUserList(type) {
+      const allData = JSON.parse(localStorage.getItem(type) || "{}");
+      return allData[userId] || [];
+    }
+
+    function renderSection(type) {
+      const container = document.getElementById(type);
+      const ids = getUserList(type);
+      if (!ids.length) {
+        container.innerHTML = `<p class="no-data">No hay animes en esta lista.</p>`;
+        return;
+      }
+      const filtered = allAnimes.filter(a => ids.includes(a.id));
+      container.innerHTML = filtered.map(anime => `
+        <div class="anime-card">
+          <img src="${anime.cover}" alt="${anime.name}" />
+          <p>${anime.name}</p>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
