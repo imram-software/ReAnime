@@ -1,528 +1,538 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Re:Anime</title>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&family=Nunito:wght@300;700&display=swap" rel="stylesheet" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Nunito', sans-serif;
-      background: linear-gradient(135deg, #ffe1f0, #caf0f8);
-      min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-      transition: background 1s ease, color 0.5s;
-      padding-top: 60px;
-      text-align: center;
-    }
-    header {
-      position: fixed; top: 0; left: 0; width: 100%;
-      background: #fff0fa;
-      padding: 0.8rem 2rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      font-family: 'Zen Tokyo Zoo', cursive;
-      font-size: 2rem;
-      color: #ff4ecd;
-      z-index: 1000;
-      transition: background 0.5s, color 0.5s;
-    }
-    footer {
-      margin-top: 4rem;
-      padding: 1rem;
-      background: #fff0fa;
-      color: #ff4ecd;
-      font-size: 0.9rem;
-      transition: background 0.5s, color 0.5s;
-    }
-    footer .footer-link {
-      color: #ff79c6;
-      text-decoration: none;
-      font-weight: bold;
-      transition: color 0.5s;
-    }
-    body.dark { background: linear-gradient(135deg, #2b2b2b, #444); color: #eee; }
-    body.dark footer { background: #1e1e1e; color: #ff4ecd; }
-    body.dark footer .footer-link { color: #ff79c6; }
-    body.dark header { background: #1e1e1e; color: #ff4ecd; }
-    body.dark .intro h1,
-    body.dark .news-section h2,
-    body.dark .anime-card h3,
-    body.dark .anime-card .info,
-    body.dark #anime-details h2,
-    body.dark #anime-details p.description,
-    body.dark .genre-item span,
-    body.dark .news-item h3,
-    body.dark .news-item p { color: #eee !important; }
-    body.dark .genre-item { background: #444 !important; }
-    body.dark .genre-item:hover,
-    body.dark .genre-item:has(input[type="checkbox"]:checked) { background-color: #ff4ecd !important; }
-
-    .intro {
-      height: 80vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 0 1rem;
-      transition: opacity 0.6s ease;
-    }
-    .intro h1 {
-      font-family: 'Zen Tokyo Zoo', cursive;
-      font-size: 4rem;
-      color: #ff79c6;
-      text-shadow: 0 0 15px #ff9de5, 0 0 30px #ff4ecd;
-      animation: glow 3s ease-in-out infinite;
-      margin-bottom: 0.5rem;
-    }
-    .intro p {
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
-      max-width: 600px;
-      color: #222;
-      transition: color 0.5s;
-    }
-    body.dark .intro p { color: #eee; }
-
-    .btn {
-      background-color: #ff8fab;
-      border: none;
-      border-radius: 30px;
-      color: white;
-      font-size: 1.1rem;
-      font-weight: bold;
-      cursor: pointer;
-      padding: 0.9rem 2rem;
-      box-shadow: 0 0 15px #ff8fab80;
-      transition: 0.3s;
-    }
-    .btn:hover { background-color: #ff5e95; transform: scale(1.05); }
-    .hidden { display: none !important; opacity: 0 !important; }
-
-    .main-content {
-      display: flex; flex-direction: row-reverse;
-      max-width: 1200px; margin: 0 auto 2rem;
-      padding: 0 1rem; gap: 1.5rem;
-    }
-    .sidebar {
-      width: 220px; max-height: 500px; overflow-y: auto;
-      background: #fff0fa; padding: 1rem;
-      border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .content-area { flex: 1; }
-    .genre-filters { display: flex; flex-direction: column; gap: 0.5rem; }
-    .genre-item {
-      display: flex; align-items: center; gap: 0.6rem;
-      background: #ff8fab88; padding: 0.5rem 1rem;
-      border-radius: 30px; font-size: 0.95rem;
-      color: #333; cursor: pointer;
-      transition: background 0.3s, color 0.3s;
-      user-select: none;
-    }
-    .genre-item:hover { background-color: #ff8fab; }
-    .genre-item input[type="checkbox"] {
-      accent-color: #ff4ecd;
-      width: 18px; height: 18px; margin: 0; cursor: pointer;
-    }
-    .genre-item input[type="checkbox"]:checked + span {
-      font-weight: bold; color: white;
-    }
-    .genre-item:has(input[type="checkbox"]:checked) {
-      background-color: #ff4ecd;
-    }
-
-    .anime-directory {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
-      gap: 1rem;
-    }
-
-    .news-section {
-      max-width: 900px; margin: 2rem auto 4rem;
-      text-align: left; padding: 0 1rem;
-    }
-    .news-section h2 {
-      color: #ff4ecd; font-size: 2rem; margin-bottom: 1rem;
-    }
-    .news-item {
-      background: white; border-radius: 12px;
-      padding: 1rem; margin-bottom: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      display: flex; gap: 1rem; align-items: center;
-    }
-    .news-item img {
-      width: 120px; height: 80px; object-fit: cover;
-      border-radius: 8px; flex-shrink: 0;
-    }
-    .news-item div { flex: 1; }
-    .news-item h3 { margin-bottom: 0.3rem; color: #333; }
-    .news-item p { color: #666; font-size: 0.9rem; }
-
-    .filter-section {
-      max-width: 900px; margin: 0 auto 2rem;
-      padding: 0 1rem; text-align: left;
-      display: flex; flex-wrap: wrap;
-      gap: 1rem; align-items: center; justify-content: space-between;
-    }
-    #search-input {
-      flex: 1 1 200px; padding: 0.5rem 1rem;
-      font-size: 1rem; border-radius: 30px;
-      border: 1px solid #ddd; outline: none;
-      transition: 0.3s;
-    }
-    #search-input:focus {
-      border-color: #ff4ecd; box-shadow: 0 0 8px #ff4ecd88;
-    }
-
-    .anime-card {
-      background: white; border-radius: 12px;
-      overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease; cursor: pointer;
-      text-align: center;
-    }
-    .anime-card:hover { transform: scale(1.05); }
-    .anime-card .image-container {
-      position: relative; width: 100%; height: 220px; overflow: hidden;
-    }
-    .anime-card .image-container img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
-    .anime-card .anime-title-overlay {
-      position: absolute; bottom: 0; width: 100%;
-      padding: 0.5rem;
-      background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
-      color: #fff; font-weight: bold; font-size: 0.95rem;
-      text-shadow: 0 0 5px rgba(0,0,0,0.6);
-    }
-    .anime-card h3 {
-      margin: 0.5rem 0 0.3rem; font-size: 1rem; color: #333;
-    }
-    .anime-card .info {
-      font-size: 0.85rem; color: #666; padding-bottom: 0.8rem;
-    }
-
-    #anime-details {
-      max-width: 900px; margin: 2rem auto 4rem;
-      background: white; border-radius: 12px;
-      padding: 1rem 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      text-align: left; display: none;
-    }
-    #anime-details h2 {
-      font-family: 'Zen Tokyo Zoo', cursive;
-      color: #ff4ecd; margin-bottom: 0.5rem;
-    }
-    #anime-details p.description {
-      margin-bottom: 1rem; color: #444; font-size: 1rem;
-    }
-    #episode-list {
-      margin-bottom: 1rem; display: flex;
-      flex-wrap: wrap; gap: 0.5rem;
-    }
-    #episode-list button {
-      background: #ff8fab; border: none;
-      border-radius: 20px; padding: 0.4rem 1rem;
-      color: white; cursor: pointer; font-weight: 700;
-      transition: background 0.3s;
-    }
-    #episode-list button:hover,
-    #episode-list button.active { background: #ff4ecd; }
-
-    #video-player {
-      width: 100%; max-width: 720px; height: 450px;
-      margin: 0 auto; border-radius: 12px;
-      overflow: hidden; box-shadow: 0 0 20px #ff4ecd88;
-      position: relative;
-    }
-
-    @keyframes glow {
-      0%,100% { text-shadow: 0 0 15px #ff9de5,0 0 30px #ff4ecd; }
-      50%  { text-shadow: 0 0 25px #ff79c6,0 0 40px #ff2ea6; }
-    }
-    @media (max-width:768px) {
-      .main-content { flex-direction: column; padding:0 1rem; }
-      .sidebar { width:100%; max-height:none; overflow-y:visible; margin-bottom:1rem; }
-      #search-input { width:100%; }
-      .genre-item { justify-content:flex-start; }
-    }
-
-    #login-btn {
-      position: fixed; top: 10px; right: 10px;
-      background-color: #ff8fab; color: white;
-      padding: 0.5rem 1rem; border-radius: 30px;
-      text-decoration: none; font-weight: bold;
-      box-shadow: 0 0 10px #ff8fab80; transition: 0.3s;
-      z-index: 1001;
-    }
-    #login-btn:hover { background-color: #ff4ecd; }
-
-    #user-info {
-      position: fixed; top: 10px; right: 10px;
-      display: flex; align-items: center; gap: 0.5rem;
-      z-index: 1001; cursor: pointer;
-    }
-    #user-info img { width: 40px; border-radius: 50%; }
-
-    #user-popup {
-      position: fixed; top: 60px; right: 10px;
-      background: #fff0fa; color: #333;
-      border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      padding: 1rem; min-width: 200px; z-index: 1002;
-      display: none; text-align: left;
-    }
-    #user-popup button {
-      margin-top: 1rem; background: #ff4ecd;
-      color: white; padding: 0.5rem 1rem;
-      border: none; border-radius: 20px;
-      cursor: pointer; width: 100%;
-    }
-
-    .theme-toggle {
-      position: fixed; top: 10px; left: 10px;
-      background: #ff8fab; color: white;
-      padding: 0.5rem 1rem; border-radius: 30px;
-      font-weight: bold; cursor: pointer;
-      box-shadow: 0 0 10px #ff8fab80;
-      z-index: 1001;
-    }
-
-    body.dark .news-item,
-    body.dark .anime-card,
-    body.dark #anime-details,
-    body.dark .sidebar {
-      background: #333; color: #eee;
-    }
-  </style>
-</head>
-<body>
-  <header>Re:Anime</header>
-  <a id="login-btn" href="#">Iniciar sesión con Discord</a>
-  <div id="user-info" class="hidden"></div>
-  <div id="user-popup"></div>
-  <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">🌗 Tema</button>
-
-  <section class="intro" id="intro">
-    <h1>Re:Anime</h1>
-    <p>Tu mundo anime! Descubre tu próxima obsesión, esta página está en desarrollo y seguiremos añadiendo contenido :3</p>
-    <button class="btn" id="enter-btn">Entrar al mundo anime</button>
-  </section>
-
-  <section class="news-section" id="news-section" style="display:none;">
-    <h2>Últimas noticias de anime</h2>
-    <div id="news-list"></div>
-  </section>
-
-  <div class="main-content" id="filter-section" style="display:none;">
-    <aside class="sidebar">
-      <h3 style="margin-bottom:0.5rem; color:#ff4ecd;">Géneros</h3>
-      <div class="genre-filters" id="genre-filters"></div>
-    </aside>
-    <section class="content-area">
-      <input type="text" id="search-input" placeholder="Buscar anime por nombre..." />
-      <section class="anime-directory" id="anime-directory"></section>
-    </section>
-  </div>
-
-  <div id="anime-details">
-    <h2 id="detail-name"></h2>
-    <p class="description" id="detail-description"></p>
-    <div id="episode-list"></div>
-    <div id="video-player"></div>
-  </div>
-
-  <script>
-    const clientId = "1390810180823945350";
-    const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
-    const scope = "identify";
-    const loginBtn = document.getElementById("login-btn");
-    loginBtn.href = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}`;
-
-    const user = JSON.parse(localStorage.getItem("user"));
-    const userInfo = document.getElementById("user-info");
-    const userPopup = document.getElementById("user-popup");
-
-    if (user) {
-      loginBtn.style.display = "none";
-      const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-      userInfo.classList.remove("hidden");
-      userInfo.innerHTML = `<img src="${avatarUrl}" /><span>${user.username}</span>`;
-      userInfo.onclick = () => {
-        userPopup.style.display = userPopup.style.display === "block" ? "none" : "block";
-        userPopup.innerHTML = `
-          <strong>${user.username}#${user.discriminator}</strong><br>
-          <img src="${avatarUrl}" width="80" style="border-radius:50%; margin-top:0.5rem;"><br>
-          <button onclick="logout()">Cerrar sesión</button>
-        `;
-      };
-    }
-
-    function logout() {
-      localStorage.removeItem("user");
-      localStorage.removeItem("user_data");
-      location.reload();
-    }
-
-    const theme = localStorage.getItem("theme") || "light";
-    document.body.classList.add(theme);
-
-    function toggleTheme() {
-      const current = localStorage.getItem("theme") || "light";
-      const next = current === "light" ? "dark" : "light";
-      document.body.classList.replace(current, next);
-      localStorage.setItem("theme", next);
-    }
-  </script>
-
-  <script>
-    const enterBtn = document.getElementById('enter-btn');
-    const intro = document.getElementById('intro');
-    const newsSection = document.getElementById('news-section');
-    const filterSection = document.getElementById('filter-section');
-    const animeDirectory = document.getElementById('anime-directory');
-    const searchInput = document.getElementById('search-input');
-    const genreFilters = document.getElementById('genre-filters');
-    const detailName = document.getElementById('detail-name');
-    const detailDescription = document.getElementById('detail-description');
-    const episodeList = document.getElementById('episode-list');
-    const videoPlayer = document.getElementById('video-player');
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const genreFromURL = urlParams.get('genre');
-    const animeIdFromURL = urlParams.get('id');
-    let allAnimes = [];
-
-    async function loadAniListNews() {
-      const newsList = document.getElementById('news-list');
-      newsList.innerHTML = '<p>Cargando noticias de AniList...</p>';
-      const query = `
-        query ($page: Int, $perPage: Int) {
-          Page(page: $page, perPage: $perPage) {
-            media(sort: START_DATE_DESC, type: ANIME) {
-              id title { romaji english } coverImage { large }
-              startDate { year month day } description(asHtml: false) siteUrl
-            }
-          }
-        }
-      `;
-      try {
-        const res = await fetch('https://graphql.anilist.co', {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json','Accept':'application/json' },
-          body: JSON.stringify({ query, variables:{ page:1, perPage:3 } })
-        });
-        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
-        const data = await res.json();
-        newsList.innerHTML = '';
-        data.data.Page.media.forEach(anime => {
-          const div = document.createElement('div'); div.classList.add('news-item');
-          div.innerHTML = `
-            <a href="${anime.siteUrl}" target="_blank" style="display:flex; gap:1rem; align-items:center; text-decoration:none; color:inherit;">
-              <img src="${anime.coverImage.large}" alt="${anime.title.romaji}" />
-              <div>
-                <h3>${anime.title.english||anime.title.romaji}</h3>
-                <p>${anime.description?anime.description.slice(0,120)+'...':'Sin descripción.'}</p>
-                <small>Fecha de inicio: ${anime.startDate.year||'?'}-${anime.startDate.month||'?'}-${anime.startDate.day||'?'}<\/small>
-              </div>
-            <\/a>
-          `;
-          newsList.appendChild(div);
-        });
-      } catch {
-        newsList.innerHTML = '<p>No se pudieron cargar las noticias.</p>';
-      }
-    }
-
-    function loadGenres(animes) {
-      if (!Array.isArray(animes)) return;
-      genreFilters.innerHTML = '';
-      const genres = Array.from(new Set(animes.flatMap(a=>a.genre))).sort();
-      genres.forEach(genre => {
-        const wrapper = document.createElement('label'); wrapper.className='genre-item';
-        const checkbox = document.createElement('input'); checkbox.type='checkbox'; checkbox.value=genre;
-        const span = document.createElement('span'); span.textContent=genre;
-        wrapper.append(checkbox, span); genreFilters.appendChild(wrapper);
-        checkbox.addEventListener('change', filterAnimes);
-      });
-      if (genreFromURL) {
-        const cb = [...genreFilters.querySelectorAll('input')].find(el=>el.value.toLowerCase()===decodeURIComponent(genreFromURL).toLowerCase());
-        if (cb){ cb.checked=true; filterAnimes(); }
-      }
-    }
-
-    function filterAnimes() {
-      const term = searchInput.value.toLowerCase();
-      const checked = [...genreFilters.querySelectorAll('input:checked')].map(c=>c.value);
-      const filtered = allAnimes.filter(a=>a.name.toLowerCase().includes(term) && (checked.length===0||checked.some(g=>a.genre.includes(g))));
-      renderAnimes(filtered);
-    }
-
-    function renderAnimes(animes) {
-      animeDirectory.innerHTML = '';
-      if(animes.length===0){ animeDirectory.innerHTML='<p>No se encontraron resultados.</p>'; return; }
-      animes.forEach(a=>{
-        const card = document.createElement('div'); card.className='anime-card';
-        card.innerHTML = `
-          <div class="image-container">
-            <img src="${a.cover}" alt="${a.name}" />
-            <div class="anime-title-overlay">${a.name}</div>
-          </div>
-        `;
-        card.addEventListener('click',()=>window.location.href=`anime.html?id=${encodeURIComponent(a.id)}`);
-        animeDirectory.appendChild(card);
-      });
-    }
-
-    function showAnimeDetails(anime) {
-      intro.style.display='none'; newsSection.style.display='none'; filterSection.style.display='none'; animeDirectory.style.display='none';
-      document.getElementById('anime-details').style.display='block';
-      detailName.textContent=anime.name;
-      detailDescription.textContent=anime.description||'Sin descripción.';
-      episodeList.innerHTML=''; videoPlayer.innerHTML='';
-      if(anime.episodes?.length){
-        anime.episodes.forEach((ep,i)=>{
-          const btn=document.createElement('button'); btn.textContent=`${ep.number}. ${ep.title}`;
-          btn.addEventListener('click',()=>{
-            [...episodeList.children].forEach(b=>b.classList.remove('active'));
-            btn.classList.add('active');
-            const temp=document.createElement('div'); temp.innerHTML=ep.embed;
-            const iframe=temp.querySelector('iframe');
-            if(iframe){
-              iframe.removeAttribute('width'); iframe.removeAttribute('height');
-              iframe.style.width='100%'; iframe.style.height='100%'; iframe.style.border='none'; iframe.style.display='block';
-              videoPlayer.innerHTML=''; videoPlayer.appendChild(iframe);
-            } else videoPlayer.innerHTML=ep.embed;
-          });
-          episodeList.appendChild(btn);
-          if(i===0) btn.click();
-        });
-      } else episodeList.innerHTML='<p>Sin episodios disponibles.</p>';
-    }
-
-    function loadApp(skipIntro=false) {
-      if(!skipIntro) intro.classList.add('hidden'); else intro.style.display='none';
-      newsSection.style.display='block'; filterSection.style.display='flex'; animeDirectory.style.display='grid';
-      loadAniListNews();
-      fetch('animes.json')
-        .then(r=>r.json())
-        .then(data=>{
-          allAnimes=data; loadGenres(allAnimes);
-          if(animeIdFromURL){
-            const ani=allAnimes.find(a=>a.id===animeIdFromURL);
-            ani?showAnimeDetails(ani):renderAnimes(allAnimes);
-          } else if(genreFromURL) filterAnimes(); else renderAnimes(allAnimes);
-        })
-        .catch(()=>animeDirectory.innerHTML='<p>Error cargando datos.</p>');
-    }
-
-    searchInput.addEventListener('input', filterAnimes);
-
-    if(genreFromURL||animeIdFromURL) loadApp(true);
-    else enterBtn.addEventListener('click',()=>loadApp());
-  </script>
-
-  <footer>
-    © 2025 Re:Anime - All rights reserved.<br/>
-    Un proyecto de <a href="https://discord.com/users/781172416218136577" target="_blank" class="footer-link">Ream</a>.
-  </footer>
-</body>
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Re:Anime</title>
+      <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&family=Nunito:wght@300;700&display=swap" rel="stylesheet" />
+      <style>
+         * { margin: 0; padding: 0; box-sizing: border-box; }
+         body {
+         font-family: 'Nunito', sans-serif;
+         background: linear-gradient(135deg, #ffe1f0, #caf0f8);
+         min-height: 100vh;
+         overflow-x: hidden;
+         position: relative;
+         transition: background 1s ease, color 0.5s;
+         padding-top: 60px;
+         text-align: center;
+         }
+         header {
+         position: fixed; top: 0; left: 0; width: 100%;
+         background: #fff0fa;
+         padding: 0.8rem 2rem;
+         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+         font-family: 'Zen Tokyo Zoo', cursive;
+         font-size: 2rem;
+         color: #ff4ecd;
+         z-index: 1000;
+         transition: background 0.5s, color 0.5s;
+         }
+         footer {
+         margin-top: 4rem;
+         padding: 1rem;
+         background: #fff0fa;
+         color: #ff4ecd;
+         font-size: 0.9rem;
+         transition: background 0.5s, color 0.5s;
+         }
+         footer .footer-link {
+         color: #ff79c6;
+         text-decoration: none;
+         font-weight: bold;
+         transition: color 0.5s;
+         }
+         body.dark { background: linear-gradient(135deg, #2b2b2b, #444); color: #eee; }
+         body.dark footer { background: #1e1e1e; color: #ff4ecd; }
+         body.dark footer .footer-link { color: #ff79c6; }
+         body.dark header { background: #1e1e1e; color: #ff4ecd; }
+         body.dark .intro h1,
+         body.dark .news-section h2,
+         body.dark .anime-card h3,
+         body.dark .anime-card .info,
+         body.dark #anime-details h2,
+         body.dark #anime-details p.description,
+         body.dark .genre-item span,
+         body.dark .news-item h3,
+         body.dark .news-item p { color: #eee !important; }
+         body.dark .genre-item { background: #444 !important; }
+         body.dark .genre-item:hover,
+         body.dark .genre-item:has(input[type="checkbox"]:checked) { background-color: #ff4ecd !important; }
+         .intro {
+         height: 80vh;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         justify-content: center;
+         text-align: center;
+         padding: 0 1rem;
+         transition: opacity 0.6s ease;
+         }
+         .intro h1 {
+         font-family: 'Zen Tokyo Zoo', cursive;
+         font-size: 4rem;
+         color: #ff79c6;
+         text-shadow: 0 0 15px #ff9de5, 0 0 30px #ff4ecd;
+         animation: glow 3s ease-in-out infinite;
+         margin-bottom: 0.5rem;
+         }
+         .intro p {
+         font-size: 1.2rem;
+         margin-bottom: 2rem;
+         max-width: 600px;
+         color: #222;
+         transition: color 0.5s;
+         }
+         body.dark .intro p { color: #eee; }
+         .btn {
+         background-color: #ff8fab;
+         border: none;
+         border-radius: 30px;
+         color: white;
+         font-size: 1.1rem;
+         font-weight: bold;
+         cursor: pointer;
+         padding: 0.9rem 2rem;
+         box-shadow: 0 0 15px #ff8fab80;
+         transition: 0.3s;
+         }
+         .btn:hover { background-color: #ff5e95; transform: scale(1.05); }
+         .hidden { display: none !important; opacity: 0 !important; }
+         .main-content {
+         display: flex; flex-direction: row-reverse;
+         max-width: 1200px; margin: 0 auto 2rem;
+         padding: 0 1rem; gap: 1.5rem;
+         }
+         .sidebar {
+         width: 220px; max-height: 500px; overflow-y: auto;
+         background: #fff0fa; padding: 1rem;
+         border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+         }
+         .content-area { flex: 1; }
+         .genre-filters { display: flex; flex-direction: column; gap: 0.5rem; }
+         .genre-item {
+         display: flex; align-items: center; gap: 0.6rem;
+         background: #ff8fab88; padding: 0.5rem 1rem;
+         border-radius: 30px; font-size: 0.95rem;
+         color: #333; cursor: pointer;
+         transition: background 0.3s, color 0.3s;
+         user-select: none;
+         }
+         .genre-item:hover { background-color: #ff8fab; }
+         .genre-item input[type="checkbox"] {
+         accent-color: #ff4ecd;
+         width: 18px; height: 18px; margin: 0; cursor: pointer;
+         }
+         .genre-item input[type="checkbox"]:checked + span {
+         font-weight: bold; color: white;
+         }
+         .genre-item:has(input[type="checkbox"]:checked) {
+         background-color: #ff4ecd;
+         }
+         .anime-directory {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+         gap: 1.2rem;
+         }
+         .news-section {
+         max-width: 900px; margin: 2rem auto 4rem;
+         text-align: left; padding: 0 1rem;
+         }
+         .news-section h2 {
+         color: #ff4ecd; font-size: 2rem; margin-bottom: 1rem;
+         }
+         .news-item {
+         background: white; border-radius: 12px;
+         padding: 1rem; margin-bottom: 1rem;
+         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+         display: flex; gap: 1rem; align-items: center;
+         }
+         .news-item img {
+         width: 120px; height: 80px; object-fit: cover;
+         border-radius: 8px; flex-shrink: 0;
+         }
+         .news-item div { flex: 1; }
+         .news-item h3 { margin-bottom: 0.3rem; color: #333; }
+         .news-item p { color: #666; font-size: 0.9rem; }
+         .filter-section {
+         max-width: 900px; margin: 0 auto 2rem;
+         padding: 0 1rem; text-align: left;
+         display: flex; flex-wrap: wrap;
+         gap: 1rem; align-items: center; justify-content: space-between;
+         }
+         #search-input {
+         margin-top: 1.5rem;
+         flex: 1 1 200px;
+         padding: 0.7rem 1.2rem;
+         font-size: 1.1rem;
+         border-radius: 30px;
+         border: 1px solid #ddd;
+         outline: none;
+         transition: 0.3s;
+         }
+         #search-input:focus {
+         border-color: #ff4ecd; box-shadow: 0 0 8px #ff4ecd88;
+         }
+         .anime-card {
+         background: white;
+         border-radius: 12px;
+         overflow: hidden;
+         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+         transition: transform 0.3s ease;
+         cursor: pointer;
+         text-align: center;
+         display: flex;
+         flex-direction: column;
+         height: 260px; /* altura vertical */
+         }
+         .anime-card:hover {
+         transform: scale(1.05);
+         }
+         .anime-card .image-container {
+         position: relative;
+         width: 100%;
+         height: 200px; /* imagen vertical */
+         overflow: hidden;
+         border-bottom: 1px solid #eee;
+         }
+         .anime-card .image-container img {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+         display: block;
+         }
+         .anime-card .anime-title-overlay {
+         position: absolute;
+         bottom: 0;
+         width: 100%;
+         padding: 0.3rem 0.6rem;
+         background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+         color: #fff;
+         font-weight: bold;
+         font-size: 0.9rem;
+         text-shadow: 0 0 5px rgba(0,0,0,0.8);
+         }
+         .anime-card h3 {
+         margin: 0.3rem 0 0;
+         font-size: 1rem;
+         color: #333;
+         padding: 0.3rem 0.6rem;
+         flex-grow: 1;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         background: #fff;
+         }
+         .anime-card .info {
+         font-size: 0.85rem; color: #666; padding-bottom: 0.8rem;
+         }
+         #anime-details {
+         max-width: 900px; margin: 2rem auto 4rem;
+         background: white; border-radius: 12px;
+         padding: 1rem 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+         text-align: left; display: none;
+         }
+         #anime-details h2 {
+         font-family: 'Zen Tokyo Zoo', cursive;
+         color: #ff4ecd; margin-bottom: 0.5rem;
+         }
+         #anime-details p.description {
+         margin-bottom: 1rem; color: #444; font-size: 1rem;
+         }
+         #episode-list {
+         margin-bottom: 1rem; display: flex;
+         flex-wrap: wrap; gap: 0.5rem;
+         }
+         #episode-list button {
+         background: #ff8fab; border: none;
+         border-radius: 20px; padding: 0.4rem 1rem;
+         color: white; cursor: pointer; font-weight: 700;
+         transition: background 0.3s;
+         }
+         #episode-list button:hover,
+         #episode-list button.active { background: #ff4ecd; }
+         #video-player {
+         width: 100%; max-width: 720px; height: 450px;
+         margin: 0 auto; border-radius: 12px;
+         overflow: hidden; box-shadow: 0 0 20px #ff4ecd88;
+         position: relative;
+         }
+         @keyframes glow {
+         0%,100% { text-shadow: 0 0 15px #ff9de5,0 0 30px #ff4ecd; }
+         50%  { text-shadow: 0 0 25px #ff79c6,0 0 40px #ff2ea6; }
+         }
+         @media (max-width:768px) {
+         .main-content { flex-direction: column; padding:0 1rem; }
+         .sidebar { width:100%; max-height:none; overflow-y:visible; margin-bottom:1rem; }
+         #search-input { width:100%; }
+         .genre-item { justify-content:flex-start; }
+         }
+         #login-btn {
+         position: fixed; top: 10px; right: 10px;
+         background-color: #ff8fab; color: white;
+         padding: 0.5rem 1rem; border-radius: 30px;
+         text-decoration: none; font-weight: bold;
+         box-shadow: 0 0 10px #ff8fab80; transition: 0.3s;
+         z-index: 1001;
+         }
+         #login-btn:hover { background-color: #ff4ecd; }
+         #user-info {
+         position: fixed; top: 10px; right: 10px;
+         display: flex; align-items: center; gap: 0.5rem;
+         z-index: 1001; cursor: pointer;
+         }
+         #user-info img { width: 40px; border-radius: 50%; }
+         #user-popup {
+         position: fixed; top: 60px; right: 10px;
+         background: #fff0fa; color: #333;
+         border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+         padding: 1rem; min-width: 200px; z-index: 1002;
+         display: none; text-align: left;
+         }
+         #user-popup button {
+         margin-top: 1rem; background: #ff4ecd;
+         color: white; padding: 0.5rem 1rem;
+         border: none; border-radius: 20px;
+         cursor: pointer; width: 100%;
+         }
+         .theme-toggle {
+         position: fixed; top: 10px; left: 10px;
+         background: #ff8fab; color: white;
+         padding: 0.5rem 1rem; border-radius: 30px;
+         font-weight: bold; cursor: pointer;
+         box-shadow: 0 0 10px #ff8fab80;
+         z-index: 1001;
+         }
+         body.dark .news-item,
+         body.dark .anime-card,
+         body.dark #anime-details,
+         body.dark .sidebar {
+         background: #333; color: #eee;
+         }
+      </style>
+   </head>
+   <body>
+      <header>Re:Anime</header>
+      <a id="login-btn" href="#">Iniciar sesión con Discord</a>
+      <div id="user-info" class="hidden"></div>
+      <div id="user-popup"></div>
+      <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">🌗 Tema</button>
+      <section class="intro" id="intro">
+         <h1>Re:Anime</h1>
+         <p>Tu mundo anime! Descubre tu próxima obsesión, esta página está en desarrollo y seguiremos añadiendo contenido :3</p>
+         <button class="btn" id="enter-btn">Entrar al mundo anime</button>
+      </section>
+      <section class="news-section" id="news-section" style="display:none;">
+         <h2>Últimas noticias de anime</h2>
+         <div id="news-list"></div>
+      </section>
+      <div class="main-content" id="filter-section" style="display:none;">
+         <aside class="sidebar">
+            <h3 style="margin-bottom:0.5rem; color:#ff4ecd;">Géneros</h3>
+            <div class="genre-filters" id="genre-filters"></div>
+         </aside>
+         <section class="content-area">
+            <input type="text" id="search-input" placeholder="🔍 Buscar anime por nombre..." />
+            <section class="anime-directory" id="anime-directory"></section>
+         </section>
+      </div>
+      <div id="anime-details">
+         <h2 id="detail-name"></h2>
+         <p class="description" id="detail-description"></p>
+         <div id="episode-list"></div>
+         <div id="video-player"></div>
+      </div>
+      <script>
+         const clientId = "1390810180823945350";
+         const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
+         const scope = "identify";
+         const loginBtn = document.getElementById("login-btn");
+         loginBtn.href = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}`;
+         
+         const user = JSON.parse(localStorage.getItem("user"));
+         const userInfo = document.getElementById("user-info");
+         const userPopup = document.getElementById("user-popup");
+         
+         if (user) {
+           loginBtn.style.display = "none";
+           const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+           userInfo.classList.remove("hidden");
+           userInfo.innerHTML = `<img src="${avatarUrl}" /><span>${user.username}</span>`;
+           userInfo.onclick = () => {
+             userPopup.style.display = userPopup.style.display === "block" ? "none" : "block";
+             userPopup.innerHTML = `
+               <strong>${user.username}#${user.discriminator}</strong><br>
+               <img src="${avatarUrl}" width="80" style="border-radius:50%; margin-top:0.5rem;"><br>
+               <button onclick="logout()">Cerrar sesión</button>
+             `;
+           };
+         }
+         
+         function logout() {
+           localStorage.removeItem("user");
+           localStorage.removeItem("user_data");
+           location.reload();
+         }
+         
+         const theme = localStorage.getItem("theme") || "light";
+         document.body.classList.add(theme);
+         
+         function toggleTheme() {
+           const current = localStorage.getItem("theme") || "light";
+           const next = current === "light" ? "dark" : "light";
+           document.body.classList.replace(current, next);
+           localStorage.setItem("theme", next);
+         }
+      </script>
+      <script>
+         const enterBtn = document.getElementById('enter-btn');
+         const intro = document.getElementById('intro');
+         const newsSection = document.getElementById('news-section');
+         const filterSection = document.getElementById('filter-section');
+         const animeDirectory = document.getElementById('anime-directory');
+         const searchInput = document.getElementById('search-input');
+         const genreFilters = document.getElementById('genre-filters');
+         const detailName = document.getElementById('detail-name');
+         const detailDescription = document.getElementById('detail-description');
+         const episodeList = document.getElementById('episode-list');
+         const videoPlayer = document.getElementById('video-player');
+         
+         const urlParams = new URLSearchParams(window.location.search);
+         const genreFromURL = urlParams.get('genre');
+         const animeIdFromURL = urlParams.get('id');
+         let allAnimes = [];
+         
+         async function loadAniListNews() {
+           const newsList = document.getElementById('news-list');
+           newsList.innerHTML = '<p>Cargando noticias de AniList...</p>';
+           const query = `
+             query ($page: Int, $perPage: Int) {
+               Page(page: $page, perPage: $perPage) {
+                 media(sort: START_DATE_DESC, type: ANIME) {
+                   id title { romaji english } coverImage { large }
+                   startDate { year month day } description(asHtml: false) siteUrl
+                 }
+               }
+             }
+           `;
+           try {
+             const res = await fetch('https://graphql.anilist.co', {
+               method: 'POST',
+               headers: { 'Content-Type':'application/json','Accept':'application/json' },
+               body: JSON.stringify({ query, variables:{ page:1, perPage:3 } })
+             });
+             if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+             const data = await res.json();
+             newsList.innerHTML = '';
+             data.data.Page.media.forEach(anime => {
+               const div = document.createElement('div'); div.classList.add('news-item');
+               div.innerHTML = `
+                 <a href="${anime.siteUrl}" target="_blank" style="display:flex; gap:1rem; align-items:center; text-decoration:none; color:inherit;">
+                   <img src="${anime.coverImage.large}" alt="${anime.title.romaji}" />
+                   <div>
+                     <h3>${anime.title.english||anime.title.romaji}</h3>
+                     <p>${anime.description?anime.description.slice(0,120)+'...':'Sin descripción.'}</p>
+                     <small>Fecha de inicio: ${anime.startDate.year||'?'}-${anime.startDate.month||'?'}-${anime.startDate.day||'?'}<\/small>
+                   </div>
+                 <\/a>
+               `;
+               newsList.appendChild(div);
+             });
+           } catch {
+             newsList.innerHTML = '<p>No se pudieron cargar las noticias.</p>';
+           }
+         }
+         
+         function loadGenres(animes) {
+           if (!Array.isArray(animes)) return;
+           genreFilters.innerHTML = '';
+           const genres = Array.from(new Set(animes.flatMap(a=>a.genre))).sort();
+           genres.forEach(genre => {
+             const wrapper = document.createElement('label'); wrapper.className='genre-item';
+             const checkbox = document.createElement('input'); checkbox.type='checkbox'; checkbox.value=genre;
+             const span = document.createElement('span'); span.textContent=genre;
+             wrapper.append(checkbox, span); genreFilters.appendChild(wrapper);
+             checkbox.addEventListener('change', filterAnimes);
+           });
+           if (genreFromURL) {
+             const cb = [...genreFilters.querySelectorAll('input')].find(el=>el.value.toLowerCase()===decodeURIComponent(genreFromURL).toLowerCase());
+             if (cb){ cb.checked=true; filterAnimes(); }
+           }
+         }
+         
+         function filterAnimes() {
+           const term = searchInput.value.toLowerCase();
+           const checked = [...genreFilters.querySelectorAll('input:checked')].map(c=>c.value);
+           const filtered = allAnimes.filter(a=>a.name.toLowerCase().includes(term) && (checked.length===0||checked.some(g=>a.genre.includes(g))));
+           renderAnimes(filtered);
+         }
+         
+         function renderAnimes(animes) {
+           animeDirectory.innerHTML = '';
+           if(animes.length===0){ animeDirectory.innerHTML='<p>No se encontraron resultados.</p>'; return; }
+           animes.forEach(a=>{
+             const card = document.createElement('div'); card.className='anime-card';
+             card.innerHTML = `
+               <div class="image-container">
+                 <img src="${a.cover}" alt="${a.name}" />
+                 <div class="anime-title-overlay">${a.name}</div>
+               </div>
+             `;
+             card.addEventListener('click',()=>window.location.href=`anime.html?id=${encodeURIComponent(a.id)}`);
+             animeDirectory.appendChild(card);
+           });
+         }
+         
+         function showAnimeDetails(anime) {
+           intro.style.display='none'; newsSection.style.display='none'; filterSection.style.display='none'; animeDirectory.style.display='none';
+           document.getElementById('anime-details').style.display='block';
+           detailName.textContent=anime.name;
+           detailDescription.textContent=anime.description||'Sin descripción.';
+           episodeList.innerHTML=''; videoPlayer.innerHTML='';
+           if(anime.episodes?.length){
+             anime.episodes.forEach((ep,i)=>{
+               const btn=document.createElement('button'); btn.textContent=`${ep.number}. ${ep.title}`;
+               btn.addEventListener('click',()=>{
+                 [...episodeList.children].forEach(b=>b.classList.remove('active'));
+                 btn.classList.add('active');
+                 const temp=document.createElement('div'); temp.innerHTML=ep.embed;
+                 const iframe=temp.querySelector('iframe');
+                 if(iframe){
+                   iframe.removeAttribute('width'); iframe.removeAttribute('height');
+                   iframe.style.width='100%'; iframe.style.height='100%'; iframe.style.border='none'; iframe.style.display='block';
+                   videoPlayer.innerHTML=''; videoPlayer.appendChild(iframe);
+                 } else videoPlayer.innerHTML=ep.embed;
+               });
+               episodeList.appendChild(btn);
+               if(i===0) btn.click();
+             });
+           } else episodeList.innerHTML='<p>Sin episodios disponibles.</p>';
+         }
+         
+         function loadApp(skipIntro=false) {
+           if(!skipIntro) intro.classList.add('hidden'); else intro.style.display='none';
+           newsSection.style.display='block'; filterSection.style.display='flex'; animeDirectory.style.display='grid';
+           loadAniListNews();
+           fetch('animes.json')
+             .then(r=>r.json())
+             .then(data=>{
+               allAnimes=data; loadGenres(allAnimes);
+               if(animeIdFromURL){
+                 const ani=allAnimes.find(a=>a.id===animeIdFromURL);
+                 ani?showAnimeDetails(ani):renderAnimes(allAnimes);
+               } else if(genreFromURL) filterAnimes(); else renderAnimes(allAnimes);
+             })
+             .catch(()=>animeDirectory.innerHTML='<p>Error cargando datos.</p>');
+         }
+         
+         searchInput.addEventListener('input', filterAnimes);
+         
+         if(genreFromURL||animeIdFromURL) loadApp(true);
+         else enterBtn.addEventListener('click',()=>loadApp());
+      </script>
+      <footer>
+         © 2025 Re:Anime - All rights reserved.<br/>
+         Un proyecto de <a href="https://discord.com/users/781172416218136577" target="_blank" class="footer-link">Ream</a>.
+      </footer>
+   </body>
 </html>
