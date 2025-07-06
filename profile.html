@@ -21,23 +21,23 @@
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 1rem;
     }
-    .anime-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      overflow: hidden;
-      text-align: center;
-      transition: transform 0.3s ease;
-      cursor: pointer;
-    }
-    .anime-card:hover {
-      transform: scale(1.05);
-    }
-    .anime-card img {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-    }
+         .anime-card {
+         background: white;
+         border-radius: 12px;
+         overflow: hidden;
+         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+         transition: transform 0.3s ease;
+         cursor: pointer;
+         text-align: center;
+         }
+         .anime-card:hover {
+         transform: scale(1.05);
+         }
+         .anime-card img {
+         width: 100%;
+         height: 220px;
+         object-fit: cover;
+         }
     h2 {
       color: #ff4ecd;
       margin-top: 2rem;
@@ -85,7 +85,7 @@
 
     if (!userId) {
       document.getElementById('profile-content').innerHTML = `
-        <p style='text-align:center; margin-top:5rem;'>Debes iniciar sesión con Discord para ver tu perfil.</p>
+        <p style='text-align:center; margin-top:5rem;'>Debes iniciar sesión con Discord para ver tu perfil -w-</p>
         <div style="text-align:center; margin-top:1rem;">
           <a href="index.html" style="text-decoration:none; font-weight:bold; color:#ff4ecd;">← Volver al inicio</a>
         </div>
@@ -112,13 +112,13 @@
           <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
         </div>
 
-        <h2>⭐ Favoritos</h2>
+        <h2>Favoritos</h2>
         <div id="favorites" class="anime-grid"></div>
 
-        <h2>👁️ Ver después</h2>
+        <h2>Ver después</h2>
         <div id="watchlist" class="anime-grid"></div>
 
-        <h2>✅ Vistos</h2>
+        <h2>Vistos</h2>
         <div id="watched" class="anime-grid"></div>
       `;
 
@@ -136,7 +136,7 @@
       const container = document.getElementById(type);
       const ids = getUserList(type);
       if (!ids.length) {
-        container.innerHTML = `<p class="no-data">No hay animes en esta lista.</p>`;
+        container.innerHTML = `<p class="no-data">No hay animes en esta lista -w-</p>`;
         return;
       }
       const filtered = allAnimes.filter(a => ids.includes(a.id));
