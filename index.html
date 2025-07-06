@@ -527,28 +527,28 @@ body.dark .intro p {
     }
   </style>
 <script type="text/javascript">
-  function googleTranslateElementInit() {
-    new google.translate.TranslateElement({
-      pageLanguage: 'en',
-      includedLanguages: 'en,es',
-      layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-      autoDisplay: false
-    }, 'google_translate_element');
-  }
-</script>
-<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,es',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  </script>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
 <body>
   <header>Re:Anime</header>
   <a id="login-btn" href="#">Login with Discord</a>
   <div id="user-info" class="hidden"></div>
   <div id="user-popup"></div>
-  <button class="theme-toggle" onclick="toggleTheme()">🌓 Theme</button>
+  <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">🌓 Theme</button>
 
   <div id="language-switcher" style="position: fixed; top: 60px; left: 10px; z-index: 1001;">
-  <button id="language-btn" class="theme-toggle">🌐 Español?</button>
-</div>
-<div id="google_translate_element" style="display: none;"></div>
+    <button id="language-btn" class="theme-toggle">🌐 Español?</button>
+  </div>
+  <div id="google_translate_element" style="position: fixed; top: 110px; left: 10px; z-index: 1000;"></div>
 
 
   <script>
@@ -900,6 +900,13 @@ function renderAnimes(animes) {
     });
   }
     let currentLang = 'en';
+    window.addEventListener('load', function () {
+      if (!window.google || !window.google.translate || !document.querySelector('.goog-te-combo')) {
+        var gtScript = document.createElement('script');
+        gtScript.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        document.head.appendChild(gtScript);
+      }
+    });
 
 document.getElementById("language-btn").addEventListener("click", () => {
   const select = document.querySelector("select.goog-te-combo");
