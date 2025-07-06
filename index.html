@@ -161,44 +161,69 @@
          gap: 1rem; align-items: center; justify-content: space-between;
          }
          #search-input {
-         margin-top: 2rem; /* Más separación arriba */
-         margin-bottom: 2rem; /* Separación abajo para no pegar con animes */
-         flex: 1 1 300px; /* Ancho mínimo mayor */
-         padding: 0.8rem 1.5rem;
-         font-size: 1.1rem;
-         border-radius: 30px;
-         border: 1px solid #ddd;
-         outline: none;
-         transition: 0.3s;
-         }
-         #search-input:focus {
-         border-color: #ff4ecd; box-shadow: 0 0 8px #ff4ecd88;
-         }
-         .anime-directory {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* mayor ancho mínimo */
-  gap: 1.8rem; /* más separación entre tarjetas */
-}
+      flex: 1 1 200px;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 30px;
+      border: 1px solid #ddd;
+      outline: none;
+      transition: 0.3s;
+    }
+    #search-input:focus {
+      border-color: #ff4ecd;
+      box-shadow: 0 0 8px #ff4ecd88;
+    }
+    .genre-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .genre-filters label {
+      background: #ff8fab88;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.3s;
+    }
+    .genre-filters input[type="checkbox"]:checked + label {
+      background: #ff4ecd;
+      color: white;
+      font-weight: bold;
+    }
 
-.anime-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  transition: transform 0.3s ease;
-  cursor: pointer;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  height: 320px; /* altura vertical aumentada */
-}
-
-.anime-card .image-container {
+    /* Directorio */
+    .anime-directory {
+      max-width: 900px;
+      margin: 0 auto 4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+      padding: 0 1rem;
+    }
+    .anime-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      cursor: pointer; /* changed to pointer so user knows it's clickable */
+      text-align: center;
+    }
+    .anime-card:hover {
+      transform: scale(1.05);
+    }
+    .anime-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+    .anime-card .image-container {
   position: relative;
   width: 100%;
-  height: 260px; /* imagen vertical más grande */
+  height: 220px;
   overflow: hidden;
-  border-bottom: 1px solid #eee;
 }
 
 .anime-card .image-container img {
@@ -207,44 +232,50 @@
   object-fit: cover;
   display: block;
 }
-         .anime-card .anime-title-overlay {
-         position: absolute;
-         bottom: 0;
-         width: 100%;
-         padding: 0.3rem 0.6rem;
-         background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-         color: #fff;
-         font-weight: bold;
-         font-size: 0.9rem;
-         text-shadow: 0 0 5px rgba(0,0,0,0.8);
-         }
-         .anime-card h3 {
-         margin: 0.3rem 0 0;
-         font-size: 1rem;
-         color: #333;
-         padding: 0.3rem 0.6rem;
-         flex-grow: 1;
-         display: flex;
-         align-items: center;
-         justify-content: center;
-         background: #fff;
-         }
-         .anime-card .info {
-         font-size: 0.85rem; color: #666; padding-bottom: 0.8rem;
-         }
-         #anime-details {
-         max-width: 900px; margin: 2rem auto 4rem;
-         background: white; border-radius: 12px;
-         padding: 1rem 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-         text-align: left; display: none;
-         }
-         #anime-details h2 {
-         font-family: 'Zen Tokyo Zoo', cursive;
-         color: #ff4ecd; margin-bottom: 0.5rem;
-         }
-         #anime-details p.description {
-         margin-bottom: 1rem; color: #444; font-size: 1rem;
-         }
+
+.anime-card .anime-title-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 0.5rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.95rem;
+  text-shadow: 0 0 5px rgba(0,0,0,0.6);
+}
+    .anime-card h3 {
+      margin: 0.5rem 0 0.3rem;
+      font-size: 1rem;
+      color: #333;
+    }
+    .anime-card .info {
+      font-size: 0.85rem;
+      color: #666;
+      padding-bottom: 0.8rem;
+    }
+
+    /* Sección detalles anime */
+    #anime-details {
+      max-width: 900px;
+      margin: 2rem auto 4rem;
+      background: white;
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: left;
+      display: none;
+    }
+    #anime-details h2 {
+      font-family: 'Zen Tokyo Zoo', cursive;
+      color: #ff4ecd;
+      margin-bottom: 0.5rem;
+    }
+    #anime-details p.description {
+      margin-bottom: 1rem;
+      color: #444;
+      font-size: 1rem;
+    }
          #episode-list {
          margin-bottom: 1rem; display: flex;
          flex-wrap: wrap; gap: 0.5rem;
