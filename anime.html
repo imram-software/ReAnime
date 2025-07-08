@@ -13,6 +13,46 @@
       transition: background 0.5s, color 0.5s;
       position: relative;
     }
+    body.dark {
+      background: linear-gradient(135deg, #2b2b2b, #444);
+      color: #eee;
+    }
+    body.dark header {
+      background: #1e1e1e;
+      color: #ff4ecd;
+    }
+    body.dark .container,
+    body.dark #user-popup {
+      background: #333;
+      color: #eee;
+    }
+    body.dark .sidebar button,
+    body.dark .sidebar {
+      background: #222;
+      color: #ffb6d9;
+      border-color: #444;
+    }
+    body.dark .sidebar button.active,
+    body.dark .sidebar button:hover {
+      background: #ff4ecd;
+      color: #fff;
+    }
+    body.dark .genres span {
+      background: #444;
+      color: #ffb6d9;
+    }
+    body.dark .anime-title {
+      color: #ffb6d9;
+    }
+    body.dark .back-btn,
+    body.dark #anime-actions button {
+      background: #ff4ecd;
+      color: #fff;
+    }
+    body.dark #login-btn {
+      background: #ff4ecd;
+      color: #fff;
+    }
     header {
       display: flex;
       justify-content: space-between;
