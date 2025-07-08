@@ -421,12 +421,13 @@
            userInfo.classList.remove("hidden");
            userInfo.innerHTML = `<img src="${avatarUrl}" /><span>${user.username}</span>`;
            userInfo.onclick = () => {
-             userPopup.style.display = userPopup.style.display === "block" ? "none" : "block";
-             userPopup.innerHTML = `
-               <strong>${user.username}#${user.discriminator}</strong><br>
-               <img src="${avatarUrl}" width="80" style="border-radius:50%; margin-top:0.5rem;"><br>
-               <button onclick="logout()">Cerrar sesión</button>
-             `;
+           userPopup.style.display = userPopup.style.display === "block" ? "none" : "block";
+           userPopup.innerHTML = `
+              <strong>${user.username}#${user.discriminator}</strong><br>
+              <img src="${avatarUrl}" width="80" style="border-radius:50%; margin-top:0.5rem;"><br>
+              <button onclick="window.location.href='profile.html'">Perfil</button><br>
+              <button onclick="logout()">Cerrar sesión</button>
+            `;
            };
          }
          
