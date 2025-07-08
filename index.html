@@ -372,6 +372,16 @@
       </style>
    </head>
    <audio id="bg-music" src="Assets/background-theme.mp3" autoplay loop hidden></audio>
+   <script>
+   document.addEventListener("DOMContentLoaded", () => {
+     const music = document.getElementById("bg-music");
+     if (music) {
+       music.volume = 0.2; // volumen al 20%
+       music.play().catch(e => console.log("Autoplay bloqueado:", e));
+     }
+   });
+</script>
+
    <body>
       <header>Re:Anime</header>
       <a id="login-btn" href="#">Iniciar sesión con Discord</a>
