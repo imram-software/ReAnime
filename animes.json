@@ -357,5 +357,63 @@
     "embed": "<iframe src='https://streamtape.com/e/g9xlpjRg9Lhqb2q' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
   }
   ]
-  }
+  },
+  {
+  "id": "enen-no-shouboutai",
+  "name": "Enen no Shouboutai (Fire Force)",
+  "cover": "https://cdn.myanimelist.net/images/anime/1664/103275.jpg",
+  "genre": ["Action", "Fantasy", "Sci-Fi"],
+  "year": 2019,
+  "rating": 9.0,
+  "description": "Spontaneous Human Combustion: a chaotic phenomenon that has plagued humanity for years, randomly transforming ordinary people into flaming, violent creatures known as Infernals. While Infernals make up the first-generation accounts of Human Combustion, the second and third generations became known as pyrokinetics—people gifted with the ability to manipulate and control their flames while remaining human. To combat the Infernal threat and discover the cause, the Tokyo Armed Forces, Fire Defense Agency, and Holy Church of Sol produced their answer: the Special Fire Force.",
+  "episodes": [
+    { "number": 1, "title": "Shinra Kusakabe Enlists", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 2, "title": "The Heart of a Fire Soldier", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 3, "title": "The Rookie Fire Soldier Games", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 4, "title": "The Hero and the Princess", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 5, "title": "The Battle Begins", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 6, "title": "The Spark of Promise", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 7, "title": "The Investigation of the 1st Commences", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 8, "title": "Infernal Insects", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 9, "title": "The Spreading Malice", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 10, "title": "The Promise", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 11, "title": "Formation of Special Fire Force Company 8 / The Mightiest Hikeshi", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 12, "title": "Eve of Hostilities in Asakusa", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 13, "title": "The Trap is Set", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 14, "title": "For Whom the Flame Burns", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 15, "title": "The Blacksmith’s Dream", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 16, "title": "We Are Family", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 17, "title": "Black and White and Gray", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 18, "title": "The Secrets of Pyrokinesis", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 19, "title": "Into the Nether", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 20, "title": "Wearing His Pride", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 21, "title": "Those Connected", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 22, "title": "A Brother’s Determination", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 23, "title": "Smile", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 24, "title": "The Burning Past", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" }
+  ]
+  },
+  {
+  "id": "sakura-trick",
+  "name": "Sakura Trick",
+  "cover": "https://cdn.myanimelist.net/images/anime/2/56189.jpg",
+  "genre": ["Comedy", "Girls Love"],
+  "year": 2014,
+  "rating": 7.5,
+  "description": "Haruka y Yuu, amigas inseparables, comienzan la secundaria en una escuela que pronto cerrará. Para mantener su vínculo especial, comparten besos secretos que despiertan sentimientos más profundos. En medio de situaciones escolares cotidianas, crece su romance íntimo, tierno y humorístico.",
+  "episodes": [
+    { "number": 1, "title": "A Cherry Blossom‑colored Beginning / Yakisoba, Verandas and Girls", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 2, "title": "Yet Another Cherry Blossom Color / After School with Harry‑chan", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 3, "title": "The President is My Sister / A Pool Cleaning Promise", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 4, "title": "A Sour Plan? / Is This a Test of Courage!?", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 5, "title": "Let’s Have Tea With Big Sis! / The Witch, The Apple and Big Sis", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 6, "title": "It’s the Culture Festival ☆ Sleepover Time! / It’s the Culture Festival ☆ Showtime!", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 7, "title": "Swimsuit Fanservice: Accidents Included / Shopping with Yuu‑chan", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 8, "title": "A Cherry Blossom‑colored Wedding / A Cherry Blossom‑colored Christmas", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 9, "title": "The End of Year Debut of S.B.J.K / Return of the Sour Operation!?", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 10, "title": "Memories and Surprises of a Snowy Day / A Promise in the Gym Storage", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 11, "title": "The President is SumiSumi! / The Cherry Blossom‑colored Truth", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+    { "number": 12, "title": "Pudding and Mitsuki’s Decision / Sakura Trick", "embed": "<iframe src='https://streamtape.com/e/LINK/' width='800' height='600' frameborder='0' allowfullscreen></iframe>" }
+  ]
+ }
 ]
