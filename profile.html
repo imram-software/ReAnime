@@ -12,6 +12,54 @@
       background: linear-gradient(135deg, #ffe1f0, #caf0f8);
       padding: 2rem;
     }
+    body.dark {
+      background: linear-gradient(135deg, #2b2b2b, #444);
+      color: #eee;
+    }
+    body.dark .perfil-container {
+      background: #222;
+      color: #eee;
+    }
+    body.dark .anime-card {
+      background: #333;
+      color: #eee;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    body.dark .anime-card:hover {
+      background: #444;
+    }
+    body.dark .user-info {
+      background: #333;
+      color: #eee;
+    }
+    body.dark .logout-btn {
+      background: #ff4ecd;
+      color: #fff;
+    }
+    body.dark .logout-btn:hover {
+      background: #ff2ea6;
+    }
+    body.dark h2 {
+      color: #ffb6d9;
+    }
+    .volver-btn {
+      background: #ff8fab;
+      color: white;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+      transition: background 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .volver-btn:hover {
+      background: #ff4ecd;
+      color: #fff;
+      text-decoration: none;
+    }
     .perfil-container {
       max-width: 900px;
       margin: 0 auto;
@@ -80,15 +128,16 @@
   </div>
 
   <script>
+    const theme = localStorage.getItem('theme') || 'light';
+    document.body.classList.add(theme);
+
     const user = JSON.parse(localStorage.getItem("user"));
     const userId = user?.id;
 
     if (!userId) {
       document.getElementById('profile-content').innerHTML = `
+        <a href="index.html" class="volver-btn">← Volver al inicio</a>
         <p style='text-align:center; margin-top:5rem;'>Debes iniciar sesión con Discord para ver tu perfil -w-</p>
-        <div style="text-align:center; margin-top:1rem;">
-          <a href="index.html" style="text-decoration:none; font-weight:bold; color:#ff4ecd;">← Volver al inicio</a>
-        </div>
       `;
       throw new Error("No user");
     }
@@ -103,6 +152,7 @@
       const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
 
       container.innerHTML = `
+        <a href="index.html" class="volver-btn">← Volver al inicio</a>
         <div class="user-info">
           <img src="${avatarUrl}" alt="Avatar" />
           <div>
