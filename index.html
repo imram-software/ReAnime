@@ -371,6 +371,7 @@
          }
       </style>
    </head>
+   <audio id="bg-music" src="Assets/bg.mp3" autoplay loop hidden></audio>
    <body>
       <header>Re:Anime</header>
       <a id="login-btn" href="#">Iniciar sesión con Discord</a>
@@ -592,10 +593,16 @@
          
          if(genreFromURL||animeIdFromURL) loadApp(true);
          else enterBtn.addEventListener('click', () => {
+            const music = document.getElementById('bg-music');
+music.volume = 0.2; // volumen al 20%
+music.play().catch(e => console.log("Autoplay bloqueado:", e));
+
          intro.classList.add('fade-out');
          
          // Mostrar el resto después del fade-out
          setTimeout(() => {
+         const music = document.getElementById('bg-music');
+         if (music) music.play().catch(e => console.log("Autoplay bloqueado:", e));
          intro.style.display = 'none';
          newsSection.style.display = 'block';
          filterSection.style.display = 'flex';
