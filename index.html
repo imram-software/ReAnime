@@ -285,10 +285,27 @@
          #episode-list button:hover,
          #episode-list button.active { background: #ff4ecd; }
          #video-player {
-         width: 100%; max-width: 720px; height: 450px;
+         width: 100%;
+         max-width: 920px;
          margin: 0 auto; border-radius: 12px;
          overflow: hidden; box-shadow: 0 0 20px #ff4ecd88;
          position: relative;
+         background: #000;
+         /* Keep a consistent 16:9 layout while remaining responsive */
+         aspect-ratio: 16 / 9;
+         height: auto;
+         }
+
+         .video-container {
+         width: 100%; height: 100%; position: relative;
+         }
+
+         .video-container iframe,
+         .video-container video,
+         .video-container object,
+         .video-container embed {
+         width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+         border: none; display: block; object-fit: cover;
          }
          @keyframes glow {
          0%,100% { text-shadow: 0 0 15px #ff9de5,0 0 30px #ff4ecd; }
@@ -571,11 +588,31 @@
                  btn.classList.add('active');
                  const temp=document.createElement('div'); temp.innerHTML=ep.embed;
                  const iframe=temp.querySelector('iframe');
-                 if(iframe){
+                 if (iframe) {
                    iframe.removeAttribute('width'); iframe.removeAttribute('height');
-                   iframe.style.width='100%'; iframe.style.height='100%'; iframe.style.border='none'; iframe.style.display='block';
-                   videoPlayer.innerHTML=''; videoPlayer.appendChild(iframe);
-                 } else videoPlayer.innerHTML=ep.embed;
+                   iframe.style.border = 'none'; iframe.style.display = 'block';
+                   const wrapper = document.createElement('div');
+                   wrapper.className = 'video-container';
+                   wrapper.appendChild(iframe);
+                   videoPlayer.innerHTML = '';
+                   videoPlayer.appendChild(wrapper);
+                 } else {
+                   // For other embed types (video tag or raw HTML), try to normalize and wrap them
+                   const tempDiv = document.createElement('div');
+                   tempDiv.innerHTML = ep.embed;
+                   const vid = tempDiv.querySelector('video') || tempDiv.querySelector('iframe') || tempDiv.firstElementChild;
+                   if (vid) {
+                     if (vid.removeAttribute) { vid.removeAttribute('width'); vid.removeAttribute('height'); }
+                     vid.style.border = 'none'; vid.style.display = 'block';
+                     const wrapper = document.createElement('div');
+                     wrapper.className = 'video-container';
+                     wrapper.appendChild(vid);
+                     videoPlayer.innerHTML = '';
+                     videoPlayer.appendChild(wrapper);
+                   } else {
+                     videoPlayer.innerHTML = ep.embed;
+                   }
+                 }
                });
                episodeList.appendChild(btn);
                if(i===0) btn.click();
