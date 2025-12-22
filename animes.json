@@ -4,135 +4,122 @@
     "name": "Re:Zero kara Hajimeru Isekai Seikatsu",
     "cover": "https://cdn.myanimelist.net/images/anime/1522/128039.jpg",
     "genre": ["Isekai", "Fantasy", "Adventure"],
+
+    "opinion": [
+      "Ram opina que Subaru es débil… pero su obstinación es lo que lo mantiene con vida.",
+      "Desde el punto de vista de Ram, Re:Zero no es un isekai feliz, es un castigo disfrazado.",
+      "Ram cree que este mundo no perdona a los ingenuos, y Subaru aprende eso a la fuerza."
+    ],
+
+    "dato": [
+      "Re:Zero popularizó el concepto de reinicios traumáticos en el género isekai.",
+      "El autor escribió la historia originalmente como una web novel.",
+      "Cada muerte de Subaru está pensada para dejar consecuencias psicológicas reales."
+    ],
+
     "year": 2016,
     "rating": 9.0,
     "description": "Subaru Natsuki is transported to a fantasy world and discovers he has the ability to return from death — but only after experiencing it. Trapped in a cruel time loop, he must uncover the truth and protect those he cares about.",
+
     "episodes": [
-      {
-        "number": 1,
-        "title": "The End of the Beginning and the Beginning of the End",
-        "embed": "<iframe src='https://hqq.ac/e/VE1jSmdIbGZ3SGx3MTJiUGN0aWZwdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 2,
-        "title": "The Truth of Zero",
-        "embed": "<iframe src='https://hqq.ac/e/SXlOL0NPOThEYXJ2bGpPY29XNllzUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 3,
-        "title": "Starting Life from Zero in Another World",
-        "embed": "<iframe src='https://hqq.ac/e/QjBwTUgwWFpsSndTd3pHdktFQ3p4Zz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 4,
-        "title": "The Happy Roswaal Mansion Family",
-        "embed": "<iframe src='https://hqq.ac/e/cEVhWnZBTFhYR3FSbVlnK0dTVnJ6UT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 5,
-        "title": "The Morning of Our Promise Is Still Distant",
-        "embed": "<iframe src='https://hqq.ac/e/aVpLZTh2bzIwUXhBUlArRWZHVktPUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 6,
-        "title": "The Sound of Chains",
-        "embed": "<iframe src='https://hqq.ac/e/L0lmY0hhSE5xRFJ6b1FTR2FGK3ZHQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 7,
-        "title": "Natsuki Subaru’s Restart",
-        "embed": "<iframe src='https://hqq.ac/e/Njh2dG9naWRha1FNc2EyS1YrOWJ3QT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 8,
-        "title": "I Cried, Cried My Lungs Out, and Stopped Crying",
-        "embed": "<iframe src='https://hqq.ac/e/b0tDY2dWODZCazczS2l5WEZtTEh6dz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 9,
-        "title": "The Meaning of Courage",
-        "embed": "<iframe src='https://hqq.ac/e/Njl3akt3YjhEY29VWkhMWFdXZXhUQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 10,
-        "title": "A Wager That Defies the Gods",
-        "embed": "<iframe src='https://hqq.ac/e/OWRITUIvbE51Ylk0QTZiVmFFUXBwZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 11,
-        "title": "Rem",
-        "embed": "<iframe src='https://hqq.ac/e/Sk9aSGMyVE5IRnVuL1VIR0NQWjBKZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 12,
-        "title": "Return to the Capital",
-        "embed": "<iframe src='https://hqq.ac/e/d3duWVJhdktpRXc0WjBDTEFodW1pZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 13,
-        "title": "Self-Proclaimed Knight Natsuki Subaru",
-        "embed": "<iframe src='https://hqq.ac/e/UW1aRk4zSEFNZEo2anJ5U1hiekhBdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 14,
-        "title": "The Sickness Called Despair",
-        "embed": "<iframe src='https://hqq.ac/e/QzB0eUlMSTNyeGEzTmc2T1dWSk5YZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 15,
-        "title": "The Outside of Madness",
-        "embed": "<iframe src='https://hqq.ac/e/OEVXVnJtUXdtRFB0TGk5aUF5ZURTQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 16,
-        "title": "The Greed of a Pig",
-        "embed": "<iframe src='https://hqq.ac/e/a0ZKNkVxM3NRODhKVjN3NFpaS21Idz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 17,
-        "title": "Disgrace in the Extreme",
-        "embed": "<iframe src='https://hqq.ac/e/N2xMdHkvdHJGSzUwaWJ3RGFYNExnZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 18,
-        "title": "From Zero",
-        "embed": "<iframe src='https://hqq.ac/e/RUMvZjRYUWY2STVTRURSRWlsVW0yZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 19,
-        "title": "Battle Against the White Whale",
-        "embed": "<iframe src='https://hqq.ac/e/ZHhFdkhueVZNYWp3aFBVRWFsMjM3Zz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 20,
-        "title": "Wilhelm van Astrea",
-        "embed": "<iframe src='https://hqq.ac/e/YXhncE5WUVVWWVpaaklOdklzUlhWdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 21,
-        "title": "A Wager That Defies Despair",
-        "embed": "<iframe src='https://hqq.ac/e/dFhRNkc3S3RjN0pXYXVRY3pFR3UxUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 22,
-        "title": "A Flash of Sloth",
-        "embed": "<iframe src='https://hqq.ac/e/TjYvU0duV3czbHYyNXJ1NnM4TGV4dz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 23,
-        "title": "Nefarious Sloth",
-        "embed": "<iframe src='https://hqq.ac/e/L05RM3FwSlRCN1F5TUhjMHNjTkdtUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 24,
-        "title": "The Self-Proclaimed Knight and the Greatest Knight",
-        "embed": "<iframe src='https://hqq.ac/e/S1RQWnN0SDRTcFlYQXp2SjdtYitZdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      },
-      {
-        "number": 25,
-        "title": "That's All This Story Is About",
-        "embed": "<iframe src='https://hqq.ac/e/bFBCU2ZiaWlONTFGTHowdUhsckVzdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
-      }
+      { "number": 1, "title": "The End of the Beginning and the Beginning of the End", "embed": "<iframe src='https://hqq.ac/e/VE1jSmdIbGZ3SGx3MTJiUGN0aWZwdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+      { "number": 2, "title": "The Truth of Zero", "embed": "<iframe src='https://hqq.ac/e/SXlOL0NPOThEYXJ2bGpPY29XNllzUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+      { "number": 3, "title": "Starting Life from Zero in Another World", "embed": "<iframe src='https://hqq.ac/e/QjBwTUgwWFpsSndTd3pHdktFQ3p4Zz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+      { "number": 4, "title": "The Happy Roswaal Mansion Family", "embed": "<iframe src='https://hqq.ac/e/cEVhWnZBTFhYR3FSbVlnK0dTVnJ6UT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+      { "number": 5, "title": "The Morning of Our Promise Is Still Distant", "embed": "<iframe src='https://hqq.ac/e/aVpLZTh2bzIwUXhBUlArRWZHVktPUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+      { "number": 6, "title": "The Sound of Chains", "embed": "<iframe src='https://hqq.ac/e/L0lmY0hhSE5xRFJ6b1FTR2FGK3ZHQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+      { "number": 7, "title": "Natsuki Subaru’s Restart", "embed": "<iframe src='https://hqq.ac/e/Njh2dG9naWRha1FNc2EyS1YrOWJ3QT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+      { "number": 8, "title": "I Cried, Cried My Lungs Out, and Stopped Crying", "embed": "<iframe src='https://hqq.ac/e/b0tDY2dWODZCazczS2l5WEZtTEh6dz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+      { "number": 9, "title": "The Meaning of Courage", "embed": "<iframe src='https://hqq.ac/e/Njl3akt3YjhEY29VWkhMWFdXZXhUQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+      { "number": 10, "title": "A Wager That Defies the Gods", "embed": "<iframe src='https://hqq.ac/e/OWRITUIvbE51Ylk0QTZiVmFFUXBwZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+      { "number": 11, "title": "Rem", "embed": "<iframe src='https://hqq.ac/e/Sk9aSGMyVE5IRnVuL1VIR0NQWjBKZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
+      { "number": 12, "title": "Return to the Capital", "embed": "<iframe src='https://hqq.ac/e/d3duWVJhdktpRXc0WjBDTEFodW1pZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" }
     ]
-  }
+  },
+
+  {
+  "id": "chichi-wa-eiyuu-haha-wa-seirei",
+  "name": "Chichi wa Eiyuu, Haha wa Seirei, Musume no Watashi wa Tenseisha",
+  "cover": "https://cdn.myanimelist.net/images/anime/1811/151799l.jpg",
+  "genre": ["Fantasy", "Isekai"],
+
+  "opinion": [
+    "Ram piensa que este isekai es demasiado amable… sospechosamente amable.",
+    "Según Ram, nacer con tanto talento quita parte del mérito.",
+    "Aun así, Ram admite que la protagonista es peligrosa sin intentarlo."
+  ],
+
+  "dato": [
+    "La historia se centra más en la familia que en el combate.",
+    "La protagonista posee afinidad espiritual desde su nacimiento.",
+    "Es un isekai con enfoque slice of life en lugar de tragedia."
+  ],
+
+  "year": 2024,
+  "rating": 7.2,
+  "description": "Reencarnada como la hija de un héroe y una reina espíritu, una joven prodigio vive una vida tranquila… aunque su poder es todo menos normal.",
+
+  "episodes": [
+    {
+      "number": 1,
+      "title": "La niña reencarnada",
+      "embed": "<iframe src='https://hqq.ac/e/Q1VYeU9sSzJpdzhrZVhvQ0FRYjdOZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 2,
+      "title": "Padre héroe, madre espíritu",
+      "embed": "<iframe src='https://hqq.ac/e/aXloNlViOUZHUXZZUmFFR1AvcXNZZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 3,
+      "title": "Un talento fuera de lo común",
+      "embed": "<iframe src='https://hqq.ac/e/eXdsYUZ5MXV6ZjJBYkZiY2lRZ0x3QT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 4,
+      "title": "Aprendiendo magia",
+      "embed": "<iframe src='https://hqq.ac/e/MTJ1VHpjcm5oL0xGQUdibEcreGgrUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 5,
+      "title": "La bendición espiritual",
+      "embed": "<iframe src='https://hqq.ac/e/Y2gxYldMSGpuTjl2ZTJLMlJ5SXh6QT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 6,
+      "title": "Una familia poco normal",
+      "embed": "<iframe src='https://hqq.ac/e/MUd2bm5Zci9sTEordHZVeFFXSUxPUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 7,
+      "title": "Creciendo demasiado rápido",
+      "embed": "<iframe src='https://hqq.ac/e/UE1WYWdJTEhNMXN4c3V5NkJVc002QT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 8,
+      "title": "El mundo exterior",
+      "embed": "<iframe src='https://hqq.ac/e/anZhbUE4UEMyaWk2ZmE4U0w1QndrUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 9,
+      "title": "Problemas inesperados",
+      "embed": "<iframe src='https://hqq.ac/e/U0Y4WnluUDVDRlRydDNRaEYzWjJFdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 10,
+      "title": "La decisión",
+      "embed": "<iframe src='https://hqq.ac/e/VVBGUUgrOWJDcFVnWjRXQjY5NmRLQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 11,
+      "title": "Protegiendo lo importante",
+      "embed": "<iframe src='https://hqq.ac/e/WUI4ZEdyTVJ6d3lmUmZLVm9IYjMxZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 12,
+      "title": "El comienzo de una nueva vida",
+      "embed": "<iframe src='https://hqq.ac/e/WE54WU9OaFFncDFyTmJRTm5ob2tSQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    }
+  ]
+}
 ]
