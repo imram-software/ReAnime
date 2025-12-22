@@ -386,25 +386,481 @@
          transform: translateY(0);
          }
          }
-      </style>
-   </head>
-   <audio id="bg-music" src="Assets/background-theme.mp3" autoplay loop hidden></audio>
-   <script>
-   document.addEventListener("DOMContentLoaded", () => {
-     const music = document.getElementById("bg-music");
-     if (music) {
-       music.volume = 0.2; // volumen al 20%
-       music.play().catch(e => console.log("Autoplay bloqueado:", e));
-     }
-   });
-</script>
+       #mascot-container {
+          position: fixed;
+          left: 10vw;
+          bottom: 30px;
+          z-index: 2002;
+          width: 90px;
+          height: 120px;
+          pointer-events: auto;
+          user-select: none;
+       }
+       #mascot-img {
+          width: 80px;
+          height: 80px;
+          transition: transform 0.2s;
+          cursor: pointer;
+       }
+       #mascot-speech {
+          position: absolute;
+          left: 50%;
+          bottom: 120px; /* move higher above mascot's head */
+          transform: translateX(-50%);
+          background: #fff0fa;
+          color: #ff4ecd;
+          border-radius: 16px;
+          box-shadow: 0 2px 8px #ff4ecd44;
+          padding: 0.6rem 1.2rem;
+          font-size: 1.05rem;
+          min-width: 120px;
+          max-width: 240px;
+          text-align: center;
+          pointer-events: none;
+          animation: mascotSpeechFade 0.5s;
+          z-index: 10;
+       }
+       @keyframes mascotSpeechFade {
+          from { opacity: 0; transform: translateY(20px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+       }
+       #mascot-chat {
+          position: fixed;
+          right: 30px;
+          bottom: 30px;
+          z-index: 3000;
+          background: rgba(59, 59, 59, 0.98);
+          border-radius: 18px;
+          box-shadow: 0 4px 24px #ff4ecd44;
+          padding: 0.5rem;
+          min-width: 260px;
+          max-width: 90vw;
+       }
+       #mascot-chat-box {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          height: 320px;
+          min-width: 260px;
+          max-width: 320px;
+       }
+       #mascot-chat-messages {
+          flex: 1 1 auto;
+          min-height: 60px;
+          max-height: 180px;
+          overflow-y: auto;
+          font-size: 0.95rem;
+          margin-bottom: 0.5rem;
+          background: #ff8fab;
+          color: #ffffff;
+          border-radius: 8px;
+          padding: 0.3rem 0.5rem;
+       }
+       #mascot-chat-input {
+          border-radius: 12px;
+          border: 1px solid #ff4ecd;
+          padding: 0.4rem 0.8rem;
+          font-size: 1rem;
+          outline: none;
+       }
+       #mascot-chat-send {
+          background: #ff8fab;
+          color: white;
+          border: none;
+          border-radius: 12px;
+          padding: 0.4rem 1rem;
+          font-weight: bold;
+          cursor: pointer;
+          margin-top: 0.2rem;
+       }
+       #mascot-chat-send:hover {
+          background: #ff4ecd;
+       }
+       #mascot-chat-close {
+          background: #eee;
+          color: #ff4ecd;
+          border: none;
+          border-radius: 12px;
+          padding: 0.2rem 0.7rem;
+          font-weight: bold;
+          cursor: pointer;
+          align-self: flex-end;
+       }
+    </style>
+ </head>
+ <audio id="bg-music" src="Assets/background-theme.mp3" autoplay loop hidden></audio>
+ <script>
+ document.addEventListener("DOMContentLoaded", () => {
+   const music = document.getElementById("bg-music");
+   if (music) {
+     music.volume = 0.2; // volumen al 20%
+     music.play().catch(e => console.log("Autoplay bloqueado:", e));
+   }
+ });
+ </script>
 
-   <body>
-      <header>Re:Anime</header>
-      <a id="login-btn" href="#">Iniciar sesión con Discord</a>
-      <div id="user-info" class="hidden"></div>
-      <div id="user-popup"></div>
-      <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">🌗 Tema</button>
+ <body>
+    <header>Re:Anime</header>
+    <a id="login-btn" href="#">Iniciar sesión con Discord</a>
+    <div id="user-info" class="hidden"></div>
+    <div id="user-popup"></div>
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">🌗 Tema</button>
+    <!-- Mascot -->
+    <div id="mascot-container">
+      <img id="mascot-img" src="Assets/ReAnime-Mascot.png" alt="Ram" />
+      <div id="mascot-speech" class="hidden"></div>
+    </div>
+    <div id="mascot-chat" class="hidden">
+      <div id="mascot-chat-box">
+        <div id="mascot-chat-messages"></div>
+        <div id="mascot-chat-actions" style="display:flex;flex-direction:column;gap:0.3rem;">
+          <input id="mascot-chat-input" type="text" placeholder="Ask me something..." />
+          <button id="mascot-chat-send">Send</button>
+          <button id="mascot-chat-close">✖</button>
+        </div>
+      </div>
+    </div>
+    <script>
+       // Mascot logic
+       const mascotImg = document.getElementById('mascot-img');
+       const mascotContainer = document.getElementById('mascot-container');
+       const mascotSpeech = document.getElementById('mascot-speech');
+       const mascotChat = document.getElementById('mascot-chat');
+       const mascotChatBox = document.getElementById('mascot-chat-box');
+       const mascotChatMessages = document.getElementById('mascot-chat-messages');
+       const mascotChatInput = document.getElementById('mascot-chat-input');
+       const mascotChatSend = document.getElementById('mascot-chat-send');
+       const mascotChatClose = document.getElementById('mascot-chat-close');
+
+       // Walking animation
+       let mascotPos = 10; // vw
+       let mascotDir = 1; // 1: right, -1: left
+       function walkMascot() {
+          mascotPos += mascotDir * 0.15;
+          if (mascotPos > 80) mascotDir = -1;
+          if (mascotPos < 5) mascotDir = 1;
+          mascotContainer.style.left = mascotPos + 'vw';
+          mascotImg.style.transform = mascotDir === 1 ? 'scaleX(1)' : 'scaleX(-1)';
+       }
+       setInterval(walkMascot, 30);
+
+       // Speech bubbles
+       const mascotMessages = [
+         "¡Hola! Soy tu guía kawaii~",
+         "¿Quieres una recomendación de anime?",
+         "Hazme clic para hablar conmigo!",
+         "¿Sabías que Re:Zero tiene 25 episodios?",
+         "Puedo ayudarte a encontrar tu próximo anime favorito!",
+         "Pregúntame lo que quieras~",
+         "¿Te gusta la fantasía o el isekai?",
+         "¡No olvides agregar tus favoritos!",
+         "¿Buscas algo de acción, romance o comedia?",
+         "¡Dime un género y te recomiendo!",
+         "¿Te gustaría ver algo nuevo hoy?",
+         "¡Estoy aquí para ayudarte!",
+         "¿Anime corto o largo? ¡Pregunta!",
+         "¿Sabías que puedes buscar por género?",
+         "¡Pídeme otro anime si no te convence!"
+       ];
+       function showMascotSpeech(msg) {
+          mascotSpeech.textContent = msg;
+          mascotSpeech.classList.remove('hidden');
+          setTimeout(() => mascotSpeech.classList.add('hidden'), 6500); // Dura más tiempo
+       }
+       setInterval(() => {
+          if (mascotChat.classList.contains('hidden')) {
+             showMascotSpeech(mascotMessages[Math.floor(Math.random()*mascotMessages.length)]);
+          }
+       }, 7000);
+
+       mascotImg.onclick = () => {
+          mascotChat.classList.remove('hidden');
+          mascotChatInput.focus();
+          mascotChatMessages.innerHTML = '<div><b>Ram:</b> ¡Hola! ¿En qué puedo ayudarte?</div>';
+       };
+       mascotChatClose.onclick = () => mascotChat.classList.add('hidden');
+
+       // Chat logic
+       function sendMascotMessage(msg, isUser) {
+          mascotChatMessages.innerHTML += `<div style="text-align:${isUser?'right':'left'}"><b>${isUser?'Tú':'Ram'}:</b> ${msg}</div>`;
+          mascotChatMessages.scrollTop = mascotChatMessages.scrollHeight;
+       }
+       mascotChatSend.onclick = () => {
+          const userMsg = mascotChatInput.value.trim();
+          if (!userMsg) return;
+          sendMascotMessage(userMsg, true);
+          mascotChatInput.value = '';
+          handleMascotChat(userMsg);
+       };
+       mascotChatInput.addEventListener('keydown', e => {
+          if (e.key === 'Enter') mascotChatSend.click();
+       });
+
+       // Handle mascot chat
+       function handleMascotChat(msg) {
+           msg = msg.toLowerCase();
+           // Remove previous recommendation button if exists
+           let oldBtn = document.getElementById('mascot-go-anime');
+           if (oldBtn) oldBtn.remove();
+
+           // Saludos
+           if (/^(hola|hello|buenas|holi|holaa|hey|hi|que onda|qué onda)/i.test(msg)) {
+             const greetings = [
+               '¡Hola! ¿Quieres una recomendación de anime?',
+               '¡Holi! ¿Te ayudo a buscar anime?',
+               '¡Hey! ¿Buscas algo para ver?',
+               '¡Bienvenido! Pregúntame por animes o géneros.'
+             ];
+             sendMascotMessage(greetings[Math.floor(Math.random()*greetings.length)], false);
+             return;
+           }
+
+           // Despedidas
+           if (/(adiós|adios|bye|nos vemos|hasta luego|see you|chau|chao)/i.test(msg)) {
+             const byes = [
+               '¡Hasta luego! Vuelve cuando quieras.',
+               '¡Nos vemos! Espero haberte ayudado.',
+               '¡Chao! Que tengas un buen día.',
+               '¡Bye bye! No olvides recomendarme a tus amigos.'
+             ];
+             sendMascotMessage(byes[Math.floor(Math.random()*byes.length)], false);
+             return;
+           }
+
+           // Agradecimientos
+           if (/(gracias|thanks|thank you|te lo agradezco|muy amable)/i.test(msg)) {
+             const thanks = [
+               '¡De nada! Si necesitas algo más, aquí estaré.',
+               '¡Para eso estoy! Pregúntame cuando quieras.',
+               '¡Con gusto! ¿Quieres otra recomendación?',
+               '¡Siempre feliz de ayudar!'
+             ];
+             sendMascotMessage(thanks[Math.floor(Math.random()*thanks.length)], false);
+             return;
+           }
+
+           // Pedir otro anime
+           if (/(otro|más|dame otro|dame uno más|otra opción|otra recomendación|otra|next|another|more)/i.test(msg)) {
+             sendMascotMessage('¡Por supuesto! Aquí va otra recomendación...', false);
+             fetch('animes.json').then(r=>r.json()).then(animes => {
+               if (!animes.length) {
+                 sendMascotMessage('No encontré ningún anime en la base de datos.', false);
+                 return;
+               }
+               const pick = animes[Math.floor(Math.random()*animes.length)];
+               sendMascotMessage(`Te recomiendo: <b>${pick.name}</b>.<br>¿Quieres ir a verlo?`, false);
+               let actions = document.getElementById('mascot-chat-actions');
+               if (actions) {
+                 let btn = document.createElement('button');
+                 btn.id = 'mascot-go-anime';
+                 btn.textContent = `¡Ir a ${pick.name}!`;
+                 btn.style.background = '#ff4ecd';
+                 btn.style.color = '#fff';
+                 btn.style.border = 'none';
+                 btn.style.borderRadius = '12px';
+                 btn.style.padding = '0.4rem 1rem';
+                 btn.style.marginTop = '0.2rem';
+                 btn.style.cursor = 'pointer';
+                 btn.onclick = () => { window.location.href = `anime.html?id=${pick.id}`; };
+                 actions.insertBefore(btn, actions.firstChild);
+               }
+             });
+             return;
+           }
+
+           // Recomendar anime por género y filtro de groserías
+           const badWords = [
+             'puta','puto','mierda','pendejo','pendeja','idiota','imbecil','estupido','estúpido','estupida','estúpida','joder','chingar','chingada','culero','culera','cabron','cabrón','cabrona','coño','verga','vergas','cagar','cagas','cago','cagada','cagado','cagaste','zorra','perra','maldito','maldita','hdp','hijo de puta','fuck','shit','bitch','asshole','dick','fag','faggot','bastard','slut','whore','suck','sucks','sucking','sucka','sucker','retard','retarded','imbécil','marica','maricón','maricona','gay','putazo','putazos','pito','culo','culito','chingón','chingona','chingones','chingonas','chingadazo','chingadazos','chingadita','chingaditas','chingadón','chingadóna','chingadones','chingadonas','chingadazo','chingadazos','chingadita','chingaditas','chingadón','chingadóna','chingadones','chingadonas'
+           ];
+           if (badWords.some(bw => msg.includes(bw))) {
+             sendMascotMessage('¡Eso no se dice! Me voy...', false);
+             setTimeout(() => {
+               mascotContainer.style.display = 'none';
+               mascotChat.classList.add('hidden');
+             }, 2000);
+             return;
+           }
+
+           fetch('animes.json').then(r=>r.json()).then(animes => {
+             if (!animes.length) {
+               sendMascotMessage('No encontré ningún anime en la base de datos.', false);
+               return;
+             }
+             // Obtener todos los géneros únicos
+             const allGenres = Array.from(new Set(animes.flatMap(a => a.genre.map(g => g.toLowerCase()))));
+             // Palabras a ignorar
+             const ignoreWords = ['un', 'una', 'unos', 'unas', 'el', 'la', 'los', 'las', 'otro', 'otra', 'otros', 'otras', 'de', 'del', 'al', 'a', 'me', 'quiero', 'ver', 'dame', 'ponme', 'pon', 'muéstrame', 'muéstranos', 'sugiere', 'enséñame', 'anime', 'recomiéndame', 'recomienda', 'recomiendas', 'sugiere', 'busco', 'para', 'ver', 'quiero', 'me', 'da', 'dame', 'una', 'uno', 'más', 'mas', 'y', 'o', 'por', 'favor', 'pero', 'sin', 'no', 'quiero', 'que', 'sea', 'con', 'ni', 'ningún', 'ninguna', 'ningunos', 'ningunas'];
+             // Tokenizar mensaje
+             const tokens = msg.split(/[^a-záéíóúüñ0-9\-]+/i).map(t => t.trim().toLowerCase()).filter(Boolean);
+             // --- DETECTAR GÉNEROS A INCLUIR Y EXCLUIR ---
+             let includeGenres = [];
+             let excludeGenres = [];
+             // Buscar "no quiero [género]", "sin [género]", "pero no [género]", "que no sea [género]"
+             for (const genre of allGenres) {
+               // Excluir si hay "no quiero [género]", "sin [género]", "pero no [género]", "que no sea [género]"
+               const negPatterns = [
+                 `no quiero ${genre}`,
+                 `sin ${genre}`,
+                 `pero no ${genre}`,
+                 `que no sea ${genre}`,
+                 `que no sean ${genre}`,
+                 `excepto ${genre}`,
+                 `evita ${genre}`,
+                 `no ${genre}`
+               ];
+               if (negPatterns.some(pat => msg.includes(pat))) {
+                 excludeGenres.push(genre);
+                 continue;
+               }
+               // Incluir si el género está en el mensaje y no está en palabras ignoradas
+               if (tokens.includes(genre) && !ignoreWords.includes(genre)) {
+                 includeGenres.push(genre);
+               }
+             }
+             // Si el usuario solo pide "sin [género]" o "no quiero [género]", pero no pide ningún género, recomendar cualquier anime que NO tenga ese género
+             if (excludeGenres.length && !includeGenres.length) {
+               let found = animes.filter(a => !a.genre.map(g => g.toLowerCase()).some(g => excludeGenres.includes(g)));
+               if (!found.length) {
+                 sendMascotMessage(`No encontré animes que no sean de <b>${excludeGenres.join(', ')}</b>. ¿Quieres probar con otro género?`, false);
+                 return;
+               }
+               const pick = found[Math.floor(Math.random()*found.length)];
+               sendMascotMessage(`Te recomiendo un anime que no es de <b>${excludeGenres.join(', ')}</b>: <b>${pick.name}</b>.<br>¿Quieres ir a verlo?`, false);
+               let actions = document.getElementById('mascot-chat-actions');
+               if (actions) {
+                 let btn = document.createElement('button');
+                 btn.id = 'mascot-go-anime';
+                 btn.textContent = `¡Ir a ${pick.name}!`;
+                 btn.style.background = '#ff4ecd';
+                 btn.style.color = '#fff';
+                 btn.style.border = 'none';
+                 btn.style.borderRadius = '12px';
+                 btn.style.padding = '0.4rem 1rem';
+                 btn.style.marginTop = '0.2rem';
+                 btn.style.cursor = 'pointer';
+                 btn.onclick = () => { window.location.href = `anime.html?id=${pick.id}`; };
+                 actions.insertBefore(btn, actions.firstChild);
+               }
+               return;
+             }
+             // Si el usuario pide incluir y excluir géneros
+             if (includeGenres.length && excludeGenres.length) {
+               let found = animes.filter(a =>
+                 includeGenres.every(g => a.genre.map(x => x.toLowerCase()).includes(g)) &&
+                 !a.genre.map(g => g.toLowerCase()).some(g => excludeGenres.includes(g))
+               );
+               if (!found.length) {
+                 sendMascotMessage(`No encontré animes de <b>${includeGenres.join(', ')}</b> que no sean de <b>${excludeGenres.join(', ')}</b>. ¿Quieres probar con otros géneros?`, false);
+                 return;
+               }
+               const pick = found[Math.floor(Math.random()*found.length)];
+               sendMascotMessage(`Te recomiendo un anime de <b>${includeGenres.join(', ')}</b> y que no es de <b>${excludeGenres.join(', ')}</b>: <b>${pick.name}</b>.<br>¿Quieres ir a verlo?`, false);
+               let actions = document.getElementById('mascot-chat-actions');
+               if (actions) {
+                 let btn = document.createElement('button');
+                 btn.id = 'mascot-go-anime';
+                 btn.textContent = `¡Ir a ${pick.name}!`;
+                 btn.style.background = '#ff4ecd';
+                 btn.style.color = '#fff';
+                 btn.style.border = 'none';
+                 btn.style.borderRadius = '12px';
+                 btn.style.padding = '0.4rem 1rem';
+                 btn.style.marginTop = '0.2rem';
+                 btn.style.cursor = 'pointer';
+                 btn.onclick = () => { window.location.href = `anime.html?id=${pick.id}`; };
+                 actions.insertBefore(btn, actions.firstChild);
+               }
+               return;
+             }
+             // Si el usuario pide solo incluir géneros
+             if (includeGenres.length) {
+               let found = animes.filter(a => includeGenres.every(g => a.genre.map(x => x.toLowerCase()).includes(g)));
+               if (!found.length) {
+                 sendMascotMessage(`No encontré animes de <b>${includeGenres.join(', ')}</b>. ¿Quieres probar con otros géneros?`, false);
+                 return;
+               }
+               const pick = found[Math.floor(Math.random()*found.length)];
+               sendMascotMessage(`Te recomiendo un anime de <b>${includeGenres.join(', ')}</b>: <b>${pick.name}</b>.<br>¿Quieres ir a verlo?`, false);
+               let actions = document.getElementById('mascot-chat-actions');
+               if (actions) {
+                 let btn = document.createElement('button');
+                 btn.id = 'mascot-go-anime';
+                 btn.textContent = `¡Ir a ${pick.name}!`;
+                 btn.style.background = '#ff4ecd';
+                 btn.style.color = '#fff';
+                 btn.style.border = 'none';
+                 btn.style.borderRadius = '12px';
+                 btn.style.padding = '0.4rem 1rem';
+                 btn.style.marginTop = '0.2rem';
+                 btn.style.cursor = 'pointer';
+                 btn.onclick = () => { window.location.href = `anime.html?id=${pick.id}`; };
+                 actions.insertBefore(btn, actions.firstChild);
+               }
+               return;
+             }
+             // Si el usuario pregunta por géneros y no se detecta ninguno válido
+             if (/(género|genero|géneros|generos|tipos|tipo|categoría|categorias|categoría|categorías)/i.test(msg)) {
+               sendMascotMessage(`Los géneros disponibles son: <b>${allGenres.join(', ')}</b>. ¿Quieres uno de esos?`, false);
+               return;
+             }
+             // Pedir recomendación general
+             if (/(recomiéndame|recomienda|recomiendas|recomendar|recomienda|sugiere|sugerencia|dame un anime|dame una|quiero ver|ponme|pon|muéstrame|muéstranos|anime para ver|qué veo|que veo|qué me recomiendas|que me recomiendas|anime)/i.test(msg)) {
+               const variants = [
+                 '¡Claro! Déjame buscar un anime para ti...',
+                 '¡Con gusto! Aquí va una recomendación...',
+                 '¡Un momento! Buscando el mejor anime para ti...',
+                 '¡Listo! Te recomiendo este anime...'
+               ];
+               sendMascotMessage(variants[Math.floor(Math.random()*variants.length)], false);
+               const pick = animes[Math.floor(Math.random()*animes.length)];
+               sendMascotMessage(`Te recomiendo: <b>${pick.name}</b>.<br>¿Quieres ir a verlo?`, false);
+               let actions = document.getElementById('mascot-chat-actions');
+               if (actions) {
+                 let btn = document.createElement('button');
+                 btn.id = 'mascot-go-anime';
+                 btn.textContent = `¡Ir a ${pick.name}!`;
+                 btn.style.background = '#ff4ecd';
+                 btn.style.color = '#fff';
+                 btn.style.border = 'none';
+                 btn.style.borderRadius = '12px';
+                 btn.style.padding = '0.4rem 1rem';
+                 btn.style.marginTop = '0.2rem';
+                 btn.style.cursor = 'pointer';
+                 btn.onclick = () => { window.location.href = `anime.html?id=${pick.id}`; };
+                 actions.insertBefore(btn, actions.firstChild);
+               }
+               return;
+             }
+             // Preguntas frecuentes y respuestas simpáticas
+             if (/(quién eres|quien eres|cómo te llamas|como te llamas|eres real|qué eres|que eres|mascota|mascot|ram|quién te creó|quien te creo)/i.test(msg)) {
+               const about = [
+                 '¡Soy Ram, tu asistente anime kawaii! 💖',
+                 '¡Me llamo Ram y estoy aquí para ayudarte con el mundo anime!',
+                 '¡Soy la mascota virtual de Re:Anime! ¿Quieres una recomendación?',
+                 '¡Fui creada para hacerte sonreír y recomendarte animes!'
+               ];
+               sendMascotMessage(about[Math.floor(Math.random()*about.length)], false);
+               return;
+             }
+             if (/(cuántos animes|cuantos animes|cuantos hay|cuántos hay|cuantos puedes|cuántos puedes|cuantos sabes|cuántos sabes)/i.test(msg)) {
+               sendMascotMessage('¡Puedo recomendarte todos los animes que estén en mi base de datos! ¿Quieres uno?', false);
+               return;
+             }
+             if (/(me aburro|estoy aburrido|estoy aburrida|aburrido|aburrida)/i.test(msg)) {
+               sendMascotMessage('¡Un anime puede ser la solución perfecta para el aburrimiento! ¿Te recomiendo uno?', false);
+               return;
+             }
+             // Respuesta por defecto
+             const fallback = [
+               'No estoy segura de cómo responder a eso, pero puedo recomendarte un anime si quieres.',
+               '¡Eso suena interesante! ¿Quieres que te recomiende un anime?',
+               'No entendí muy bien, pero si me pides un anime, ¡te ayudo!',
+               '¡Pregunta por género, por tipo o simplemente di "recomiéndame un anime"!'
+             ];
+             sendMascotMessage(fallback[Math.floor(Math.random()*fallback.length)], false);
+           });
+         }
+    </script>
       <section class="intro" id="intro">
          <h1>Re:Anime</h1>
          <p>Tu mundo anime! Descubre tu próxima obsesión, esta página está en desarrollo y seguiremos añadiendo contenido :3</p>

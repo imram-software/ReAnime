@@ -6,6 +6,139 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap" rel="stylesheet" />
   <style>
+              .hidden { display: none !important; }
+            /* Cine mode for video */
+            .cine-mode-bg {
+              position: fixed;
+              top: 0; left: 0; width: 100vw; height: 100vh;
+              background: rgba(20,20,30,0.93);
+              z-index: 3000;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: background 0.4s;
+            }
+            .cine-mode-player {
+              position: relative;
+              z-index: 3002;
+              background: #222;
+              border-radius: 18px;
+              box-shadow: 0 8px 32px #00000080;
+              padding: 2rem 2.5rem 2.5rem 2.5rem;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-direction: row;
+              gap: 2.5rem;
+              min-width: 60vw;
+              min-height: 60vh;
+            }
+            .cine-ram {
+              width: 120px;
+              height: 160px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: flex-end;
+              margin-right: 2rem;
+              z-index: 3003;
+              pointer-events: none;
+            }
+            .cine-ram img {
+              width: 110px;
+              height: 110px;
+              filter: drop-shadow(0 2px 12px #ff4ecd88);
+            }
+            .cine-ram-bubble {
+              background: #fff0fa;
+              color: #ff4ecd;
+              border-radius: 16px;
+              box-shadow: 0 2px 8px #ff4ecd44;
+              padding: 0.7rem 1.3rem;
+              font-size: 1.08rem;
+              margin-bottom: 0.7rem;
+              min-width: 120px;
+              max-width: 240px;
+              text-align: center;
+              pointer-events: none;
+            }
+        /* Mascot Ram (anime.html) */
+        #mascot-container-anime {
+          position: fixed;
+          left: 8vw;
+          bottom: 30px;
+          z-index: 2002;
+          width: 90px;
+          height: 120px;
+          pointer-events: auto;
+          user-select: none;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        #mascot-img-anime {
+          width: 80px;
+          height: 80px;
+          transition: transform 0.2s;
+          cursor: pointer;
+        }
+        #mascot-speech-anime {
+          position: absolute;
+          left: 50%;
+          bottom: 110px;
+          transform: translateX(-50%);
+          background: #fff0faee;
+          color: #ff4ecd;
+          border-radius: 22px;
+          box-shadow: 0 4px 18px #ff4ecd55, 0 1.5px 0 #fff0fa;
+          padding: 1.1rem 1.2rem 0.7rem 1.2rem;
+          font-size: 1.08rem;
+          min-width: 180px;
+          max-width: 270px;
+          text-align: center;
+          pointer-events: auto;
+          animation: mascotSpeechFade 0.5s;
+          z-index: 20;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        #mascot-speech-text-anime {
+          margin-bottom: 0.7rem;
+          font-size: 1.08rem;
+          color: #ff4ecd;
+          text-shadow: 0 1px 0 #fff, 0 2px 8px #ffb6d9aa;
+        }
+        #mascot-buttons-anime {
+          position: static;
+          display: flex;
+          flex-direction: column;
+          gap: 0.35rem;
+          width: 100%;
+          align-items: stretch;
+          pointer-events: auto;
+        }
+        #mascot-buttons-anime button {
+          background: linear-gradient(90deg, #ff8fab 60%, #ff4ecd 100%);
+          color: #fff;
+          border: none;
+          border-radius: 16px;
+          padding: 0.55rem 0.7rem;
+          font-weight: bold;
+          cursor: pointer;
+          font-size: 1.01rem;
+          box-shadow: 0 2px 8px #ffb6d955;
+          transition: background 0.18s, transform 0.13s;
+          margin: 0.05rem 0;
+        }
+        #mascot-buttons-anime button:hover {
+          background: linear-gradient(90deg, #ff4ecd 60%, #ff8fab 100%);
+          transform: scale(1.04);
+        }
+        @keyframes mascotSpeechFade {
+          from { opacity: 0; transform: translateY(20px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
     body {
       font-family: sans-serif;
       margin: 0;
@@ -304,6 +437,14 @@
       <div id="user-popup"></div>
     </nav>
   </header>
+  <!-- Mascot Ram -->
+  <div id="mascot-container-anime">
+    <img id="mascot-img-anime" src="Assets/ReAnime-Mascot.png" alt="Ram" />
+    <div id="mascot-speech-anime" class="hidden">
+      <div id="mascot-speech-text-anime"></div>
+      <div id="mascot-buttons-anime" class="hidden" style="margin-top:0.7rem;"></div>
+    </div>
+  </div>
   <div class="container" id="anime-detail">Cargando...</div>
   <div id="resume-popup" style="display:none; position:fixed; left:50%; top:18%; transform:translate(-50%,0); background:rgba(34,34,34,0.97); color:#fff; border-radius:18px; box-shadow:0 8px 32px #00000060; padding:2rem 2.5rem; z-index:2000; text-align:center; min-width:260px; max-width:90vw;">
     <div id="resume-message" style="font-size:1.1rem; margin-bottom:1.2rem;"></div>
@@ -312,6 +453,154 @@
   </div>
 
   <script>
+        // Mascot Ram logic for anime.html
+        let mascotAnimeTimer = null;
+        const mascotImgAnime = document.getElementById('mascot-img-anime');
+        const mascotContainerAnime = document.getElementById('mascot-container-anime');
+        const mascotSpeechAnime = document.getElementById('mascot-speech-anime');
+        const mascotButtonsAnime = document.getElementById('mascot-buttons-anime');
+        // Asegurar que la burbuja esté oculta al cargar la página
+        mascotSpeechAnime.classList.add('hidden');
+        let mascotAnimePos = 8; // vw
+        let mascotAnimeDir = 1;
+        function walkMascotAnime() {
+          mascotAnimePos += mascotAnimeDir * 0.12;
+          if (mascotAnimePos > 80) mascotAnimeDir = -1;
+          if (mascotAnimePos < 5) mascotAnimeDir = 1;
+          mascotContainerAnime.style.left = mascotAnimePos + 'vw';
+          mascotImgAnime.style.transform = mascotAnimeDir === 1 ? 'scaleX(1)' : 'scaleX(-1)';
+        }
+        setInterval(walkMascotAnime, 30);
+
+        function showMascotSpeechAnime(msg, showButtons=false, duration=6000) {
+          document.getElementById('mascot-speech-text-anime').innerHTML = msg;
+          mascotSpeechAnime.classList.remove('hidden');
+          if (showButtons) {
+            mascotButtonsAnime.classList.remove('hidden');
+          } else {
+            mascotButtonsAnime.classList.add('hidden');
+          }
+          clearTimeout(mascotAnimeTimer);
+          if (!showButtons) {
+            mascotAnimeTimer = setTimeout(() => mascotSpeechAnime.classList.add('hidden'), duration);
+          }
+        }
+
+        mascotImgAnime.onclick = (e) => {
+          e.stopPropagation();
+          // Si la burbuja está visible, ocultarla
+          if (!mascotSpeechAnime.classList.contains('hidden')) {
+            mascotSpeechAnime.classList.add('hidden');
+            return;
+          }
+          // Mostrar burbuja con botones dentro
+          mascotButtonsAnime.innerHTML = `
+            <button data-action="watch">¿Vemos este anime juntos?</button>
+            <button data-action="opinion">¿Qué opinas de este anime?</button>
+            <button data-action="fact">¿Me cuentas un dato curioso?</button>
+            <button data-action="similar">¿Me recomiendas otro parecido?</button>
+          `;
+          showMascotSpeechAnime('¡Hola! ¿Quieres interactuar conmigo sobre este anime?', true);
+        };
+
+        // Cerrar la burbuja si se hace click fuera o en la burbuja
+        document.addEventListener('click', function(e) {
+          if (!mascotContainerAnime.contains(e.target)) {
+            mascotSpeechAnime.classList.add('hidden');
+          }
+        });
+        mascotSpeechAnime.onclick = function(e) {
+          e.stopPropagation();
+          mascotSpeechAnime.classList.add('hidden');
+        };
+
+        // Respuestas de Ram según el anime
+        let currentAnimeData = null;
+        function setRamAnimeData(anime) {
+          currentAnimeData = anime;
+        }
+
+        function getRandom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+        mascotButtonsAnime.addEventListener('click', function(e) {
+          if (!e.target.matches('button')) return;
+          if (!currentAnimeData) return;
+          const action = e.target.getAttribute('data-action');
+          if (action === 'watch') {
+            // Modo cine: fondo oscuro, reproductor grande, Ram al lado
+            activarModoCine();
+          } else if (action === 'opinion') {
+            showMascotSpeechAnime(getRandom([
+              `Creo que <b>${currentAnimeData.name}</b> es un anime ${currentAnimeData.genre && currentAnimeData.genre.length ? 'de ' + currentAnimeData.genre.join(', ') : ''} muy interesante.`,
+              `¡Me gusta mucho <b>${currentAnimeData.name}</b>! ¿A ti qué te parece?`,
+              `Tiene una historia única y personajes memorables. ¡Me encanta!`
+            ]), false);
+          } else if (action === 'fact') {
+            showMascotSpeechAnime(getRandom([
+              `¿Sabías que este anime salió en <b>${currentAnimeData.year}</b>?`,
+              `Tiene ${currentAnimeData.episodes ? currentAnimeData.episodes.length : '?'} episodios. ¡Perfecto para un maratón!`,
+              `La sinopsis: ${currentAnimeData.description ? currentAnimeData.description.slice(0,120)+'...' : '¡Es un misterio!'} `
+            ]), false);
+          } else if (action === 'similar') {
+            // Recomendar otro anime del mismo género
+            fetch('animes.json').then(r=>r.json()).then(animes => {
+              if (!animes.length || !currentAnimeData.genre || !currentAnimeData.genre.length) {
+                showMascotSpeechAnime('No encontré otro anime parecido ahora mismo.', false);
+                return;
+              }
+              // Buscar otro anime que comparta al menos un género
+              const similars = animes.filter(a => a.id !== currentAnimeData.id && a.genre.some(g => currentAnimeData.genre.includes(g)));
+              if (!similars.length) {
+                showMascotSpeechAnime('No encontré otro anime parecido ahora mismo.', false);
+                return;
+              }
+              const pick = getRandom(similars);
+              showMascotSpeechAnime(`Te recomiendo también <b>${pick.name}</b> (${pick.genre.join(', ')}). ¿Quieres ir a verlo?`, false);
+              mascotSpeechAnime.innerHTML += `<br><button id="go-similar-anime" style="margin-top:0.5rem;background:#ff4ecd;color:#fff;border:none;border-radius:12px;padding:0.4rem 1rem;cursor:pointer;">¡Ir a ${pick.name}!</button>`;
+              document.getElementById('go-similar-anime').onclick = () => {
+                window.location.href = `anime.html?id=${pick.id}`;
+              };
+            });
+          }
+        });
+
+        // --- Cine mode logic ---
+        function activarModoCine() {
+          // Buscar el reproductor de video actual
+          const videoArea = document.getElementById('video-area');
+          const videoContainer = document.getElementById('video-container');
+          if (!videoContainer || !videoContainer.firstChild) {
+            showMascotSpeechAnime('¡Primero selecciona un episodio para ver juntos!', false);
+            return;
+          }
+          // Crear fondo cine
+          let cineBg = document.createElement('div');
+          cineBg.className = 'cine-mode-bg';
+          cineBg.id = 'cine-mode-bg';
+          // Mascota Ram en modo cine
+          let cineRam = document.createElement('div');
+          cineRam.className = 'cine-ram';
+          cineRam.innerHTML = `<div class="cine-ram-bubble">¡Estoy lista para ver el anime contigo!</div><img src="Assets/ReAnime-Mascot.png" alt="Ram" />`;
+          // Clonar el reproductor
+          let cinePlayer = document.createElement('div');
+          cinePlayer.className = 'cine-mode-player';
+          cinePlayer.appendChild(cineRam);
+          // Clonar el video actual
+          let videoClone = videoContainer.firstChild.cloneNode(true);
+          videoClone.style.width = '700px';
+          videoClone.style.height = '400px';
+          cinePlayer.appendChild(videoClone);
+          // Botón cerrar
+          let closeBtn = document.createElement('button');
+          closeBtn.textContent = 'Cerrar modo cine';
+          closeBtn.style = 'position:absolute;top:18px;right:24px;background:#ff4ecd;color:#fff;border:none;border-radius:16px;padding:0.5rem 1.2rem;font-weight:bold;font-size:1rem;cursor:pointer;z-index:3100;box-shadow:0 2px 8px #ff4ecd44;';
+          closeBtn.onclick = () => {
+            document.body.removeChild(cineBg);
+          };
+          cinePlayer.appendChild(closeBtn);
+          cineBg.appendChild(cinePlayer);
+          document.body.appendChild(cineBg);
+        }
     const clientId = "1390810180823945350";
     const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
     const scope = "identify";
@@ -393,6 +682,9 @@
             </div>
           </div>
         `;
+
+        // Mascot Ram: pasar datos del anime actual
+        setRamAnimeData(anime);
 
         const epButtons = document.getElementById('ep-buttons');
         const videoContainer = document.getElementById('video-container');
