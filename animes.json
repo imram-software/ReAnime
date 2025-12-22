@@ -258,18 +258,66 @@
   "description": "Marie es una muñeca mecánica creada para servir, pero su comportamiento comienza a parecer demasiado humano. Entre malentendidos y comedia romántica, la línea entre máquina y corazón se vuelve borrosa.",
 
   "episodes": [
-    { "number": 1, "title": "La muñeca llamada Marie", "embed": "" },
-    { "number": 2, "title": "Un amo peculiar", "embed": "" },
-    { "number": 3, "title": "Rutina programada", "embed": "" },
-    { "number": 4, "title": "Errores inesperados", "embed": "" },
-    { "number": 5, "title": "¿Emociones falsas?", "embed": "" },
-    { "number": 6, "title": "La vida cotidiana", "embed": "" },
-    { "number": 7, "title": "Más allá del código", "embed": "" },
-    { "number": 8, "title": "Un pequeño cambio", "embed": "" },
-    { "number": 9, "title": "Confusión humana", "embed": "" },
-    { "number": 10, "title": "Decisiones no programadas", "embed": "" },
-    { "number": 11, "title": "Lo que significa estar viva", "embed": "" },
-    { "number": 12, "title": "Marie y el futuro", "embed": "" }
+    {
+      "number": 1,
+      "title": "La muñeca llamada Marie",
+      "embed": "<iframe src='https://hqq.ac/e/eFNnTzVIckI0NXZacUhFaFU1TXR6dz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 2,
+      "title": "Un amo peculiar",
+      "embed": "<iframe src='https://hqq.ac/e/bW9oMldlRWFSVXZ5ZklTK3loYndFZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 3,
+      "title": "Rutina programada",
+      "embed": "<iframe src='https://hqq.ac/e/ZXJSeUppYjRobDNsdTZNa09TMnZBQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 4,
+      "title": "Errores inesperados",
+      "embed": "<iframe src='https://hqq.ac/e/S0Q2aERlVHAvRzlLaHJlRnhpMzFlUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 5,
+      "title": "¿Emociones falsas?",
+      "embed": "<iframe src='https://hqq.ac/e/NkNHb2VnQUIzcDVQWTlqUVY1eHZpdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 6,
+      "title": "La vida cotidiana",
+      "embed": "<iframe src='https://hqq.ac/e/NmQzempyYkJiR09kZHh3K1Z1b1JOQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 7,
+      "title": "Más allá del código",
+      "embed": "<iframe src='https://hqq.ac/e/K0JmM1BvNWVnQWFWdmR6OGFQVWhWQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 8,
+      "title": "Un pequeño cambio",
+      "embed": "<iframe src='https://hqq.ac/e/MG5rNlUyRUcrSGh1bjRwM2pVcEZIUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 9,
+      "title": "Confusión humana",
+      "embed": "<iframe src='https://hqq.ac/e/RVJQdHRjV24zRkdodzhLS2N0UGs4QT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 10,
+      "title": "Decisiones no programadas",
+      "embed": "<iframe src='https://hqq.ac/e/SzBpWWFHcCttMi9iODlpbDN2YzI2Zz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 11,
+      "title": "Lo que significa estar viva",
+      "embed": "<iframe src='https://hqq.ac/e/K1N5TWZ1SHU5SEJLM3lUbzZqRU9WQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 12,
+      "title": "Marie y el futuro",
+      "embed": "<iframe src='https://hqq.ac/e/VVlNSGNDNUVxV2pYMGhLN20ra3drQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    }
   ]
 }
 ]
