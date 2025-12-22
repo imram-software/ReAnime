@@ -22,18 +22,131 @@
     "description": "Subaru Natsuki is transported to a fantasy world and discovers he has the ability to return from death — but only after experiencing it. Trapped in a cruel time loop, he must uncover the truth and protect those he cares about.",
 
     "episodes": [
-      { "number": 1, "title": "The End of the Beginning and the Beginning of the End", "embed": "<iframe src='https://hqq.ac/e/VE1jSmdIbGZ3SGx3MTJiUGN0aWZwdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
-      { "number": 2, "title": "The Truth of Zero", "embed": "<iframe src='https://hqq.ac/e/SXlOL0NPOThEYXJ2bGpPY29XNllzUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
-      { "number": 3, "title": "Starting Life from Zero in Another World", "embed": "<iframe src='https://hqq.ac/e/QjBwTUgwWFpsSndTd3pHdktFQ3p4Zz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
-      { "number": 4, "title": "The Happy Roswaal Mansion Family", "embed": "<iframe src='https://hqq.ac/e/cEVhWnZBTFhYR3FSbVlnK0dTVnJ6UT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
-      { "number": 5, "title": "The Morning of Our Promise Is Still Distant", "embed": "<iframe src='https://hqq.ac/e/aVpLZTh2bzIwUXhBUlArRWZHVktPUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
-      { "number": 6, "title": "The Sound of Chains", "embed": "<iframe src='https://hqq.ac/e/L0lmY0hhSE5xRFJ6b1FTR2FGK3ZHQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
-      { "number": 7, "title": "Natsuki Subaru’s Restart", "embed": "<iframe src='https://hqq.ac/e/Njh2dG9naWRha1FNc2EyS1YrOWJ3QT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
-      { "number": 8, "title": "I Cried, Cried My Lungs Out, and Stopped Crying", "embed": "<iframe src='https://hqq.ac/e/b0tDY2dWODZCazczS2l5WEZtTEh6dz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
-      { "number": 9, "title": "The Meaning of Courage", "embed": "<iframe src='https://hqq.ac/e/Njl3akt3YjhEY29VWkhMWFdXZXhUQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
-      { "number": 10, "title": "A Wager That Defies the Gods", "embed": "<iframe src='https://hqq.ac/e/OWRITUIvbE51Ylk0QTZiVmFFUXBwZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
-      { "number": 11, "title": "Rem", "embed": "<iframe src='https://hqq.ac/e/Sk9aSGMyVE5IRnVuL1VIR0NQWjBKZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" },
-      { "number": 12, "title": "Return to the Capital", "embed": "<iframe src='https://hqq.ac/e/d3duWVJhdktpRXc0WjBDTEFodW1pZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>" }
+      {
+        "number": 1,
+        "title": "The End of the Beginning and the Beginning of the End",
+        "embed": "<iframe src='https://hqq.ac/e/VE1jSmdIbGZ3SGx3MTJiUGN0aWZwdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 2,
+        "title": "The Truth of Zero",
+        "embed": "<iframe src='https://hqq.ac/e/SXlOL0NPOThEYXJ2bGpPY29XNllzUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 3,
+        "title": "Starting Life from Zero in Another World",
+        "embed": "<iframe src='https://hqq.ac/e/QjBwTUgwWFpsSndTd3pHdktFQ3p4Zz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 4,
+        "title": "The Happy Roswaal Mansion Family",
+        "embed": "<iframe src='https://hqq.ac/e/cEVhWnZBTFhYR3FSbVlnK0dTVnJ6UT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 5,
+        "title": "The Morning of Our Promise Is Still Distant",
+        "embed": "<iframe src='https://hqq.ac/e/aVpLZTh2bzIwUXhBUlArRWZHVktPUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 6,
+        "title": "The Sound of Chains",
+        "embed": "<iframe src='https://hqq.ac/e/L0lmY0hhSE5xRFJ6b1FTR2FGK3ZHQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 7,
+        "title": "Natsuki Subaru’s Restart",
+        "embed": "<iframe src='https://hqq.ac/e/Njh2dG9naWRha1FNc2EyS1YrOWJ3QT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 8,
+        "title": "I Cried, Cried My Lungs Out, and Stopped Crying",
+        "embed": "<iframe src='https://hqq.ac/e/b0tDY2dWODZCazczS2l5WEZtTEh6dz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 9,
+        "title": "The Meaning of Courage",
+        "embed": "<iframe src='https://hqq.ac/e/Njl3akt3YjhEY29VWkhMWFdXZXhUQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 10,
+        "title": "A Wager That Defies the Gods",
+        "embed": "<iframe src='https://hqq.ac/e/OWRITUIvbE51Ylk0QTZiVmFFUXBwZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 11,
+        "title": "Rem",
+        "embed": "<iframe src='https://hqq.ac/e/Sk9aSGMyVE5IRnVuL1VIR0NQWjBKZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 12,
+        "title": "Return to the Capital",
+        "embed": "<iframe src='https://hqq.ac/e/d3duWVJhdktpRXc0WjBDTEFodW1pZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 13,
+        "title": "Self-Proclaimed Knight Natsuki Subaru",
+        "embed": "<iframe src='https://hqq.ac/e/UW1aRk4zSEFNZEo2anJ5U1hiekhBdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 14,
+        "title": "The Sickness Called Despair",
+        "embed": "<iframe src='https://hqq.ac/e/QzB0eUlMSTNyeGEzTmc2T1dWSk5YZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 15,
+        "title": "The Outside of Madness",
+        "embed": "<iframe src='https://hqq.ac/e/OEVXVnJtUXdtRFB0TGk5aUF5ZURTQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 16,
+        "title": "The Greed of a Pig",
+        "embed": "<iframe src='https://hqq.ac/e/a0ZKNkVxM3NRODhKVjN3NFpaS21Idz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 17,
+        "title": "Disgrace in the Extreme",
+        "embed": "<iframe src='https://hqq.ac/e/N2xMdHkvdHJGSzUwaWJ3RGFYNExnZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 18,
+        "title": "From Zero",
+        "embed": "<iframe src='https://hqq.ac/e/RUMvZjRYUWY2STVTRURSRWlsVW0yZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 19,
+        "title": "Battle Against the White Whale",
+        "embed": "<iframe src='https://hqq.ac/e/ZHhFdkhueVZNYWp3aFBVRWFsMjM3Zz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 20,
+        "title": "Wilhelm van Astrea",
+        "embed": "<iframe src='https://hqq.ac/e/YXhncE5WUVVWWVpaaklOdklzUlhWdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 21,
+        "title": "A Wager That Defies Despair",
+        "embed": "<iframe src='https://hqq.ac/e/dFhRNkc3S3RjN0pXYXVRY3pFR3UxUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 22,
+        "title": "A Flash of Sloth",
+        "embed": "<iframe src='https://hqq.ac/e/TjYvU0duV3czbHYyNXJ1NnM4TGV4dz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 23,
+        "title": "Nefarious Sloth",
+        "embed": "<iframe src='https://hqq.ac/e/L05RM3FwSlRCN1F5TUhjMHNjTkdtUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 24,
+        "title": "The Self-Proclaimed Knight and the Greatest Knight",
+        "embed": "<iframe src='https://hqq.ac/e/S1RQWnN0SDRTcFlYQXp2SjdtYitZdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      },
+      {
+        "number": 25,
+        "title": "That's All This Story Is About",
+        "embed": "<iframe src='https://hqq.ac/e/bFBCU2ZiaWlONTFGTHowdUhsckVzdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+      }
     ]
   },
 
@@ -120,6 +233,43 @@
       "title": "El comienzo de una nueva vida",
       "embed": "<iframe src='https://hqq.ac/e/WE54WU9OaFFncDFyTmJRTm5ob2tSQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
     }
+  ]
+},
+{
+  "id": "kikaijikake-no-marie",
+  "name": "Kikaijikake no Marie",
+  "cover": "https://cdn.myanimelist.net/images/anime/1618/151138.jpg",
+  "genre": ["Comedy", "Romance", "Sci-Fi"],
+
+  "opinion": [
+    "Ram dice que Marie es inquietantemente perfecta… y eso la hace desconfiar.",
+    "Para Ram, los humanos que crean muñecas emocionales suelen ser los más solitarios.",
+    "Ram admite que, aunque sea comedia, hay algo triste escondido en la historia."
+  ],
+
+  "dato": [
+    "La obra original es un manga corto con enfoque en comedia romántica.",
+    "Juega con el concepto de androide doméstica y emociones humanas.",
+    "Su tono ligero contrasta con temas como la soledad y el apego."
+  ],
+
+  "year": 2024,
+  "rating": 7.0,
+  "description": "Marie es una muñeca mecánica creada para servir, pero su comportamiento comienza a parecer demasiado humano. Entre malentendidos y comedia romántica, la línea entre máquina y corazón se vuelve borrosa.",
+
+  "episodes": [
+    { "number": 1, "title": "La muñeca llamada Marie", "embed": "" },
+    { "number": 2, "title": "Un amo peculiar", "embed": "" },
+    { "number": 3, "title": "Rutina programada", "embed": "" },
+    { "number": 4, "title": "Errores inesperados", "embed": "" },
+    { "number": 5, "title": "¿Emociones falsas?", "embed": "" },
+    { "number": 6, "title": "La vida cotidiana", "embed": "" },
+    { "number": 7, "title": "Más allá del código", "embed": "" },
+    { "number": 8, "title": "Un pequeño cambio", "embed": "" },
+    { "number": 9, "title": "Confusión humana", "embed": "" },
+    { "number": 10, "title": "Decisiones no programadas", "embed": "" },
+    { "number": 11, "title": "Lo que significa estar viva", "embed": "" },
+    { "number": 12, "title": "Marie y el futuro", "embed": "" }
   ]
 }
 ]
