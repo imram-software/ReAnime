@@ -573,6 +573,13 @@
             showMascotSpeechAnime('¡Primero selecciona un episodio para ver juntos!', false);
             return;
           }
+          const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+if (isMobile) {
+  showMascotSpeechAnime(
+    'En celular algunos reproductores pueden ir lento 😿. Si puedes, baja la calidad del video.'
+  );
+}
+
           // Crear fondo cine
           let cineBg = document.createElement('div');
           cineBg.className = 'cine-mode-bg';
@@ -586,16 +593,14 @@
           cinePlayer.className = 'cine-mode-player';
           cinePlayer.appendChild(cineRam);
           // Clonar el video actual
-          let videoClone = videoContainer.firstChild.cloneNode(true);
-          videoClone.style.width = '700px';
-          videoClone.style.height = '400px';
-          cinePlayer.appendChild(videoClone);
+          const originalIframe = videoContainer.firstChild;
+          cinePlayer.appendChild(originalIframe);
           // Botón cerrar
           let closeBtn = document.createElement('button');
           closeBtn.textContent = 'Cerrar modo cine';
           closeBtn.style = 'position:absolute;top:18px;right:24px;background:#ff4ecd;color:#fff;border:none;border-radius:16px;padding:0.5rem 1.2rem;font-weight:bold;font-size:1rem;cursor:pointer;z-index:3100;box-shadow:0 2px 8px #ff4ecd44;';
           closeBtn.onclick = () => {
-            document.body.removeChild(cineBg);
+            videoContainer.appendChild(originalIframe);
           };
           cinePlayer.appendChild(closeBtn);
           cineBg.appendChild(cinePlayer);
