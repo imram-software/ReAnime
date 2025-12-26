@@ -111,29 +111,40 @@
         }
         #mascot-buttons-anime {
           position: static;
-          display: flex;
-          flex-direction: column;
-          gap: 0.35rem;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.5rem;
           width: 100%;
           align-items: stretch;
           pointer-events: auto;
+          padding: 0.5rem;
         }
         #mascot-buttons-anime button {
-          background: linear-gradient(90deg, #ff8fab 60%, #ff4ecd 100%);
+          background: linear-gradient(135deg, #ff8fab 0%, #ff4ecd 100%);
           color: #fff;
           border: none;
-          border-radius: 16px;
-          padding: 0.55rem 0.7rem;
+          border-radius: 20px;
+          padding: 0.6rem 0.8rem;
           font-weight: bold;
           cursor: pointer;
-          font-size: 1.01rem;
-          box-shadow: 0 2px 8px #ffb6d955;
-          transition: background 0.18s, transform 0.13s;
-          margin: 0.05rem 0;
+          font-size: 0.95rem;
+          box-shadow: 0 3px 10px #ffb6d955;
+          transition: all 0.2s ease;
+          margin: 0;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.3rem;
+          min-height: 40px;
         }
         #mascot-buttons-anime button:hover {
-          background: linear-gradient(90deg, #ff4ecd 60%, #ff8fab 100%);
-          transform: scale(1.04);
+          background: linear-gradient(135deg, #ff4ecd 0%, #ff8fab 100%);
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: 0 5px 15px #ffb6d980;
+        }
+        #mascot-buttons-anime button:active {
+          transform: translateY(0) scale(0.98);
         }
         @keyframes mascotSpeechFade {
           from { opacity: 0; transform: translateY(20px) scale(0.95); }
@@ -410,9 +421,6 @@
       margin-top: 1rem;
       font-size: 1rem;
     }
-    #anime-actions {
-      margin: 1rem 0;
-    }
     #anime-actions button {
       margin-right: 0.5rem;
       background: #ff8fab;
@@ -486,6 +494,56 @@
           }
         }
 
+        function showIndividualSpeechBubble(msg, actionType, extraButton=null) {
+          // Remove any existing individual bubbles
+          document.querySelectorAll('.individual-speech-bubble').forEach(b => b.remove());
+
+          // Hide the main speech bubble
+          mascotSpeechAnime.classList.add('hidden');
+
+          const bubble = document.createElement('div');
+          bubble.className = 'individual-speech-bubble';
+          bubble.style.cssText = `
+            position: absolute;
+            left: 50%;
+            bottom: 110px;
+            transform: translateX(-50%);
+            background: #fff0faee;
+            color: #ff4ecd;
+            border-radius: 22px;
+            box-shadow: 0 4px 18px #ff4ecd55, 0 1.5px 0 #fff0fa;
+            padding: 1.1rem 1.2rem 0.7rem 1.2rem;
+            font-size: 1.08rem;
+            min-width: 180px;
+            max-width: 270px;
+            text-align: center;
+            pointer-events: auto;
+            animation: mascotSpeechFade 0.5s;
+            z-index: 25;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          `;
+          bubble.innerHTML = `<div style="margin-bottom: 0.7rem; font-size: 1.08rem; color: #ff4ecd; text-shadow: 0 1px 0 #fff, 0 2px 8px #ffb6d9aa;">${msg}</div>`;
+          if (extraButton) {
+            bubble.innerHTML += extraButton;
+          }
+          mascotContainerAnime.appendChild(bubble);
+
+          // Auto-hide after 9 seconds
+          setTimeout(() => {
+            if (bubble.parentNode) bubble.remove();
+          }, 9000);
+
+          // Click outside to close
+          document.addEventListener('click', function closeBubble(e) {
+            if (!bubble.contains(e.target) && !mascotContainerAnime.contains(e.target)) {
+              bubble.remove();
+              document.removeEventListener('click', closeBubble);
+            }
+          });
+        }
+
         mascotImgAnime.onclick = (e) => {
           e.stopPropagation();
           // Si la burbuja está visible, ocultarla
@@ -495,10 +553,11 @@
           }
           // Mostrar burbuja con botones dentro
           mascotButtonsAnime.innerHTML = `
-            <button data-action="watch">¿Vemos este anime juntos?</button>
-            <button data-action="opinion">¿Qué opinas de este anime?</button>
-            <button data-action="fact">¿Me cuentas un dato curioso?</button>
-            <button data-action="similar">¿Me recomiendas otro parecido?</button>
+            <button data-action="watch" title="Ver en modo cine">¿Vemos este anime juntos?</button>
+            <button data-action="opinion" title="Opinión de Ram">¿Qué opinas de este anime?</button>
+            <button data-action="fact" title="Dato curioso">¿Me cuentas un dato curioso?</button>
+            <button data-action="rating" title="Calificación">¿Cuál es su calificación?</button>
+            <button data-action="similar" title="Recomendación">¿Me recomiendas otro parecido?</button>
           `;
           showMascotSpeechAnime('¡Hola! ¿Quieres interactuar conmigo sobre este anime?', true);
         };
@@ -509,10 +568,6 @@
             mascotSpeechAnime.classList.add('hidden');
           }
         });
-        mascotSpeechAnime.onclick = function(e) {
-          e.stopPropagation();
-          mascotSpeechAnime.classList.add('hidden');
-        };
 
         // Respuestas de Ram según el anime
         let currentAnimeData = null;
@@ -522,46 +577,47 @@
 
         function getRandom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
 
-        mascotButtonsAnime.addEventListener('click', function(e) {
-          if (!e.target.matches('button')) return;
-          if (!currentAnimeData) return;
-          const action = e.target.getAttribute('data-action');
-          if (action === 'watch') {
-            // Modo cine: fondo oscuro, reproductor grande, Ram al lado
-            activarModoCine();
-          } else if (action === 'opinion') {
-            showMascotSpeechAnime(getRandom([
-              `Creo que <b>${currentAnimeData.name}</b> es un anime ${currentAnimeData.genre && currentAnimeData.genre.length ? 'de ' + currentAnimeData.genre.join(', ') : ''} muy interesante.`,
-              `¡Me gusta mucho <b>${currentAnimeData.name}</b>! ¿A ti qué te parece?`,
-              `Tiene una historia única y personajes memorables. ¡Me encanta!`
-            ]), false);
-          } else if (action === 'fact') {
-            showMascotSpeechAnime(getRandom([
-              `¿Sabías que este anime salió en <b>${currentAnimeData.year}</b>?`,
-              `Tiene ${currentAnimeData.episodes ? currentAnimeData.episodes.length : '?'} episodios. ¡Perfecto para un maratón!`,
-              `La sinopsis: ${currentAnimeData.description ? currentAnimeData.description.slice(0,120)+'...' : '¡Es un misterio!'} `
-            ]), false);
-          } else if (action === 'similar') {
-            // Recomendar otro anime del mismo género
-            fetch('animes.json').then(r=>r.json()).then(animes => {
-              if (!animes.length || !currentAnimeData.genre || !currentAnimeData.genre.length) {
-                showMascotSpeechAnime('No encontré otro anime parecido ahora mismo.', false);
-                return;
-              }
-              // Buscar otro anime que comparta al menos un género
-              const similars = animes.filter(a => a.id !== currentAnimeData.id && a.genre.some(g => currentAnimeData.genre.includes(g)));
-              if (!similars.length) {
-                showMascotSpeechAnime('No encontré otro anime parecido ahora mismo.', false);
-                return;
-              }
-              const pick = getRandom(similars);
-              showMascotSpeechAnime(`Te recomiendo también <b>${pick.name}</b> (${pick.genre.join(', ')}). ¿Quieres ir a verlo?`, false);
-              mascotSpeechAnime.innerHTML += `<br><button id="go-similar-anime" style="margin-top:0.5rem;background:#ff4ecd;color:#fff;border:none;border-radius:12px;padding:0.4rem 1rem;cursor:pointer;">¡Ir a ${pick.name}!</button>`;
-              document.getElementById('go-similar-anime').onclick = () => {
-                window.location.href = `anime.html?id=${pick.id}`;
-              };
-            });
+        mascotSpeechAnime.addEventListener('click', function(e) {
+          if (e.target.matches('button')) {
+            if (!currentAnimeData) return;
+            const action = e.target.getAttribute('data-action');
+            if (action === 'watch') {
+              // Modo cine: fondo oscuro, reproductor grande, Ram al lado
+              activarModoCine();
+            } else if (action === 'opinion') {
+              const opinions = currentAnimeData.opinion || [`Creo que <b>${currentAnimeData.name}</b> es un anime ${currentAnimeData.genre && currentAnimeData.genre.length ? 'de ' + currentAnimeData.genre.join(', ') : ''} muy interesante.`];
+              showIndividualSpeechBubble(getRandom(opinions), 'opinion');
+            } else if (action === 'fact') {
+              const facts = currentAnimeData.dato || [`¿Sabías que este anime salió en <b>${currentAnimeData.year}</b>?`];
+              showIndividualSpeechBubble(getRandom(facts), 'fact');
+            } else if (action === 'rating') {
+              const rating = currentAnimeData.rating || 'No disponible';
+              showIndividualSpeechBubble(`<b>${currentAnimeData.name}</b> tiene una calificación de <b>${rating}/10</b> en MyAnimeList.`, 'rating');
+            } else if (action === 'similar') {
+              // Recomendar otro anime del mismo género
+              fetch('animes.json').then(r=>r.json()).then(animes => {
+                if (!animes.length || !currentAnimeData.genre || !currentAnimeData.genre.length) {
+                  showIndividualSpeechBubble('No encontré otro anime parecido ahora mismo.', 'similar');
+                  return;
+                }
+                // Buscar otro anime que comparta al menos un género
+                const similars = animes.filter(a => a.id !== currentAnimeData.id && a.genre.some(g => currentAnimeData.genre.includes(g)));
+                if (!similars.length) {
+                  showIndividualSpeechBubble('No encontré otro anime parecido ahora mismo.', 'similar');
+                  return;
+                }
+                const pick = getRandom(similars);
+                showIndividualSpeechBubble(`Te recomiendo también <b>${pick.name}</b> (${pick.genre.join(', ')}). ¿Quieres ir a verlo?`, 'similar', `<button id="go-similar-anime" style="margin-top:0.5rem;background:#ff4ecd;color:#fff;border:none;border-radius:12px;padding:0.4rem 1rem;cursor:pointer;">¡Ir a ${pick.name}!</button>`);
+                document.getElementById('go-similar-anime').onclick = () => {
+                  window.location.href = `anime.html?id=${pick.id}`;
+                };
+              });
+            }
+            return;
           }
+          // close the speech bubble
+          e.stopPropagation();
+          mascotSpeechAnime.classList.add('hidden');
         });
 
         // --- Cine mode logic ---
@@ -781,5 +837,18 @@
       watchedBtn.onclick = () => { toggleList("watched", animeId); updateActionButtons(animeId); };
     }
   </script>
+
+  <!-- Comments Section -->
+  <div id="comments-section" style="margin-top: 2rem; padding: 1rem; border-top: 2px solid #ffe0ef;">
+    <h3 style="color: #ff4ecd; font-family: 'Zen Tokyo Zoo', cursive;">Comentarios</h3>
+    <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Mantente respetuoso y usa el sentido comun al comentar <strong>podrias ser Baneado Temporalmente de la pagina</strong>. Utiliza GitHub para autenticarte y comentar. <em>chill, no somos tan serios!.</em></p>
+    <script src="https://utteranc.es/client.js"
+            repo="imram-software/ReAnime"
+            issue-term="url"
+            theme="preferred-color-scheme"
+            crossorigin="anonymous"
+            async>
+    </script>
+  </div>
 </body>
 </html>
