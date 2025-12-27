@@ -1,5 +1,5 @@
 [
-  {
+{
     "id": "re-zero-kara-hajjimeru-isekai-seikatsu",
     "name": "Re:Zero kara Hajimeru Isekai Seikatsu",
     "cover": "https://cdn.myanimelist.net/images/anime/1522/128039.jpg",
@@ -148,9 +148,9 @@
         "embed": "<iframe src='https://hqq.ac/e/bFBCU2ZiaWlONTFGTHowdUhsckVzdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
       }
     ]
-  },
+},
 
-  {
+{
   "id": "chichi-wa-eiyuu-haha-wa-seirei",
   "name": "Chichi wa Eiyuu, Haha wa Seirei, Musume no Watashi wa Tenseisha",
   "cover": "https://cdn.myanimelist.net/images/anime/1811/151799l.jpg",
@@ -317,6 +317,91 @@
       "number": 12,
       "title": "Marie y el futuro",
       "embed": "<iframe src='https://hqq.ac/e/VVlNSGNDNUVxV2pYMGhLN20ra3drQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    }
+  ]
+},
+{
+  "id": "shikanoko-nokonoko-koshitantan",
+  "name": "Shikanoko Nokonoko Koshitantan",
+  "cover": "https://cdn.myanimelist.net/images/anime/1739/142002.jpg",
+  "genre": ["Comedy", "Slice of Life", "Absurd"],
+
+  "opinion": [
+    "Este anime no tiene sentido… y aun así, funciona. Lo cual me molesta un poco.",
+    "La chica ciervo es tan caótica que ni siquiera Subaru sobreviviría a su lógica.",
+    "No es inteligente, no es profundo… pero logra algo peligroso: hacerte reír sin razón."
+  ],
+
+  "dato": [
+    "El anime se volvió viral por su humor absurdo y escenas completamente inesperadas.",
+    "La obra original es un manga conocido por romper cualquier estructura narrativa.",
+    "Shikanoko fue comparado con Nichijou por su humor sin explicación lógica."
+  ],
+
+  "year": 2024,
+  "rating": 7.8,
+  "description": "Una comedia absurda donde la vida escolar normal se desmorona cuando una chica con cuernos de ciervo y comportamiento inexplicable aparece. No hay moraleja, no hay lógica, solo caos cuidadosamente animado.",
+
+  "episodes": [
+    {
+      "number": 1,
+      "title": "La chica ciervo aparece",
+      "embed": "<iframe src='https://hqq.ac/e/dXc2ZEpxTng4VTVNVnRDbjFnQTRnUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 2,
+      "title": "El inicio del caos",
+      "embed": "<iframe src='https://hqq.ac/e/UUdDamliUFk4bGk4eEtwVFZMYkJNdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 3,
+      "title": "Comedia sin explicación",
+      "embed": "<iframe src='https://hqq.ac/e/SkJZN2ZIRmRQVHdWZk15bWpWejAwZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 4,
+      "title": "Un día normal… supuestamente",
+      "embed": "<iframe src='https://hqq.ac/e/eEF3U0k1QmRvcmVZc011ZDcrc2xHdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 5,
+      "title": "El club se vuelve extraño",
+      "embed": "<iframe src='https://hqq.ac/e/OCtEMUN3RHJ2aUl5N3M0RFJ2WVVvZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 6,
+      "title": "Nada tiene sentido",
+      "embed": "<iframe src='https://hqq.ac/e/OEZ3eUNOTWZkL0RRV3F0RVhZZGh6QT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 7,
+      "title": "El ciervo no descansa",
+      "embed": "<iframe src='https://hqq.ac/e/L0pkYVdkVXNDaTAwQk84UlhLRDZrZz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 8,
+      "title": "Humor al límite",
+      "embed": "<iframe src='https://hqq.ac/e/Q1d0QkpvTXNRb0VMdEE4Yk1yZlJpUT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 9,
+      "title": "Aceptando el absurdo",
+      "embed": "<iframe src='https://hqq.ac/e/NTQ2TTlxMjNGQlUrdWk3Wk93cXlJQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 10,
+      "title": "Caos sin retorno",
+      "embed": "<iframe src='https://hqq.ac/e/dG5FVWhUZkxDNUIzN3A0d2grK1Vvdz09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 11,
+      "title": "El clímax más extraño",
+      "embed": "<iframe src='https://hqq.ac/e/ZWhEUTZoRUFjQUxjUUsxRDlsWCtIQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
+    },
+    {
+      "number": 12,
+      "title": "El final… o eso creo",
+      "embed": "<iframe src='https://hqq.ac/e/RU1taU1KM2piQW1VK3RJdXYwVkpPQT09' width='800' height='600' frameborder='0' allowfullscreen></iframe>"
     }
   ]
 }
