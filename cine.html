@@ -6,90 +6,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
-    body{
-      margin:0;
-      background:#0b0b10;
-      color:#fff;
-      font-family:system-ui, sans-serif;
-    }
-    .stage{
-      display:grid;
-      grid-template-columns:1fr 320px;
-      height:100vh;
-    }
-    .video-zone{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      background:#000;
-    }
-    .video-wrapper{
-      width:100%;
-      max-width:1100px;
-      aspect-ratio:16/9;
-    }
+    body{margin:0;background:#0b0b10;color:#fff;font-family:system-ui,sans-serif}
+    .stage{display:grid;grid-template-columns:1fr 340px;height:100vh}
+    .video-zone{display:flex;justify-content:center;align-items:center;background:#000}
+    .video-wrapper{width:100%;max-width:1100px;aspect-ratio:16/9}
     iframe{width:100%;height:100%;border:none}
 
-    .ram-zone{
-      background:#141421;
-      border-left:1px solid #222;
-      display:flex;
-      flex-direction:column;
-      padding:1rem;
-    }
-    .ram-head{
-      display:flex;
-      align-items:center;
-      gap:.6rem;
-      margin-bottom:.6rem;
-    }
+    .ram-zone{background:#141421;border-left:1px solid #222;display:flex;flex-direction:column;padding:1rem}
+    .ram-head{display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem}
     .ram-head img{width:56px;height:56px}
     .ram-name{color:#ff4ecd;font-weight:bold}
+    .ram-sub{font-size:.75rem;color:#aaa}
 
-    .ram-chat{
-      flex:1;
-      background:#0f0f18;
-      border-radius:14px;
-      padding:.6rem;
-      overflow:auto;
-      font-size:.9rem;
-    }
-    .msg{margin-bottom:.4rem}
+    .ram-chat{flex:1;background:#0f0f18;border-radius:14px;padding:.6rem;overflow:auto;font-size:.85rem}
+    .msg{margin-bottom:.35rem}
     .ram{color:#ffb6d9}
+    .sys{color:#9aa0ff}
 
-    .ram-controls{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:.4rem;
-      margin-top:.6rem;
-    }
-    .ram-controls button{
-      background:#ff4ecd;
-      color:#fff;
-      border:none;
-      border-radius:10px;
-      padding:.4rem;
-      font-size:.8rem;
-      cursor:pointer;
-    }
+    .ram-controls{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.6rem}
+    .ram-controls button{background:#ff4ecd;color:#fff;border:none;border-radius:10px;padding:.4rem;font-size:.75rem;cursor:pointer}
 
-    @media(max-width:900px){
-      .stage{grid-template-columns:1fr}
-      .ram-zone{height:45vh}
-    }
+    @media(max-width:900px){.stage{grid-template-columns:1fr}.ram-zone{height:48vh}}
   </style>
 </head>
 <body>
 
 <div class="stage">
-  <div class="video-zone">
-    <div class="video-wrapper" id="video"></div>
-  </div>
+  <div class="video-zone"><div class="video-wrapper" id="video"></div></div>
 
   <div class="ram-zone">
     <div class="ram-head">
       <img src="Assets/ReAnime-Mascot.png" alt="Ram">
-      <div class="ram-name">Ram</div>
+      <div>
+        <div class="ram-name">Ram</div>
+        <div class="ram-sub" id="ram-info">Cargando…</div>
+      </div>
     </div>
 
     <div class="ram-chat" id="chat"></div>
@@ -98,6 +49,8 @@
       <button data-a="comment">💬 Comentar</button>
       <button data-a="fact">📌 Dato</button>
       <button data-a="opinion">💭 Opinión</button>
+      <button data-a="react">😮 Reacción</button>
+      <button data-a="next">⏭ Siguiente</button>
       <button data-a="back">⬅ Volver</button>
     </div>
   </div>
@@ -106,50 +59,88 @@
 <script>
 const chat = document.getElementById('chat');
 const video = document.getElementById('video');
+const info = document.getElementById('ram-info');
 const params = new URLSearchParams(location.search);
 const animeId = params.get('id');
 
-const say = txt =>{
+let fakeTime = 0;
+let currentAnime, currentEpisode, episodeIndex = 0;
+let lastInteraction = Date.now();
+
+const format = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+
+const say = (txt,type='ram') =>{
   const d=document.createElement('div');
-  d.className='msg ram';
-  d.textContent='Ram: '+txt;
+  d.className='msg '+type;
+  d.textContent = type==='ram' ? `Ram [${format(fakeTime)}]: ${txt}` : txt;
   chat.appendChild(d);
   chat.scrollTop=chat.scrollHeight;
 };
 
+const rand = a => a[Math.floor(Math.random()*a.length)];
+
 fetch('animes.json').then(r=>r.json()).then(list=>{
-  const anime=list.find(a=>a.id===animeId);
-  if(!anime){ say('Este anime no existe.'); return; }
+  currentAnime = list.find(a=>a.id===animeId);
+  if(!currentAnime){ say('No sé qué anime es este…'); return; }
 
-  say(`Veamos ${anime.name} juntos.`);
+  const last = JSON.parse(localStorage.getItem('lastWatched')||'null');
+  episodeIndex = last && last.id===currentAnime.id ? last.index : 0;
+  currentEpisode = currentAnime.episodes[episodeIndex];
 
-  const last=JSON.parse(localStorage.getItem('lastWatched')||'null');
-  const ep = last&&last.id===anime.id ? anime.episodes[last.index] : anime.episodes[0];
+  info.textContent = `${currentAnime.name} · Ep ${currentEpisode.number}`;
+  say(`Bien… ${currentAnime.name}, episodio ${currentEpisode.number}.`);
 
   const tmp=document.createElement('div');
-  tmp.innerHTML=ep.embed;
+  tmp.innerHTML=currentEpisode.embed;
   const iframe=tmp.querySelector('iframe');
   iframe.loading='lazy';
   video.appendChild(iframe);
 
-  const random = arr => arr[Math.floor(Math.random()*arr.length)];
+  setInterval(()=>fakeTime++,1000);
 
-  const comments=[
-    'Hmm… esta parte me gusta.','Esto se va a poner interesante.','No apartes la vista.','He visto peores decisiones que esta.','Esto es muy humano.','Ram no haría eso.'
+  const timedComments = [
+    {t:60, m:'Ya estamos entrando en calor.'},
+    {t:300, m:'Aquí empieza el desarrollo.'},
+    {t:600, m:'Este momento es clave.'},
+    {t:900, m:'Presta atención a los detalles.'}
   ];
 
-  let t=0;
+  const generic = [
+    'Hmm… interesante.','Esto explica muchas cosas.','No esperaba eso.','Esto es muy humano.','Ram ya lo sospechaba.'
+  ];
+
+  const reactions = ['😮','😄','😐','😴','😳','😡'];
+
+  let tcIndex = 0;
+
   setInterval(()=>{
-    if(t++%20===0) say(random(comments));
+    if(timedComments[tcIndex] && fakeTime >= timedComments[tcIndex].t){
+      say(timedComments[tcIndex].m);
+      tcIndex++;
+    }
+
+    if(Date.now()-lastInteraction>45000){
+      say(rand(generic));
+    }
   },5000);
 
   document.querySelectorAll('.ram-controls button').forEach(b=>{
     b.onclick=()=>{
+      lastInteraction = Date.now();
       const a=b.dataset.a;
       if(a==='back') history.back();
-      if(a==='fact') say(random(anime.dato||['No tengo un dato ahora.']));
-      if(a==='opinion') say(random(anime.opinion||['Es interesante.']));
-      if(a==='comment') say(random(comments));
+      if(a==='fact') say(rand(currentAnime.dato||['No tengo un dato ahora.']));
+      if(a==='opinion') say(rand(currentAnime.opinion||['Es interesante.']));
+      if(a==='comment') say(rand(generic));
+      if(a==='react') say(rand(reactions));
+      if(a==='next'){
+        if(currentAnime.episodes[episodeIndex+1]){
+          localStorage.setItem('lastWatched',JSON.stringify({id:currentAnime.id,index:episodeIndex+1}));
+          location.reload();
+        }else{
+          say('No hay más episodios por ahora.');
+        }
+      }
     };
   });
 });
