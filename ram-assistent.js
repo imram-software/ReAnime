@@ -226,23 +226,34 @@ const BAD = [
    UTILIDADES
 ══════════════════════════════════════════════════════════════ */
 function pickAnime(genreFilter = null, exclude = [], wantsShort = false) {
-  let pool = window.allAnimes.filter(a => !exclude.includes(a.id));
+  const list = window.allAnimes || [];
+  if (!list.length) return null; // data aun no cargada
+  let pool = list.filter(a => !exclude.includes(a.id));
   if (genreFilter) {
     const gpool = pool.filter(a => a.genre.map(g => g.toLowerCase()).includes(genreFilter.toLowerCase()));
     if (gpool.length) pool = gpool;
   }
   if (wantsShort) {
-    // Intenta filtrar animes de pocos episodios si el campo existe
     const short = pool.filter(a => a.episodes && a.episodes.length <= 13);
     if (short.length) pool = short;
   }
-  if (!pool.length) pool = window.allAnimes;
-  return pool[Math.floor(Math.random() * pool.length)];
+  if (!pool.length) pool = list;
+  return pool[Math.floor(Math.random() * pool.length)] || null;
+}
+
+
+function animesReady() {
+  return window.allAnimes && window.allAnimes.length > 0;
+}
+
+function ifNotReady() {
+  ramSay('Todavia cargando los datos. Entra al catalogo primero y vuelve a intentarlo.');
+  return true;
 }
 
 function detectGenre(msg) {
-  if (!window.allAnimes.length) return null;
-  const all = Array.from(new Set(window.allAnimes.flatMap(a => a.genre.map(g => g.toLowerCase()))));
+  if (!animesReady()) return null;
+  const all = Array.from(new Set((window.allAnimes||[]).flatMap(a => a.genre.map(g => g.toLowerCase()))));
   // Buscar match exacto primero, luego parcial
   const lo = msg.toLowerCase();
   return all.find(g => lo.includes(g)) || null;
@@ -275,8 +286,8 @@ function detectLength(msg) {
 }
 
 function buildGenreQuickReplies() {
-  if (!window.allAnimes.length) return;
-  const all = Array.from(new Set(window.allAnimes.flatMap(a => a.genre))).sort();
+  if (!animesReady()) return;
+  const all = Array.from(new Set((window.allAnimes||[]).flatMap(a => a.genre))).sort();
   const preferred = ram.memory.likedGenres.slice(0, 2);
   const rest = all.filter(g => !preferred.includes(g)).slice(0, 4 - preferred.length);
   showQuickReplies([...preferred, ...rest].slice(0, 4));
@@ -286,11 +297,12 @@ function giveAnotherRec() {
   const g = ram.memory.lastGenreAsked || (ram.memory.likedGenres[0] || null);
   const avoidIds = [
     ...ram.memory.seenAnimes,
-    ...allAnimes
+    ...(window.allAnimes||[])
       .filter(a => a.genre.map(x => x.toLowerCase()).some(x => ram.memory.dislikedGenres.includes(x)))
       .map(a => a.id),
   ];
   const pick = pickAnime(g, avoidIds, ram.memory.wantsShort);
+      if (!pick) { if (animesReady()) { ramSay("No encontre nada con esos filtros."); } else { ramSay("Todavia cargando los animes. Espera un momento e intentalo de nuevo."); } return; }
   ram.memory.lastRecommended = pick;
   ram.memory.seenAnimes.push(pick.id);
   const prefix = g ? `Otro de <b>${g}</b>: ` : '';
@@ -338,6 +350,7 @@ function handleChat(rawInput) {
         if (ram.memory.likedGenres.length) {
           const g = ram.memory.likedGenres[Math.floor(Math.random() * ram.memory.likedGenres.length)];
           const pick = pickAnime(g, ram.memory.seenAnimes, ram.memory.wantsShort);
+      if (!pick) { if (animesReady()) { ramSay("No encontre nada con esos filtros."); } else { ramSay("Todavia cargando los animes. Espera un momento e intentalo de nuevo."); } return; }
           ram.memory.lastRecommended = pick;
           ram.memory.seenAnimes.push(pick.id);
           ramSay(`Recuerdo que te gusta <b>${g}</b>. Te recomiendo: <b>${pick.name}</b>.`);
@@ -368,6 +381,7 @@ function handleChat(rawInput) {
       if (UNSURE.test(msg) || NO.test(msg)) {
         ram.pending = null;
         const pick = pickAnime(null, ram.memory.seenAnimes, ram.memory.wantsShort);
+      if (!pick) { if (animesReady()) { ramSay("No encontre nada con esos filtros."); } else { ramSay("Todavia cargando los animes. Espera un momento e intentalo de nuevo."); } return; }
         ram.memory.lastRecommended = pick;
         ram.memory.seenAnimes.push(pick.id);
         ramSay(`Sin preferencia. Te recomiendo: <b>${pick.name}</b>.`);
@@ -382,6 +396,7 @@ function handleChat(rawInput) {
       if (/(sorprende|sorprendeme|elige tu|elige vos|lo que sea|cualquiera|aleatorio|random)/i.test(lo)) {
         ram.pending = null;
         const pick = pickAnime(null, ram.memory.seenAnimes, ram.memory.wantsShort);
+      if (!pick) { if (animesReady()) { ramSay("No encontre nada con esos filtros."); } else { ramSay("Todavia cargando los animes. Espera un momento e intentalo de nuevo."); } return; }
         ram.memory.lastRecommended = pick;
         ram.memory.seenAnimes.push(pick.id);
         ramSay(`Bien. Sin filtros: <b>${pick.name}</b>.`);
@@ -397,6 +412,7 @@ function handleChat(rawInput) {
         if (!ram.memory.likedGenres.includes(g)) ram.memory.likedGenres.push(g);
         ram.memory.lastGenreAsked = g;
         const pick = pickAnime(g, ram.memory.seenAnimes, ram.memory.wantsShort);
+      if (!pick) { if (animesReady()) { ramSay("No encontre nada con esos filtros."); } else { ramSay("Todavia cargando los animes. Espera un momento e intentalo de nuevo."); } return; }
         ram.memory.lastRecommended = pick;
         ram.memory.seenAnimes.push(pick.id);
         ram.pending = null;
@@ -685,7 +701,8 @@ function handleChat(rawInput) {
 
   /* ── GENEROS DISPONIBLES ── */
   if (/(qu[eé] (generos|géneros|tipos|categorias|categorías) (hay|tienen|tienes)|lista (de generos|de géneros)|generos? disponibles?|cu[aá]les son (los generos|los géneros)|mu[eé]strame (los generos|los géneros)|dame (los generos|los géneros))/i.test(lo) || lo === 'generos' || lo === 'géneros' || lo === 'tipos') {
-    const all = Array.from(new Set(window.allAnimes.flatMap(a => a.genre))).sort();
+    if (!animesReady()) { ramSay('Todavia cargando los datos. Espera un momento.'); return; }
+    const all = Array.from(new Set((window.allAnimes||[]).flatMap(a => a.genre))).sort();
     ramSay(`Generos disponibles: <b>${all.join(', ')}</b>.`);
     setTimeout(() => {
       ramSay('¿Quieres buscar por alguno?', 400);
@@ -701,6 +718,7 @@ function handleChat(rawInput) {
     if (!ram.memory.likedGenres.includes(foundGenre)) ram.memory.likedGenres.push(foundGenre);
     ram.memory.lastGenreAsked = foundGenre;
     const pick = pickAnime(foundGenre, ram.memory.seenAnimes, ram.memory.wantsShort);
+      if (!pick) { if (animesReady()) { ramSay("No encontre nada con esos filtros."); } else { ramSay("Todavia cargando los animes. Espera un momento e intentalo de nuevo."); } return; }
     ram.memory.lastRecommended = pick;
     ram.memory.seenAnimes.push(pick.id);
     ramSay(`Para <b>${foundGenre}</b>: <b>${pick.name}</b>.`);
