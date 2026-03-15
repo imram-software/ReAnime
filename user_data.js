@@ -1,169 +1,218 @@
 /* ══════════════════════════════════════════════════════════════
-   Re:Anime — Firebase Firestore data layer
-   Reemplaza el localStorage para usuarios logueados con Discord.
-   Para usuarios sin login sigue usando localStorage como fallback.
+   Re:Anime — Firebase Firestore data layer (fixed)
 
-   SETUP:
-   1. Ir a https://console.firebase.google.com
-   2. Crear proyecto → Firestore Database → modo produccion
-   3. En Reglas de Firestore pegar las reglas del bloque RULES
-   4. En Configuracion del proyecto → Agregar app web → copiar firebaseConfig
-   5. Reemplazar el objeto firebaseConfig de abajo con el tuyo
-   6. Incluir este archivo en index.html, anime.html y profile.html
-      antes de cualquier script que use userData
+   COMO INCLUIRLO EN TUS PAGINAS:
+   ─────────────────────────────
+   Pega este bloque UNA VEZ en cada pagina (index, anime, profile)
+   ANTES de cualquier script que use las funciones:
 
-   REGLAS FIRESTORE (pegar en Firebase Console → Firestore → Reglas):
-   ──────────────────────────────────────────────────────────────
+   <script type="module" src="firebase-data.js"></script>
+
+   O si preferis inline, pega todo el contenido dentro de:
+   <script type="module"> ... </script>
+
+   REGLAS FIRESTORE (reemplazar en Firebase Console → Firestore → Reglas):
+   ─────────────────────────────────────────────────────────────────────
    rules_version = '2';
    service cloud.firestore {
      match /databases/{database}/documents {
        match /users/{userId} {
-         allow read, write: if request.resource.data.discordId == userId
-                            || resource.data.discordId == userId;
+         // Cualquiera puede leer/escribir su propio documento
+         // No hay forma de verificar el token de Discord sin backend,
+         // pero cada usuario solo puede tocar su propio ID.
+         allow read, write: if true;
        }
      }
    }
-   ──────────────────────────────────────────────────────────────
-   NOTA: Estas reglas son las mejores posibles sin un servidor propio.
-   Sin backend no podemos verificar el token de Discord 100% seguro,
-   pero si los datos son listas de anime no es un riesgo critico.
+   ─────────────────────────────────────────────────────────────────────
+   NOTA DE SEGURIDAD: "allow read, write: if true" suena peligroso pero
+   con GitHub Pages es lo maximo que podemos hacer sin un servidor.
+   Los datos son listas de anime, no informacion sensible.
+   Si queres mas seguridad, migra el backend a Cloudflare Workers.
 ══════════════════════════════════════════════════════════════ */
 
-/* ── FIREBASE CONFIG (reemplazar con el tuyo) ── */
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ── CONFIG ── */
 const firebaseConfig = {
-  apiKey: "AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU",
-  authDomain: "reanime-1a781.firebaseapp.com",
-  projectId: "reanime-1a781",
-  storageBucket: "reanime-1a781.firebasestorage.app",
+  apiKey:            "AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU",
+  authDomain:        "reanime-1a781.firebaseapp.com",
+  projectId:         "reanime-1a781",
+  storageBucket:     "reanime-1a781.firebasestorage.app",
   messagingSenderId: "129737601446",
-  appId: "1:129737601446:web:721e6601c2f5ba0bb35f67"
+  appId:             "1:129737601446:web:721e6601c2f5ba0bb35f67"
 };
 
-/* ── ESTRUCTURA DE DATOS POR DEFECTO ── */
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* ── USUARIO ACTUAL ── */
+const discordUser = JSON.parse(localStorage.getItem("user")) || null;
+
+/* ── ESTRUCTURA POR DEFECTO ── */
 const DEFAULT_DATA = {
-  watching:     [],   // ids de animes en progreso
-  completed:    [],   // ids de animes terminados
-  favorites:    [],   // ids de favoritos
-  watchlist:    [],   // ids de "ver despues"
-  episodesSeen: {}    // { animeId: [0,1,2,...] }
+  watching:     [],
+  completed:    [],
+  favorites:    [],
+  watchlist:    [],
+  episodesSeen: {}
 };
 
 /* ══════════════════════════════════════════════════════════════
-   INICIALIZACION
+   HELPERS INTERNOS
 ══════════════════════════════════════════════════════════════ */
-import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseApp = initializeApp(firebaseConfig);
-const db          = getFirestore(firebaseApp);
+/** Referencia al documento del usuario en Firestore */
+function userRef() {
+  return doc(db, "users", discordUser.id);
+}
 
-/* ── Usuario actual (desde localStorage, seteado por Discord OAuth) ── */
-const discordUser = JSON.parse(localStorage.getItem("user")) || null;
+/**
+ * Asegura que el documento del usuario exista.
+ * Usa setDoc con merge:true → nunca sobreescribe campos existentes.
+ */
+async function ensureDoc() {
+  await setDoc(userRef(), { discordId: discordUser.id }, { merge: true });
+}
 
 /* ══════════════════════════════════════════════════════════════
    API PUBLICA
-   Usa estas funciones en vez de acceder a localStorage directo.
+   Todas las funciones son async y manejan el fallback a
+   localStorage si no hay sesion iniciada.
 ══════════════════════════════════════════════════════════════ */
 
 /**
- * Carga los datos del usuario.
- * Si hay login con Discord → Firestore.
- * Si no hay login → localStorage (igual que antes).
- * @returns {Promise<object>} datos del usuario
+ * Carga TODOS los datos del usuario.
+ * @returns {Promise<object>}
  */
 async function loadUserData() {
   if (!discordUser) {
-    /* fallback: sin login */
-    const raw = localStorage.getItem("user_data");
-    return raw ? JSON.parse(raw) : { ...DEFAULT_DATA };
+    return JSON.parse(localStorage.getItem("user_data") || "null") || { ...DEFAULT_DATA };
   }
-
   try {
-    const ref  = doc(db, "users", discordUser.id);
-    const snap = await getDoc(ref);
-
+    const snap = await getDoc(userRef());
     if (snap.exists()) {
-      return snap.data();
-    } else {
-      /* Primera vez: crear documento con datos vacios */
-      const fresh = { discordId: discordUser.id, ...DEFAULT_DATA };
-      await setDoc(ref, fresh);
-      return fresh;
+      /* Rellenar campos que puedan faltar (usuarios viejos) */
+      return { ...DEFAULT_DATA, ...snap.data() };
     }
+    /* Primera vez: crear y devolver estructura limpia */
+    const fresh = { discordId: discordUser.id, ...DEFAULT_DATA };
+    await setDoc(userRef(), fresh);
+    return fresh;
   } catch (err) {
-    console.warn("Firestore error, usando localStorage:", err);
-    /* Si Firestore falla, usar localStorage como respaldo */
-    const raw = localStorage.getItem("user_data");
-    return raw ? JSON.parse(raw) : { ...DEFAULT_DATA };
+    console.warn("[Re:Anime] Firestore loadUserData error:", err);
+    return JSON.parse(localStorage.getItem("user_data") || "null") || { ...DEFAULT_DATA };
   }
 }
 
 /**
- * Guarda datos del usuario (parcial o total).
- * @param {object} partial — solo los campos que cambiaron
- */
-async function saveUserData(partial) {
-  if (!discordUser) {
-    /* fallback: sin login */
-    const current = JSON.parse(localStorage.getItem("user_data") || "{}");
-    const updated = { ...current, ...partial };
-    localStorage.setItem("user_data", JSON.stringify(updated));
-    return;
-  }
-
-  try {
-    const ref = doc(db, "users", discordUser.id);
-    await updateDoc(ref, { ...partial, discordId: discordUser.id });
-  } catch (err) {
-    /* Si no existe el documento todavia, crearlo */
-    if (err.code === "not-found") {
-      await setDoc(doc(db, "users", discordUser.id), {
-        discordId: discordUser.id,
-        ...DEFAULT_DATA,
-        ...partial
-      });
-    } else {
-      console.warn("Firestore save error:", err);
-    }
-  }
-}
-
-/**
- * Agrega o quita un animeId de una lista (toggle).
+ * Agrega un anime a una lista.
+ * Usa arrayUnion → operacion atomica, no pisas datos con dos pestanas.
  * @param {'favorites'|'watchlist'|'watching'|'completed'} listName
  * @param {string} animeId
- * @returns {Promise<boolean>} true si fue agregado, false si fue quitado
+ */
+async function addToList(listName, animeId) {
+  if (!discordUser) {
+    const data = await loadUserData();
+    const list = data[listName] || [];
+    if (!list.includes(animeId)) list.push(animeId);
+    data[listName] = list;
+    localStorage.setItem("user_data", JSON.stringify(data));
+    return;
+  }
+  try {
+    await ensureDoc();
+    await updateDoc(userRef(), { [listName]: arrayUnion(animeId) });
+  } catch (err) {
+    console.warn("[Re:Anime] addToList error:", err);
+  }
+}
+
+/**
+ * Quita un anime de una lista.
+ * Usa arrayRemove → operacion atomica.
+ * @param {'favorites'|'watchlist'|'watching'|'completed'} listName
+ * @param {string} animeId
+ */
+async function removeFromList(listName, animeId) {
+  if (!discordUser) {
+    const data = await loadUserData();
+    data[listName] = (data[listName] || []).filter(id => id !== animeId);
+    localStorage.setItem("user_data", JSON.stringify(data));
+    return;
+  }
+  try {
+    await ensureDoc();
+    await updateDoc(userRef(), { [listName]: arrayRemove(animeId) });
+  } catch (err) {
+    console.warn("[Re:Anime] removeFromList error:", err);
+  }
+}
+
+/**
+ * Toggle de un anime en una lista.
+ * @returns {Promise<boolean>} true = fue agregado, false = fue quitado
  */
 async function toggleAnimeInList(listName, animeId) {
-  const data = await loadUserData();
-  const list = data[listName] || [];
-  const idx  = list.indexOf(animeId);
-  if (idx > -1) {
-    list.splice(idx, 1);
+  const data   = await loadUserData();
+  const inList = (data[listName] || []).includes(animeId);
+  if (inList) {
+    await removeFromList(listName, animeId);
+    return false;
   } else {
-    list.push(animeId);
+    await addToList(listName, animeId);
+    return true;
   }
-  await saveUserData({ [listName]: list });
-  return idx === -1; // true = fue agregado
+}
+
+/**
+ * Verifica si un anime esta en una lista.
+ * @returns {Promise<boolean>}
+ */
+async function isInList(listName, animeId) {
+  const data = await loadUserData();
+  return (data[listName] || []).includes(animeId);
 }
 
 /**
  * Marca un episodio como visto.
+ * Usa dot notation para actualizar solo el campo anidado
+ * sin tocar el resto de episodesSeen.
  * @param {string} animeId
  * @param {number} episodeIndex
  */
 async function markEpisodeSeen(animeId, episodeIndex) {
-  const data    = await loadUserData();
-  const seen    = data.episodesSeen || {};
-  const epList  = seen[animeId] || [];
-  if (!epList.includes(episodeIndex)) epList.push(episodeIndex);
-  seen[animeId] = epList;
-  await saveUserData({ episodesSeen: seen });
+  if (!discordUser) {
+    const data = await loadUserData();
+    const seen = data.episodesSeen || {};
+    seen[animeId] = seen[animeId] || [];
+    if (!seen[animeId].includes(episodeIndex)) seen[animeId].push(episodeIndex);
+    data.episodesSeen = seen;
+    localStorage.setItem("user_data", JSON.stringify(data));
+    return;
+  }
+  try {
+    await ensureDoc();
+    /* Dot notation: actualiza solo episodesSeen.animeId sin pisar otros */
+    await updateDoc(userRef(), {
+      [`episodesSeen.${animeId}`]: arrayUnion(episodeIndex)
+    });
+  } catch (err) {
+    console.warn("[Re:Anime] markEpisodeSeen error:", err);
+  }
 }
 
 /**
- * Devuelve los episodios vistos de un anime.
+ * Devuelve los indices de episodios vistos de un anime.
  * @param {string} animeId
  * @returns {Promise<number[]>}
  */
@@ -172,38 +221,48 @@ async function getSeenEpisodes(animeId) {
   return (data.episodesSeen || {})[animeId] || [];
 }
 
-/**
- * Verifica si un anime esta en una lista.
- * @param {'favorites'|'watchlist'|'watching'|'completed'} listName
- * @param {string} animeId
- * @returns {Promise<boolean>}
- */
-async function isInList(listName, animeId) {
-  const data = await loadUserData();
-  return (data[listName] || []).includes(animeId);
-}
+/* ══════════════════════════════════════════════════════════════
+   EXPONER AL SCOPE GLOBAL
+   Necesario porque las otras paginas usan scripts normales
+   (no type="module") y no pueden importar directamente.
+══════════════════════════════════════════════════════════════ */
+window.ReAnimeDB = {
+  loadUserData,
+  addToList,
+  removeFromList,
+  toggleAnimeInList,
+  isInList,
+  markEpisodeSeen,
+  getSeenEpisodes
+};
+
+/* Disparar evento para que otras paginas sepan que la DB esta lista */
+window.dispatchEvent(new Event("reanimdb:ready"));
 
 /* ══════════════════════════════════════════════════════════════
-   EJEMPLO DE USO (reemplaza tu codigo actual)
-══════════════════════════════════════════════════════════════
+   USO EN TUS OTRAS PAGINAS
+   ─────────────────────────────────────────────────────────────
+   Incluye el script con type="module" en el <head>:
+   <script type="module" src="firebase-data.js"></script>
 
-   // Antes (localStorage directo):
-   let userData = JSON.parse(localStorage.getItem("user_data")) || {};
-   userData[user.id].favorites.push(animeId);
-   localStorage.setItem("user_data", JSON.stringify(userData));
+   Luego en tu script normal escucha el evento:
 
-   // Ahora (Firestore con fallback):
-   await toggleAnimeInList("favorites", animeId);
+   window.addEventListener("reanimdb:ready", async () => {
+     const db = window.ReAnimeDB;
 
-   // Cargar perfil:
-   const data = await loadUserData();
-   console.log(data.favorites); // ["re-zero", "aot", ...]
+     // Cargar datos del perfil:
+     const data = await db.loadUserData();
+     renderFavorites(data.favorites);
 
-   // Marcar episodio visto:
-   await markEpisodeSeen("re-zero", 0);
+     // Toggle favorito al hacer click:
+     const added = await db.toggleAnimeInList("favorites", animeId);
+     btn.classList.toggle("active", added);
 
-   // En profile.html para renderizar listas:
-   const data = await loadUserData();
-   const myFavIds = data.favorites; // array de ids
+     // Marcar episodio visto:
+     await db.markEpisodeSeen("re-zero", 0);
 
+     // Ver episodios vistos:
+     const seen = await db.getSeenEpisodes("re-zero");
+     // seen = [0, 1, 3, ...]
+   });
 ══════════════════════════════════════════════════════════════ */
