@@ -53,15 +53,19 @@ const chatClose    = document.getElementById('mascot-chat-close');
 const chatActions  = document.getElementById('mascot-chat-actions');
 
 /* ─── WALK ─── */
-let mPos = 10, mDir = 1;
-function walkMascot() {
-  mPos += mDir * 0.12;
-  if (mPos > 75) mDir = -1;
-  if (mPos < 5)  mDir =  1;
-  mascotCont.style.left = mPos + 'vw';
+let mPos = 10, mDir = 1, _lastWalk = 0;
+function walkMascot(ts) {
+  if (ts - _lastWalk > 16) {
+    _lastWalk = ts;
+    mPos += mDir * 0.06;
+    if (mPos > 75) mDir = -1;
+    if (mPos < 5)  mDir =  1;
+    mascotCont.style.left = mPos + 'vw';
   mascotImg.style.transform = `scaleX(${mDir})`;
+  }
+  requestAnimationFrame(walkMascot);
 }
-setInterval(walkMascot, 30);
+requestAnimationFrame(walkMascot);
 
 /* ─── BURBUJAS INACTIVAS ─── */
 const idleBubbles = [

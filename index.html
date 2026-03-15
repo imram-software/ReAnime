@@ -64,8 +64,10 @@
       height: 56px;
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 2rem;
-      background: rgba(8,8,8,0.88);
+      background: rgba(8,8,8,0.95);
+      /* backdrop-filter solo en dispositivos capaces */
       backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
     }
 
@@ -143,17 +145,23 @@
 
     /* Decorative Japanese-style grid lines */
     .hero-lines {
-      position: absolute; inset: 0; z-index: 0;
+      position: absolute; inset: -60px; z-index: 0;
+      overflow: hidden;
+    }
+    .hero-lines::before {
+      content: '';
+      position: absolute; inset: 0;
       background-image:
         linear-gradient(rgba(255,45,120,0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,45,120,0.04) 1px, transparent 1px);
       background-size: 60px 60px;
       mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+      will-change: transform;
       animation: gridDrift 6s linear infinite;
     }
     @keyframes gridDrift {
-      0%   { background-position: 0 0; }
-      100% { background-position: 60px -60px; }
+      0%   { transform: translate(0, 0); }
+      100% { transform: translate(60px, -60px); }
     }
 
     .hero-badge {
@@ -258,8 +266,7 @@
     .news-track-wrap.dragging { cursor: grabbing; }
     #news-track {
       display: flex; gap: 1.2rem;
-      transition: transform 0.55s cubic-bezier(.77,0,.18,1);
-      will-change: transform;
+      transition: transform 0.45s cubic-bezier(.77,0,.18,1);
     }
 
     .news-card {
@@ -354,6 +361,7 @@
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 1rem;
       padding: 0 2rem 3rem;
+      contain: layout style; /* limitar repaints al contenedor */
     }
 
     .anime-card {
@@ -370,6 +378,7 @@
     .anime-card img {
       width: 100%; height: 100%; object-fit: cover;
       display: block; transition: filter 0.4s;
+      will-change: filter; /* aislar filter repaint del transform */
     }
     .anime-card:hover img { filter: brightness(0.6); }
 
@@ -503,7 +512,7 @@
       width: 72px; height: 72px; object-fit: contain;
       cursor: pointer; pointer-events: auto;
       transition: transform 0.15s;
-      filter: drop-shadow(0 0 8px var(--pink-glow));
+      /* drop-shadow removido del walk loop - se aplica solo en CSS estatico */
     }
     #mascot-img:hover { transform: scale(1.1); }
 
@@ -623,6 +632,19 @@
       .news-card { flex: 0 0 280px; }
       footer { flex-direction: column; text-align: center; }
       #mascot-chat { width: calc(100vw - 2rem); right: 1rem; }
+    }
+
+    /* Dispositivos lentos o accesibilidad */
+    @media (prefers-reduced-motion: reduce) {
+      .hero-lines::before { animation: none; }
+      .anime-card { transition: border-color 0.2s; }
+      .anime-card:hover { transform: none; }
+      .scroll-line { animation: none; }
+      .btn-enter::before { transition: none; }
+    }
+    /* Deshabilitar backdrop-filter en dispositivos sin GPU suficiente */
+    @media (max-width: 600px) {
+      header { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(8,8,8,0.98); }
     }
   </style>
 </head>
