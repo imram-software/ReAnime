@@ -226,7 +226,7 @@ const BAD = [
    UTILIDADES
 ══════════════════════════════════════════════════════════════ */
 function pickAnime(genreFilter = null, exclude = [], wantsShort = false) {
-  let pool = allAnimes.filter(a => !exclude.includes(a.id));
+  let pool = window.allAnimes.filter(a => !exclude.includes(a.id));
   if (genreFilter) {
     const gpool = pool.filter(a => a.genre.map(g => g.toLowerCase()).includes(genreFilter.toLowerCase()));
     if (gpool.length) pool = gpool;
@@ -236,13 +236,13 @@ function pickAnime(genreFilter = null, exclude = [], wantsShort = false) {
     const short = pool.filter(a => a.episodes && a.episodes.length <= 13);
     if (short.length) pool = short;
   }
-  if (!pool.length) pool = allAnimes;
+  if (!pool.length) pool = window.allAnimes;
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function detectGenre(msg) {
-  if (!allAnimes.length) return null;
-  const all = Array.from(new Set(allAnimes.flatMap(a => a.genre.map(g => g.toLowerCase()))));
+  if (!window.allAnimes.length) return null;
+  const all = Array.from(new Set(window.allAnimes.flatMap(a => a.genre.map(g => g.toLowerCase()))));
   // Buscar match exacto primero, luego parcial
   const lo = msg.toLowerCase();
   return all.find(g => lo.includes(g)) || null;
@@ -275,8 +275,8 @@ function detectLength(msg) {
 }
 
 function buildGenreQuickReplies() {
-  if (!allAnimes.length) return;
-  const all = Array.from(new Set(allAnimes.flatMap(a => a.genre))).sort();
+  if (!window.allAnimes.length) return;
+  const all = Array.from(new Set(window.allAnimes.flatMap(a => a.genre))).sort();
   const preferred = ram.memory.likedGenres.slice(0, 2);
   const rest = all.filter(g => !preferred.includes(g)).slice(0, 4 - preferred.length);
   showQuickReplies([...preferred, ...rest].slice(0, 4));
@@ -574,6 +574,14 @@ function handleChat(rawInput) {
      FLUJO LIBRE
   ══════════════════════════════════════════════════════ */
 
+
+  /* ── UNSURE EN FLUJO LIBRE ── */
+  if (UNSURE.test(msg)) {
+    ramSay('Dime que buscas. Puedo recomendar por genero o mostrar los populares.');
+    showQuickReplies(['Recomiendame algo', 'Busco por genero', 'Ver los populares']);
+    return;
+  }
+
   /* ── SALUDOS ── */
   if (/^(hola|holi|holaa|holaa+|hello|hellow|hey|heey|hey+|hi\b|buenas?(\s(tardes?|noches?|d[ií]as?))?|buen dia|buen día|que onda|qué onda|como andas|cómo andas|como estas|cómo estás|que tal|qué tal|saludos|ola\b|yo\b)/i.test(lo)) {
     if (ram.memory.name) {
@@ -677,7 +685,7 @@ function handleChat(rawInput) {
 
   /* ── GENEROS DISPONIBLES ── */
   if (/(qu[eé] (generos|géneros|tipos|categorias|categorías) (hay|tienen|tienes)|lista (de generos|de géneros)|generos? disponibles?|cu[aá]les son (los generos|los géneros)|mu[eé]strame (los generos|los géneros)|dame (los generos|los géneros))/i.test(lo) || lo === 'generos' || lo === 'géneros' || lo === 'tipos') {
-    const all = Array.from(new Set(allAnimes.flatMap(a => a.genre))).sort();
+    const all = Array.from(new Set(window.allAnimes.flatMap(a => a.genre))).sort();
     ramSay(`Generos disponibles: <b>${all.join(', ')}</b>.`);
     setTimeout(() => {
       ramSay('¿Quieres buscar por alguno?', 400);
@@ -730,7 +738,7 @@ function handleChat(rawInput) {
   /* ── POPULARES ── */
   if (/(popular(es)?|trending|top (anime|animes|\d+)|los? mejor(es)?|los? m[aá]s (vistos?|populares?|vistos?)|los? que m[aá]s se ven|cu[aá]l(es)? son los mejores|recomendados?|destacados?|los? cl[aá]sicos?|que esta de moda|qué está de moda)/i.test(lo)) {
     ramSay('Estos son algunos de los mas vistos:');
-    const tops = allAnimes.slice(0, 3);
+    const tops = window.allAnimes.slice(0, 3);
     ram.memory.lastPopularList = tops;
     tops.forEach((a, i) => {
       setTimeout(() => ramSay(`${i + 1}. <b>${a.name}</b>`), i * 250);
@@ -748,7 +756,7 @@ function handleChat(rawInput) {
 
   /* ── CUANTOS ANIMES ── */
   if (/(cu[aá]ntos? (animes?|hay|tienen|tienes)|how many|total (de|de animes?)|cuantos? tienen|cuantos? hay)/i.test(lo)) {
-    ramSay(`Hay <b>${allAnimes.length}</b> animes en el catalogo.`);
+    ramSay(`Hay <b>${window.allAnimes.length}</b> animes en el catalogo.`);
     setTimeout(() => {
       ram.pending = 'confirm_rec';
       showQuickReplies(['Recomiendame uno', 'Busco por genero']);
@@ -760,7 +768,7 @@ function handleChat(rawInput) {
   if (/((sabes|tienes|hay) (algo sobre|informacion de|info de)|(conoces|tienes).+anime|de qu[eé] trata|de que va|cu[eé]ntame (sobre|de)|qu[eé] es .+anime|info (de|sobre)|datos (de|sobre))/i.test(lo)) {
     const g = detectGenre(lo);
     if (g) {
-      const matches = allAnimes.filter(a => a.genre.map(x => x.toLowerCase()).includes(g));
+      const matches = window.allAnimes.filter(a => a.genre.map(x => x.toLowerCase()).includes(g));
       if (matches.length) {
         ramSay(`Tengo <b>${matches.length}</b> animes de <b>${g}</b> en el catalogo.`);
         setTimeout(() => {

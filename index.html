@@ -769,8 +769,8 @@
   /* ══════════════════════════════════════════════
      APP STATE
   ══════════════════════════════════════════════ */
-  let allAnimes = [];
-  let activeGenres = new Set();
+  window.allAnimes = [];
+  let activeGenres = new Set(); window.activeGenres = activeGenres;
 
   const urlParams = new URLSearchParams(location.search);
   const genreFromURL = urlParams.get('genre');
@@ -805,7 +805,7 @@
     fetch('animes.json')
       .then(r => r.json())
       .then(data => {
-        allAnimes = data;
+        window.allAnimes = data; allAnimes = data;
         buildGenreChips();
         if (genreFromURL) {
           activeGenres.add(decodeURIComponent(genreFromURL));
