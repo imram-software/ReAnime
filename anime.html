@@ -4,411 +4,500 @@
   <meta charset="UTF-8" />
   <title>Re:Anime · Ver episodio</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Fuentes optimizadas -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;700&display=swap" rel="stylesheet" />
   <style>
-:root{
-      --pink:#ff4ecd;
-      --pink-soft:#ffb6d9;
-      --bg:#0f0f14;
-      --panel:#181820;
-      --text:#f1f1f1;
+    :root {
+      --bg:       #080808;
+      --bg2:      #111111;
+      --bg3:      #1a1a1a;
+      --surface:  #161616;
+      --border:   #222222;
+      --pink:     #ff2d78;
+      --pink-dim: #ff2d7822;
+      --pink-glow:#ff2d7855;
+      --rose:     #ff6fa8;
+      --text:     #e8e8e8;
+      --muted:    #666;
+      --radius:   10px;
+      --font-head:'Bebas Neue', cursive;
+      --font-body:'DM Sans', sans-serif;
+      --font-jp:  'Noto Sans JP', sans-serif;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:system-ui, sans-serif;
-      background:linear-gradient(135deg,#ffe1f0,#caf0f8);
-      color:#222;
-      transition: background 1s ease, color 0.5s;
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 2px; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-top: 56px;
     }
-    body.dark{
-      background:linear-gradient(135deg,#0f0f14,#1b1b2a);
-      color:var(--text);
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-size: 200px 200px; opacity: 0.4;
     }
 
-    header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:1rem 1.5rem;
-      background:#fff0fa;
-      border-bottom:1px solid #ddd;
-      transition: background 0.5s, color 0.5s;
+    /* ── HEADER ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      height: 56px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem;
+      background: rgba(8,8,8,0.88); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
     }
-    body.dark header{
-      background:#1e1e1e;
-      border-bottom:1px solid #222;
+    .logo {
+      font-family: var(--font-head); font-size: 2rem;
+      letter-spacing: 3px; color: var(--pink);
+      text-decoration: none; text-shadow: 0 0 20px var(--pink-glow);
     }
-    header h1{
-      font-family:'Zen Tokyo Zoo', cursive;
-      color:#ff4ecd;
-      font-size:1.8rem;
-      margin:0;
+    .logo span { color: var(--text); }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+
+    #login-btn {
+      background: var(--pink); color: #fff;
+      padding: 0.4rem 1.1rem; border-radius: 6px;
+      text-decoration: none; font-size: 0.85rem; font-weight: 700;
+      transition: opacity 0.2s; box-shadow: 0 0 16px var(--pink-glow);
     }
-    .theme-toggle {
-      position: relative;
-      background: #ff8fab;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 30px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 0 10px #ff8fab80;
-      transition: 0.3s;
-    }
-    .theme-toggle:hover { background-color: #ff4ecd; }
-    #login-btn{
-      background:#ff8fab;
-      color:#fff;
-      border:none;
-      padding:.5rem 1.2rem;
-      border-radius:20px;
-      font-weight:bold;
-      text-decoration:none;
-      box-shadow: 0 0 10px #ff8fab80;
-      transition: 0.3s;
-    }
-    #login-btn:hover { background-color: #ff4ecd; }
-    #user-info {
-      position: fixed; top: 10px; right: 10px;
-      display: flex; align-items: center; gap: 0.5rem;
-      z-index: 1001; cursor: pointer;
-    }
-    #user-info img { width: 40px; border-radius: 50%; }
+    #login-btn:hover { opacity: 0.85; }
+
+    #user-info { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; position: relative; }
+    #user-info img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--pink); }
+    #user-info span { font-size: 0.85rem; }
     #user-popup {
-      position: fixed; top: 60px; right: 10px;
-      background: #fff0fa; color: #333;
-      border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      padding: 1rem; min-width: 200px; z-index: 1002;
-      display: none; text-align: left;
+      position: absolute; top: 44px; right: 0;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem; min-width: 180px;
+      display: none; z-index: 100;
     }
     #user-popup button {
-      margin-top: 1rem; background: #ff4ecd;
-      color: white; padding: 0.5rem 1rem;
-      border: none; border-radius: 20px;
-      cursor: pointer; width: 100%;
+      display: block; width: 100%; margin-top: 0.5rem;
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); border-radius: 6px; padding: 0.5rem;
+      cursor: pointer; font-family: var(--font-body); font-size: 0.85rem;
+      transition: border-color 0.2s;
+    }
+    #user-popup button:hover { border-color: var(--pink); color: var(--pink); }
+
+    /* ── PAGE ── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      color: var(--muted); font-size: 0.85rem;
+      background: none; border: none; font-family: var(--font-body);
+      cursor: pointer; margin-bottom: 1.5rem; transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--pink); }
+
+    /* ── ANIME TOP INFO ── */
+    .anime-top {
+      display: flex; gap: 1.5rem; align-items: flex-start;
+      margin-bottom: 2rem; padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .anime-cover {
+      width: 120px; flex-shrink: 0;
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .anime-cover img { width: 100%; display: block; object-fit: cover; }
+    .anime-meta { flex: 1; }
+    .anime-name {
+      font-family: var(--font-head);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      letter-spacing: 3px; color: var(--text);
+      line-height: 1; margin-bottom: 0.6rem;
+    }
+    .anime-genres { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
+    .genre-tag {
+      font-size: 0.7rem; color: var(--pink);
+      border: 1px solid var(--pink-dim);
+      padding: 0.2rem 0.6rem; border-radius: 30px;
+      font-family: var(--font-jp);
+    }
+    .anime-description { font-size: 0.88rem; color: var(--muted); line-height: 1.65; max-width: 620px; }
+
+    /* List actions */
+    .anime-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+    .action-btn {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 6px;
+      padding: 0.4rem 0.9rem; font-size: 0.8rem;
+      cursor: pointer; font-family: var(--font-body);
+      transition: all 0.2s;
+    }
+    .action-btn:hover, .action-btn.active { border-color: var(--pink); color: var(--pink); }
+    .action-btn.active { background: var(--pink-dim); }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 1.2rem;
     }
 
-    .container{
-      max-width:1200px;
-      margin:auto;
-      padding:1.2rem;
+    /* ── EPISODE LIST ── */
+    .ep-sidebar {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.8rem;
+      max-height: 68vh; overflow-y: auto;
+      position: sticky; top: 70px;
     }
+    .ep-sidebar-title {
+      font-family: var(--font-head); font-size: 1rem;
+      letter-spacing: 2px; color: var(--muted);
+      margin-bottom: 0.6rem; padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .ep-btn {
+      width: 100%; text-align: left;
+      background: none; border: none; border-radius: 6px;
+      color: var(--muted); padding: 0.5rem 0.6rem;
+      font-size: 0.82rem; cursor: pointer;
+      font-family: var(--font-body); margin-bottom: 0.2rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .ep-btn:hover { background: var(--bg3); color: var(--text); }
+    .ep-btn.active { background: var(--pink-dim); color: var(--pink); border-left: 2px solid var(--pink); }
 
-    .top{
-      display:flex;
-      gap:1rem;
-      align-items:center;
+    /* ── PLAYER ── */
+    .player-area {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.2rem;
     }
-    .cover{
-      width:110px;
-      height:155px;
-      object-fit:cover;
-      border-radius:12px;
+    .ep-now-title {
+      font-family: var(--font-head); font-size: 1.4rem;
+      letter-spacing: 2px; color: var(--text);
+      margin-bottom: 1rem;
     }
-    .anime-title{
-      font-size:1.6rem;
-      font-weight:bold;
-      color:var(--pink-soft);
-    }
-    .genres span{
-      display:inline-block;
-      margin:.3rem .3rem 0 0;
-      padding:.25rem .7rem;
-      border-radius:20px;
-      background:#ff8fab88;
-      font-size:.8rem;
-      color:#333;
-      transition: background 0.3s;
-    }
-    body.dark .genres span{
-      background:#2a2a3a;
-      color:#fff;
-    }
+    .ep-now-title em { color: var(--pink); font-style: normal; }
 
-    .layout{
-      display:grid;
-      grid-template-columns:240px 1fr;
-      gap:1.2rem;
-      margin-top:1.5rem;
+    .video-wrapper {
+      width: 100%; aspect-ratio: 16/9;
+      background: #000; border-radius: var(--radius);
+      overflow: hidden; border: 1px solid var(--border);
+      box-shadow: 0 0 40px var(--pink-dim);
     }
+    .video-wrapper iframe { width: 100%; height: 100%; border: none; display: block; }
 
-    .episodes{
-      background:#fff0fa;
-      border-radius:14px;
-      padding:.8rem;
-      max-height:70vh;
-      overflow:auto;
-      transition: background 0.5s;
+    .cine-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      margin-top: 1rem; color: var(--rose); font-size: 0.85rem;
+      text-decoration: none; transition: color 0.2s;
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 0.4rem 0.8rem;
     }
-    body.dark .episodes{
-      background:var(--panel);
-    }
-    .episodes button{
-      width:100%;
-      margin-bottom:.4rem;
-      background:#2a2a3a;
-      border:none;
-      border-radius:10px;
-      padding:.6rem;
-      color:#fff;
-      text-align:left;
-      cursor:pointer;
-    }
-    .episodes button.active{background:#ff4ecd}
+    .cine-link:hover { color: var(--pink); border-color: var(--pink); }
 
-    .player{
-      background:var(--panel);
-      border-radius:16px;
-      padding:1rem;
+    /* ── RAM ASSISTANT (top-right corner of player) ── */
+    #ram-panel {
+      position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 500;
     }
-    .player h3{margin:.2rem 0 1rem;color:var(--pink-soft)}
+    #ram-toggle {
+      width: 52px; height: 52px; cursor: pointer;
+      filter: drop-shadow(0 0 8px var(--pink-glow));
+      transition: transform 0.2s;
+    }
+    #ram-toggle:hover { transform: scale(1.1); }
+    #ram-bubble {
+      position: absolute; right: 0; bottom: 62px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem;
+      min-width: 220px; max-width: 260px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      display: none;
+    }
+    #ram-text { font-size: 0.85rem; color: var(--text); margin-bottom: 0.8rem; line-height: 1.5; }
+    .ram-actions {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;
+    }
+    .ram-actions button {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 6px;
+      padding: 0.4rem 0.5rem; font-size: 0.75rem;
+      cursor: pointer; font-family: var(--font-body); transition: all 0.2s;
+    }
+    .ram-actions button:hover { border-color: var(--pink); color: var(--pink); }
+    .ram-actions button.wide { grid-column: 1 / 3; }
 
-    .video-wrapper{
-      position:relative;
-      width:100%;
-      aspect-ratio:16/9;
-      background:#000;
-      border-radius:14px;
-      overflow:hidden;
+    /* ── COMMENTS ── */
+    .comments-wrap {
+      margin-top: 2rem; padding-top: 2rem;
+      border-top: 1px solid var(--border);
     }
-    iframe{width:100%;height:100%;border:none}
+    .comments-title {
+      font-family: var(--font-head); font-size: 1.5rem;
+      letter-spacing: 2px; color: var(--text); margin-bottom: 1rem;
+    }
+    .comments-title em { color: var(--pink); font-style: normal; }
 
-    /* Ram Light */
-    #ram-light{
-      position:fixed;
-      bottom:20px;
-      right:20px;
-      width:64px;
-      height:64px;
-      z-index:50;
-      cursor:pointer;
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem; position: relative; z-index: 1;
+      margin-top: 3rem;
     }
-    #ram-bubble{
-      position:absolute;
-      bottom:75px;
-      right:0;
-      background:#fff0fa;
-      color:#ff4ecd;
-      border-radius:14px;
-      padding:.6rem .9rem;
-      font-size:.85rem;
-      max-width:240px;
-      display:none;
-    }
-    #ram-actions button{
-      background:#ff4ecd;
-      color:#fff;
-      border:none;
-      border-radius:10px;
-      padding:.35rem;
-      font-size:.75rem;
-      cursor:pointer;
-    }
+    .footer-logo { font-family: var(--font-head); font-size: 1.5rem; color: var(--pink); letter-spacing: 3px; }
+    footer p { font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--rose); text-decoration: none; }
+    footer a:hover { color: var(--pink); }
 
-    @media(max-width:900px){
-      .layout{grid-template-columns:1fr}
+    .hidden { display: none !important; }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      .ep-sidebar { max-height: 200px; position: static; }
+      .anime-top { flex-direction: column; }
+      .anime-cover { width: 100px; }
     }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Re:Anime</h1>
-  <div style="display:flex; align-items:center; gap:1rem;">
-    <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle">🌗 Tema</button>
-    <a id="login-btn" href="#">Iniciar sesión con Discord</a>
-  </div>
-</header>
-
-<div class="container" id="app">Cargando…</div>
-
-<div id="user-info" class="hidden"></div>
-<div id="user-popup"></div>
-
-<!-- Ram Light -->
-<div id="ram-light">
-  <img id="ram-img" src="Assets/ReAnime-Mascot.png" alt="Ram" width="64" height="64" loading="lazy">
-  <div id="ram-bubble">
-    <div id="ram-text">¿En qué puedo ayudarte?</div>
-    <div id="ram-actions" style="margin-top:.5rem;display:grid;grid-template-columns:1fr 1fr;gap:.4rem;">
-      <button data-act="watch">Ver juntos</button>
-      <button data-act="opinion">Opinión</button>
-      <button data-act="fact">Dato</button>
-      <button data-act="rating">Rating</button>
-      <button data-act="similar" style="grid-column:1/3">🔁 Similar</button>
-    </div>
-  </div>
-</div>
-</div>
-
-<script>
-const $=q=>document.querySelector(q);
-const $$=q=>document.querySelectorAll(q);
-
-const ram = $('#ram-light');
-const ramBubble = $('#ram-bubble');
-const ramText = $('#ram-text');
-const ramActions = $('#ram-actions');
-
-ram.onclick = (e)=>{
-  e.stopPropagation();
-  ramBubble.style.display = ramBubble.style.display==='block'?'none':'block';
-};
-
-document.addEventListener('click',()=>ramBubble.style.display='none');
-
-const params = new URLSearchParams(location.search);
-const animeId = params.get('id');
-
-fetch('animes.json').then(r=>r.json()).then(data=>{
-  const anime = data.find(a=>a.id===animeId);
-  if(!anime){ $('#app').textContent='Anime no encontrado'; return; }
-
-  window.currentAnime = anime;
-  document.title = anime.name+' · Re:Anime';
-
-  $('#app').innerHTML = `
-    <div class="top">
-      <img class="cover" src="${anime.cover}" loading="lazy">
-      <div>
-        <div class="anime-title">${anime.name}</div>
-        <div class="genres">${anime.genre.map(g=>`<span>${g}</span>`).join('')}</div>
+  <!-- HEADER -->
+  <header>
+    <a class="logo" href="index.html">Re<span>:</span>Anime</a>
+    <div class="header-right">
+      <a id="login-btn" href="#">Discord</a>
+      <div id="user-info" class="hidden">
+        <div id="user-popup"></div>
       </div>
     </div>
+  </header>
 
-    <div class="layout">
-      <div class="episodes" id="epList"></div>
-      <div class="player">
-        <h3 id="epTitle">Selecciona un episodio</h3>
-        <div class="video-wrapper" id="video"></div>
-        <a href="cine.html?id=${anime.id}" style="display:inline-block;margin-top:.8rem;color:#ff4ecd;font-weight:bold">🎬 Ver anime con Ram (modo cine)</a>
+  <!-- PAGE -->
+  <div class="page">
+    <button class="back-btn" onclick="history.length > 1 ? history.back() : location.href='index.html'">← Volver</button>
+    <div id="app">Cargando...</div>
+  </div>
+
+  <!-- RAM PANEL -->
+  <div id="ram-panel">
+    <img id="ram-toggle" src="Assets/ReAnime-Mascot.png" alt="Ram" />
+    <div id="ram-bubble">
+      <div id="ram-text">¿En que puedo ayudarte?</div>
+      <div class="ram-actions" id="ram-actions">
+        <button data-act="opinion">Opinion</button>
+        <button data-act="fact">Dato</button>
+        <button data-act="rating">Rating</button>
+        <button data-act="similar">Ver similar</button>
+        <button data-act="watch" class="wide">Modo cine</button>
       </div>
     </div>
-  `;
+  </div>
 
-  const epList=$('#epList');
-  const video=$('#video');
-  const epTitle=$('#epTitle');
+  <footer>
+    <div class="footer-logo">Re:Anime</div>
+    <p>© 2025 Re:Anime — <a href="https://discord.com/users/781172416218136577" target="_blank">Ream</a></p>
+  </footer>
 
-  anime.episodes.forEach((ep,i)=>{
-    const btn=document.createElement('button');
-    btn.textContent=`Ep ${ep.number}: ${ep.title}`;
-    btn.onclick=()=>{
-      $$('.episodes button').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      epTitle.textContent=`Ep ${ep.number}: ${ep.title}`;
-      const tmp=document.createElement('div');
-      tmp.innerHTML=ep.embed;
-      const iframe=tmp.querySelector('iframe');
-      iframe.loading='lazy';
-      video.innerHTML='';
-      video.appendChild(iframe);
-      localStorage.setItem('lastWatched',JSON.stringify({id:anime.id,index:i}));
-    };
-    epList.appendChild(btn);
-  });
+  <script>
+    /* ── AUTH ── */
+    const clientId    = "1390810180823945350";
+    const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
+    document.getElementById('login-btn').href =
+      `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=identify`;
 
-  const last=JSON.parse(localStorage.getItem('lastWatched')||'null');
-  if(last&&last.id===anime.id&&epList.children[last.index]){
-    epList.children[last.index].click();
-  }else{
-    epList.children[0]?.click();
-  }
-});
-
-// Ram actions
-ramActions?.addEventListener('click',e=>{
-  e.stopPropagation();
-  if(!e.target.dataset.act||!window.currentAnime) return;
-  const a = window.currentAnime;
-  const r = k => a[k] && a[k].length ? a[k][Math.floor(Math.random()*a[k].length)] : 'No tengo datos ahora.';
-  const act = e.target.dataset.act;
-  let response = '';
-  if(act==='watch') location.href = `cine.html?id=${a.id}`;
-  else {
-    if(act==='opinion') response = r('opinion');
-    if(act==='fact') response = r('dato');
-    if(act==='rating') response = `${a.name} tiene ${a.rating}/10`;
-    if(act==='similar'){
-      fetch('animes.json').then(r=>r.json()).then(list=>{
-        const sim=list.filter(x=>x.id!==a.id && x.genre.some(g=>a.genre.includes(g)));
-        response = sim.length?`Te recomiendo ${sim[Math.floor(Math.random()*sim.length)].name}`:'No encontré uno parecido.';
-        showRamResponse(response);
-      });
-      return;
+    const savedUser = JSON.parse(localStorage.getItem('user'));
+    if (savedUser) {
+      document.getElementById('login-btn').classList.add('hidden');
+      const ui = document.getElementById('user-info');
+      ui.classList.remove('hidden');
+      const av = `https://cdn.discordapp.com/avatars/${savedUser.id}/${savedUser.avatar}.png`;
+      ui.innerHTML = `<img src="${av}"/><span>${savedUser.username}</span><div id="user-popup"></div>`;
+      ui.onclick = () => {
+        const p = document.getElementById('user-popup');
+        p.style.display = p.style.display === 'block' ? 'none' : 'block';
+        p.innerHTML = `
+          <strong>${savedUser.username}</strong><br>
+          <img src="${av}" width="60" style="border-radius:50%;margin:0.5rem 0"><br>
+          <button onclick="window.location.href='profile.html'">Perfil</button>
+          <button onclick="logout()">Cerrar sesion</button>
+        `;
+      };
     }
-    showRamResponse(response);
-  }
-});
+    function logout() { localStorage.removeItem('user'); localStorage.removeItem('user_data'); location.reload(); }
 
-function showRamResponse(text) {
-  ramText.innerHTML = text;
-  ramBubble.style.display = 'block';
-  ramActions.style.display = 'none';
-  setTimeout(() => {
-    ramBubble.style.display = 'none';
-    ramActions.style.display = 'grid';
-  }, 7000);
-}
+    /* ── LOAD ANIME ── */
+    const animeId = new URLSearchParams(location.search).get('id');
+    let currentAnime = null;
 
-const clientId = "1390810180823945350";
-const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
-const scope = "identify";
-const loginBtn = document.getElementById("login-btn");
-loginBtn.href = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${scope}`;
+    fetch('animes.json').then(r => r.json()).then(data => {
+      const anime = data.find(a => a.id === animeId);
+      if (!anime) { document.getElementById('app').textContent = 'Anime no encontrado.'; return; }
+      currentAnime = anime;
+      document.title = `${anime.name} · Re:Anime`;
+      renderAnime(anime);
+    });
 
-const user = JSON.parse(localStorage.getItem("user"));
-const userInfo = document.getElementById("user-info");
-const userPopup = document.getElementById("user-popup");
+    function renderAnime(anime) {
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="anime-top">
+          <div class="anime-cover">
+            <img src="${anime.cover}" alt="${anime.name}" loading="lazy" />
+          </div>
+          <div class="anime-meta">
+            <h1 class="anime-name">${anime.name}</h1>
+            <div class="anime-genres">
+              ${(anime.genre||[]).map(g => `<span class="genre-tag">${g}</span>`).join('')}
+            </div>
+            <p class="anime-description">${anime.description || ''}</p>
+            <div class="anime-actions">
+              <button class="action-btn" id="btn-fav"    onclick="toggleList('favorites')">Favorito</button>
+              <button class="action-btn" id="btn-watch"  onclick="toggleList('watchlist')">Ver despues</button>
+              <button class="action-btn" id="btn-watched" onclick="toggleList('watched')">Visto</button>
+            </div>
+          </div>
+        </div>
 
-if (user) {
-  loginBtn.style.display = "none";
-  const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-  userInfo.classList.remove("hidden");
-  userInfo.innerHTML = `<img src="${avatarUrl}" /><span>${user.username}</span>`;
-  userInfo.onclick = () => {
-    userPopup.style.display = userPopup.style.display === "block" ? "none" : "block";
-    userPopup.innerHTML = `
-      <strong>${user.username}#${user.discriminator}</strong><br>
-      <img src="${avatarUrl}" width="80" style="border-radius:50%; margin-top:0.5rem;"><br>
-      <button onclick="window.location.href='profile.html'">Perfil</button><br>
-      <button onclick="logout()">Cerrar sesión</button>
-    `;
-  };
-}
+        <div class="layout">
+          <div class="ep-sidebar">
+            <div class="ep-sidebar-title">Episodios</div>
+            <div id="ep-list"></div>
+          </div>
+          <div class="player-area">
+            <div class="ep-now-title" id="ep-title">Selecciona un <em>episodio</em></div>
+            <div class="video-wrapper" id="video-player"></div>
+            <a href="cine.html?id=${anime.id}" class="cine-link">Modo cine</a>
+          </div>
+        </div>
 
-function logout() {
-  localStorage.removeItem("user");
-  localStorage.removeItem("user_data");
-  location.reload();
-}
+        <div class="comments-wrap">
+          <div class="comments-title"><em>Comentarios</em></div>
+          <script src="https://utteranc.es/client.js"
+            repo="imram-software/ReAnime"
+            issue-term="url"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async><\/script>
+        </div>
+      `;
 
-const theme = localStorage.getItem("theme") || "light";
-document.body.classList.add(theme);
+      /* Update list buttons */
+      updateListButtons(anime.id);
 
-function toggleTheme() {
-  const current = localStorage.getItem("theme") || "light";
-  const next = current === "light" ? "dark" : "light";
-  document.body.classList.replace(current, next);
-  localStorage.setItem("theme", next);
-}
-</script>
+      /* Build episode list */
+      const epList = document.getElementById('ep-list');
+      anime.episodes?.forEach((ep, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'ep-btn';
+        btn.textContent = `${ep.number}. ${ep.title}`;
+        btn.onclick = () => {
+          document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('ep-title').innerHTML =
+            `Ep ${ep.number}: <em>${ep.title}</em>`;
+          const tmp = document.createElement('div'); tmp.innerHTML = ep.embed;
+          const iframe = tmp.querySelector('iframe');
+          const player = document.getElementById('video-player');
+          player.innerHTML = '';
+          if (iframe) {
+            iframe.style.width = '100%'; iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            player.appendChild(iframe);
+          } else {
+            player.innerHTML = ep.embed;
+          }
+          localStorage.setItem('lastWatched', JSON.stringify({ id: anime.id, index: i }));
+        };
+        epList.appendChild(btn);
+      });
 
-<!-- Comentarios (optimizado) -->
-<div style="max-width:1200px;margin:2rem auto;padding:1rem;border-top:1px solid #222">
-  <script src="https://utteranc.es/client.js"
-    repo="imram-software/ReAnime"
-    issue-term="url"
-    theme="preferred-color-scheme"
-    crossorigin="anonymous"
-    async></script>
-</div>
+      /* Auto-select last watched or first */
+      const last = JSON.parse(localStorage.getItem('lastWatched') || 'null');
+      const target = (last?.id === anime.id && epList.children[last.index])
+        ? epList.children[last.index]
+        : epList.children[0];
+      target?.click();
+    }
 
+    /* ── LIST MANAGEMENT ── */
+    function getList(type) {
+      if (!savedUser) return [];
+      const all = JSON.parse(localStorage.getItem(type) || '{}');
+      return all[savedUser.id] || [];
+    }
+    function setList(type, arr) {
+      if (!savedUser) return;
+      const all = JSON.parse(localStorage.getItem(type) || '{}');
+      all[savedUser.id] = arr;
+      localStorage.setItem(type, JSON.stringify(all));
+    }
+    function toggleList(type) {
+      if (!savedUser) { alert('Inicia sesion con Discord primero.'); return; }
+      const list = getList(type);
+      const idx  = list.indexOf(animeId);
+      if (idx > -1) list.splice(idx, 1);
+      else list.push(animeId);
+      setList(type, list);
+      updateListButtons(animeId);
+    }
+    function updateListButtons(id) {
+      const map = { 'btn-fav': 'favorites', 'btn-watch': 'watchlist', 'btn-watched': 'watched' };
+      Object.entries(map).forEach(([btnId, type]) => {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        btn.classList.toggle('active', getList(type).includes(id));
+      });
+    }
+
+    /* ── RAM PANEL ── */
+    const ramToggle  = document.getElementById('ram-toggle');
+    const ramBubble  = document.getElementById('ram-bubble');
+    const ramText    = document.getElementById('ram-text');
+    const ramActions = document.getElementById('ram-actions');
+
+    ramToggle.onclick = e => {
+      e.stopPropagation();
+      ramBubble.style.display = ramBubble.style.display === 'block' ? 'none' : 'block';
+    };
+    document.addEventListener('click', () => ramBubble.style.display = 'none');
+    ramBubble.addEventListener('click', e => e.stopPropagation());
+
+    document.getElementById('ram-actions').addEventListener('click', e => {
+      if (!e.target.dataset.act || !currentAnime) return;
+      e.stopPropagation();
+      const a   = currentAnime;
+      const act = e.target.dataset.act;
+
+      if (act === 'watch') { location.href = `cine.html?id=${a.id}`; return; }
+
+      if (act === 'similar') {
+        fetch('animes.json').then(r => r.json()).then(list => {
+          const sim = list.filter(x => x.id !== a.id && x.genre.some(g => a.genre.includes(g)));
+          showRamResponse(sim.length
+            ? `Te recomiendo: <b>${sim[Math.floor(Math.random() * sim.length)].name}</b>.`
+            : 'No encontre uno parecido.');
+        });
+        return;
+      }
+
+      const pick = arr => arr?.length ? arr[Math.floor(Math.random() * arr.length)] : 'Sin datos disponibles.';
+      const responses = {
+        opinion: () => pick(a.opinion),
+        fact:    () => pick(a.dato),
+        rating:  () => a.rating ? `${a.name}: ${a.rating}/10` : 'Sin rating disponible.',
+      };
+      showRamResponse(responses[act]?.() || 'Sin datos disponibles.');
+    });
+
+    function showRamResponse(text) {
+      ramText.innerHTML = text;
+      ramActions.style.display = 'none';
+      ramBubble.style.display  = 'block';
+      setTimeout(() => {
+        ramActions.style.display = 'grid';
+        ramText.textContent = '¿En que puedo ayudarte?';
+      }, 7000);
+    }
+  </script>
 </body>
 </html>

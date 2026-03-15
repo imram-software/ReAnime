@@ -1,207 +1,335 @@
 <!DOCTYPE html>
-<html lang="="es">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Mi Perfil - Re:Anime</title>
+  <title>Perfil - Re:Anime</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&family=Nunito:wght@300;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;700&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --bg:       #080808;
+      --bg2:      #111111;
+      --bg3:      #1a1a1a;
+      --surface:  #161616;
+      --border:   #222222;
+      --pink:     #ff2d78;
+      --pink-dim: #ff2d7822;
+      --pink-glow:#ff2d7855;
+      --rose:     #ff6fa8;
+      --text:     #e8e8e8;
+      --muted:    #666;
+      --radius:   10px;
+      --font-head:'Bebas Neue', cursive;
+      --font-body:'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 2px; }
+
     body {
-      font-family: 'Nunito', sans-serif;
-      background: linear-gradient(135deg, #ffe1f0, #caf0f8);
-      padding: 2rem;
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-top: 56px;
     }
-    body.dark {
-      background: linear-gradient(135deg, #2b2b2b, #444);
-      color: #eee;
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-size: 200px 200px; opacity: 0.4;
     }
-    body.dark .perfil-container {
-      background: #222;
-      color: #eee;
+
+    /* ── HEADER ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      height: 56px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem;
+      background: rgba(8,8,8,0.88); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
     }
-    body.dark .anime-card {
-      background: #333;
-      color: #eee;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    .logo {
+      font-family: var(--font-head); font-size: 2rem;
+      letter-spacing: 3px; color: var(--pink);
+      text-decoration: none; text-shadow: 0 0 20px var(--pink-glow);
     }
-    body.dark .anime-card:hover {
-      background: #444;
+    .logo span { color: var(--text); }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+
+    #login-btn {
+      background: var(--pink); color: #fff;
+      padding: 0.4rem 1.1rem; border-radius: 6px;
+      text-decoration: none; font-size: 0.85rem; font-weight: 700;
+      transition: opacity 0.2s; box-shadow: 0 0 16px var(--pink-glow);
     }
-    body.dark .user-info {
-      background: #333;
-      color: #eee;
+    #login-btn:hover { opacity: 0.85; }
+
+    #user-info { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; position: relative; }
+    #user-info img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--pink); }
+    #user-info span { font-size: 0.85rem; }
+    #user-popup {
+      position: absolute; top: 44px; right: 0;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem; min-width: 180px;
+      display: none; z-index: 100;
     }
-    body.dark .logout-btn {
-      background: #ff4ecd;
-      color: #fff;
+    #user-popup button {
+      display: block; width: 100%; margin-top: 0.5rem;
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); border-radius: 6px; padding: 0.5rem;
+      cursor: pointer; font-family: var(--font-body); font-size: 0.85rem;
+      transition: border-color 0.2s;
     }
-    body.dark .logout-btn:hover {
-      background: #ff2ea6;
+    #user-popup button:hover { border-color: var(--pink); color: var(--pink); }
+
+    /* ── LAYOUT ── */
+    .page { max-width: 960px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      color: var(--muted); font-size: 0.85rem; text-decoration: none;
+      margin-bottom: 2rem; transition: color 0.2s; cursor: pointer;
+      background: none; border: none; font-family: var(--font-body);
     }
-    body.dark h2 {
-      color: #ffb6d9;
+    .back-btn:hover { color: var(--pink); }
+
+    /* ── USER CARD ── */
+    .user-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem;
+      display: flex; align-items: center; gap: 1.5rem;
+      margin-bottom: 3rem;
+      position: relative; overflow: hidden;
     }
-    .volver-btn {
-      background: #ff8fab;
-      color: white;
-      border: none;
-      padding: 0.5rem 1.2rem;
-      border-radius: 30px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 1.5rem;
-      transition: background 0.3s;
-      text-decoration: none;
-      display: inline-block;
+    .user-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--pink);
     }
-    .volver-btn:hover {
-      background: #ff4ecd;
-      color: #fff;
-      text-decoration: none;
+    .user-card img {
+      width: 72px; height: 72px; border-radius: 50%;
+      border: 2px solid var(--pink);
+      box-shadow: 0 0 20px var(--pink-glow);
     }
-    .perfil-container {
-      max-width: 900px;
-      margin: 0 auto;
+    .user-card-info strong {
+      display: block; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.2rem;
     }
+    .user-card-info small { color: var(--muted); font-size: 0.8rem; }
+    .logout-btn {
+      margin-left: auto; background: none;
+      border: 1px solid var(--border); color: var(--muted);
+      border-radius: 6px; padding: 0.4rem 0.9rem;
+      font-size: 0.82rem; cursor: pointer; font-family: var(--font-body);
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { border-color: var(--pink); color: var(--pink); }
+
+    /* ── SECTION HEADERS ── */
+    .section-header {
+      display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.2rem;
+    }
+    .section-title {
+      font-family: var(--font-head); font-size: 1.8rem;
+      letter-spacing: 3px; color: var(--text);
+    }
+    .section-title em { color: var(--pink); font-style: normal; }
+    .section-line { flex: 1; height: 1px; background: var(--border); }
+    .section-count { font-size: 0.72rem; color: var(--muted); letter-spacing: 2px; }
+    .section-wrap { margin-bottom: 3rem; }
+
+    /* ── GRID ── */
     .anime-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 1rem;
     }
-         .anime-card {
-         background: white;
-         border-radius: 12px;
-         overflow: hidden;
-         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-         transition: transform 0.3s ease;
-         cursor: pointer;
-         text-align: center;
-         }
-         .anime-card:hover {
-         transform: scale(1.05);
-         }
-         .anime-card img {
-         width: 100%;
-         height: 220px;
-         object-fit: cover;
-         }
-    h2 {
-      color: #ff4ecd;
-      margin-top: 2rem;
+    .anime-card {
+      position: relative; overflow: hidden;
+      border-radius: var(--radius);
+      background: var(--surface); border: 1px solid var(--border);
+      cursor: pointer; aspect-ratio: 2/3;
+      transition: transform 0.3s, border-color 0.3s;
     }
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      background: #fff0fa;
-      padding: 1rem;
-      border-radius: 12px;
+    .anime-card:hover { transform: translateY(-5px) scale(1.02); border-color: var(--pink); }
+    .anime-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.3s; }
+    .anime-card:hover img { filter: brightness(0.6); }
+    .anime-card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 55%);
+      display: flex; align-items: flex-end; padding: 0.7rem;
     }
-    .user-info img {
-      border-radius: 50%;
-      width: 80px;
+    .anime-card-title { font-size: 0.8rem; font-weight: 700; color: #fff; line-height: 1.3; }
+    .anime-card::after {
+      content: ''; position: absolute; top: 0; right: 0;
+      width: 0; height: 0; border-style: solid;
+      border-width: 0 24px 24px 0;
+      border-color: transparent var(--pink) transparent transparent;
+      opacity: 0; transition: opacity 0.3s;
     }
+    .anime-card:hover::after { opacity: 1; }
+
     .no-data {
-      color: #777;
-      font-style: italic;
+      color: var(--muted); font-size: 0.88rem;
+      padding: 1.5rem 0; font-style: italic;
     }
-    .logout-btn {
-      background: #ff4ecd;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 30px;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-      margin-left: auto;
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem; position: relative; z-index: 1;
     }
-    .logout-btn:hover {
-      background: #ff2ea6;
+    .footer-logo { font-family: var(--font-head); font-size: 1.5rem; color: var(--pink); letter-spacing: 3px; }
+    footer p { font-size: 0.78rem; color: var(--muted); }
+    footer a { color: var(--rose); text-decoration: none; }
+    footer a:hover { color: var(--pink); }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+      .user-card { flex-wrap: wrap; }
+      .logout-btn { margin-left: 0; }
+      .anime-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
     }
   </style>
 </head>
 <body>
-  <div class="perfil-container" id="profile-content">
-    <!-- Aquí se cargará el perfil -->
-  </div>
+
+  <header>
+    <a class="logo" href="index.html">Re<span>:</span>Anime</a>
+    <div class="header-right">
+      <a id="login-btn" href="#">Discord</a>
+      <div id="user-info" class="hidden">
+        <div id="user-popup"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="page" id="profile-content"></div>
+
+  <footer>
+    <div class="footer-logo">Re:Anime</div>
+    <p>© 2025 Re:Anime — <a href="https://discord.com/users/781172416218136577" target="_blank">Ream</a></p>
+  </footer>
 
   <script>
-    const theme = localStorage.getItem('theme') || 'light';
-    document.body.classList.add(theme);
+    /* ── AUTH HEADER ── */
+    const clientId   = "1390810180823945350";
+    const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
+    document.getElementById('login-btn').href =
+      `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=identify`;
 
-    const user = JSON.parse(localStorage.getItem("user"));
+    const savedUser = JSON.parse(localStorage.getItem('user'));
+    if (savedUser) {
+      document.getElementById('login-btn').classList.add('hidden');
+      const ui = document.getElementById('user-info');
+      ui.classList.remove('hidden');
+      const av = `https://cdn.discordapp.com/avatars/${savedUser.id}/${savedUser.avatar}.png`;
+      ui.innerHTML = `<img src="${av}"/><span>${savedUser.username}</span><div id="user-popup"></div>`;
+      ui.onclick = () => {
+        const p = document.getElementById('user-popup');
+        p.style.display = p.style.display === 'block' ? 'none' : 'block';
+        p.innerHTML = `
+          <strong>${savedUser.username}</strong><br>
+          <img src="${av}" width="60" style="border-radius:50%;margin:0.5rem 0"><br>
+          <button onclick="logout()">Cerrar sesion</button>
+        `;
+      };
+    }
+
+    /* ── PROFILE ── */
+    const user   = JSON.parse(localStorage.getItem('user'));
     const userId = user?.id;
 
     if (!userId) {
       document.getElementById('profile-content').innerHTML = `
-        <a href="index.html" class="volver-btn">← Volver al inicio</a>
-        <p style='text-align:center; margin-top:5rem;'>Debes iniciar sesión con Discord para ver tu perfil -w-</p>
+        <button class="back-btn" onclick="location.href='index.html'">← Volver al inicio</button>
+        <p style="color:var(--muted);margin-top:4rem;text-align:center;">
+          Debes iniciar sesion con Discord para ver tu perfil.
+        </p>
       `;
-      throw new Error("No user");
+    } else {
+      fetch('animes.json').then(r => r.json()).then(renderProfile);
     }
 
-    fetch("animes.json")
-      .then(res => res.json())
-      .then(data => renderProfile(data));
-
     function renderProfile(allAnimes) {
-      const container = document.getElementById("profile-content");
-
-      const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-
+      const av = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+      const container = document.getElementById('profile-content');
       container.innerHTML = `
-        <a href="index.html" class="volver-btn">← Volver al inicio</a>
-        <div class="user-info">
-          <img src="${avatarUrl}" alt="Avatar" />
-          <div>
-            <strong>${user.username}#${user.discriminator}</strong><br>
+        <button class="back-btn" onclick="location.href='index.html'">← Volver al inicio</button>
+        <div class="user-card">
+          <img src="${av}" alt="Avatar" />
+          <div class="user-card-info">
+            <strong>${user.username}${user.discriminator ? '#'+user.discriminator : ''}</strong>
             <small>ID: ${user.id}</small>
           </div>
-          <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
+          <button class="logout-btn" onclick="logout()">Cerrar sesion</button>
         </div>
-
-        <h2>Favoritos</h2>
-        <div id="favorites" class="anime-grid"></div>
-
-        <h2>Ver después</h2>
-        <div id="watchlist" class="anime-grid"></div>
-
-        <h2>Vistos</h2>
-        <div id="watched" class="anime-grid"></div>
+        <div class="section-wrap">
+          <div class="section-header">
+            <h2 class="section-title"><em>Favoritos</em></h2>
+            <div class="section-line"></div>
+            <span class="section-count" id="count-favorites"></span>
+          </div>
+          <div id="favorites" class="anime-grid"></div>
+        </div>
+        <div class="section-wrap">
+          <div class="section-header">
+            <h2 class="section-title">Ver <em>despues</em></h2>
+            <div class="section-line"></div>
+            <span class="section-count" id="count-watchlist"></span>
+          </div>
+          <div id="watchlist" class="anime-grid"></div>
+        </div>
+        <div class="section-wrap">
+          <div class="section-header">
+            <h2 class="section-title"><em>Vistos</em></h2>
+            <div class="section-line"></div>
+            <span class="section-count" id="count-watched"></span>
+          </div>
+          <div id="watched" class="anime-grid"></div>
+        </div>
       `;
-
-      renderSection("favorites", allAnimes);
-      renderSection("watchlist", allAnimes);
-      renderSection("watched", allAnimes);
+      renderSection('favorites', allAnimes);
+      renderSection('watchlist', allAnimes);
+      renderSection('watched',   allAnimes);
     }
 
     function getUserList(type) {
-      const allData = JSON.parse(localStorage.getItem(type) || "{}");
-      return allData[user.id] || [];
+      const all = JSON.parse(localStorage.getItem(type) || '{}');
+      return all[user.id] || [];
     }
 
     function renderSection(type, allAnimes) {
       const container = document.getElementById(type);
       const ids = getUserList(type);
+      const countEl = document.getElementById('count-' + type);
       if (!ids.length) {
-        container.innerHTML = `<p class="no-data">No hay animes en esta lista -w-</p>`;
+        if (countEl) countEl.textContent = '0 titulos';
+        container.innerHTML = `<p class="no-data">Sin animes en esta lista todavia.</p>`;
         return;
       }
       const filtered = allAnimes.filter(a => ids.includes(a.id));
-      container.innerHTML = filtered.map(anime => `
-        <div class="anime-card" onclick="window.location.href='anime.html?id=${anime.id}'">
-          <img src="${anime.cover}" alt="${anime.name}" />
-          <p style="padding: 0.5rem">${anime.name}</p>
-        </div>
-      `).join('');
+      if (countEl) countEl.textContent = `${filtered.length} titulos`;
+      container.innerHTML = '';
+      filtered.forEach(anime => {
+        const card = document.createElement('div');
+        card.className = 'anime-card';
+        card.onclick = () => location.href = `anime.html?id=${anime.id}`;
+        card.innerHTML = `
+          <img src="${anime.cover}" alt="${anime.name}" loading="lazy" />
+          <div class="anime-card-overlay">
+            <div class="anime-card-title">${anime.name}</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
     }
 
     function logout() {
-      localStorage.removeItem("user");
-      localStorage.removeItem("user_data");
-      location.href = "index.html";
+      localStorage.removeItem('user');
+      localStorage.removeItem('user_data');
+      location.href = 'index.html';
     }
   </script>
 </body>
