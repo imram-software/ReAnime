@@ -917,7 +917,10 @@
     }
   });
 
-  window.addEventListener('mouseup', e => {
+  // Flag para bloquear el click que el browser dispara tras mouseup
+  let blockNextClick = false;
+
+  window.addEventListener('mouseup', () => {
     if (dragStart === null) return;
     newsWrap.classList.remove('dragging');
     const wasDrag = dragActive;
@@ -925,17 +928,22 @@
     dragActive = false;
 
     if (wasDrag) {
-      // Soltar: snappear al card correcto
+      blockNextClick = true; // bloquear el click que viene justo despues
       if      (dragDelta < -60) newsGoTo(newsIndex + 1);
       else if (dragDelta >  60) newsGoTo(newsIndex - 1);
       else                      newsGoTo(newsIndex);
-    } else {
-      // Sin drag real: abrir el link manualmente
-      const link = e.target.closest('a[href]');
-      if (link) window.open(link.href, link.target || '_self');
     }
     dragDelta = 0;
   });
+
+  // Capturar y cancelar el click fantasma post-drag
+  newsWrap.addEventListener('click', e => {
+    if (blockNextClick) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      blockNextClick = false;
+    }
+  }, true); // capture: true para interceptar antes que el link
 
   /* Touch */
   let touchStartX = null, touchDelta = 0;
