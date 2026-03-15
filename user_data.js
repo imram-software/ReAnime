@@ -1,6 +1,13 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove
+  getFirestore,
+  doc,
+  setDoc,
+  updateDoc,
+  onSnapshot,
+  arrayUnion,
+  arrayRemove,
+  enableIndexedDbPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -12,7 +19,16 @@ const firebaseConfig = {
   appId:             "1:129737601446:web:721e6601c2f5ba0bb35f67"
 };
 
-const db          = getFirestore(initializeApp(firebaseConfig));
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* Cache offline de Firestore en IndexedDB — permite cargar datos
+   sin red en la primera renderizacion, igual que sessionStorage
+   pero manejado por Firestore automaticamente */
+enableIndexedDbPersistence(db).catch(() => {
+  /* Falla silenciosamente en modo privado o si hay otra pestaña abierta */
+});
+
 const discordUser = JSON.parse(localStorage.getItem("user")) || null;
 
 const DEFAULT_DATA = {
@@ -20,35 +36,17 @@ const DEFAULT_DATA = {
 };
 
 /* ─────────────────────────────────────────────────────────────
-   CACHE (sessionStorage)
-   - Se guarda cuando llega la respuesta de Firestore
-   - Se actualiza localmente despues de cada escritura
-     sin necesidad de volver a ir a la red
-   - Se borra solo al cerrar el tab
+   ESTADO LOCAL
+   onSnapshot mantiene _localData actualizado en tiempo real.
+   Las funciones de lectura usan _localData directamente (0ms).
+   Las funciones de escritura mandan a Firestore y onSnapshot
+   propaga el cambio a todos los dispositivos conectados.
 ───────────────────────────────────────────────────────────── */
-const CACHE_KEY = discordUser ? `reanime_${discordUser.id}` : null;
+let _localData    = null;   // datos en memoria, siempre frescos
+let _unsubscribe  = null;   // para cancelar el listener si hace falta
+let _readyResolve = null;
+const _readyPromise = new Promise(res => { _readyResolve = res; });
 
-function cacheRead() {
-  if (!CACHE_KEY) return null;
-  try {
-    const r = sessionStorage.getItem(CACHE_KEY);
-    return r ? JSON.parse(r) : null;
-  } catch { return null; }
-}
-
-function cacheWrite(data) {
-  if (!CACHE_KEY) return;
-  try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch {}
-}
-
-function cacheClear() {
-  if (!CACHE_KEY) return;
-  try { sessionStorage.removeItem(CACHE_KEY); } catch {}
-}
-
-/* ─────────────────────────────────────────────────────────────
-   HELPERS
-───────────────────────────────────────────────────────────── */
 function userRef() { return doc(db, "users", discordUser.id); }
 
 async function ensureDoc() {
@@ -56,102 +54,124 @@ async function ensureDoc() {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   LISTENER EN TIEMPO REAL
+   Se llama una vez al cargar el modulo.
+   Firestore lo dispara:
+     - inmediatamente con datos del cache local (IndexedDB)
+     - cada vez que el documento cambia en cualquier dispositivo
+───────────────────────────────────────────────────────────── */
+function startListener() {
+  if (!discordUser) {
+    _localData = JSON.parse(localStorage.getItem("user_data") || "null") || { ...DEFAULT_DATA };
+    _readyResolve();
+    window.dispatchEvent(new Event("reanimdb:ready"));
+    return;
+  }
+
+  _unsubscribe = onSnapshot(
+    userRef(),
+    { includeMetadataChanges: false },  // solo cambios reales, no cache intermedio
+    (snap) => {
+      if (snap.exists()) {
+        _localData = { ...DEFAULT_DATA, ...snap.data() };
+      } else {
+        /* Primera vez: crear documento */
+        _localData = { discordId: discordUser.id, ...DEFAULT_DATA };
+        setDoc(userRef(), _localData).catch(e => console.warn("[Re:Anime] setDoc:", e));
+      }
+
+      /* Primera llamada: marcar como listo */
+      if (_readyResolve) {
+        _readyResolve();
+        _readyResolve = null;
+        window.dispatchEvent(new Event("reanimdb:ready"));
+      }
+
+      /* Llamadas posteriores (cambio desde otro dispositivo):
+         disparar evento para que la UI se actualice */
+      window.dispatchEvent(new CustomEvent("reanimdb:update", { detail: _localData }));
+    },
+    (err) => {
+      console.warn("[Re:Anime] onSnapshot error:", err);
+      /* Fallback: intentar con localStorage */
+      _localData = JSON.parse(localStorage.getItem("user_data") || "null") || { ...DEFAULT_DATA };
+      if (_readyResolve) {
+        _readyResolve();
+        _readyResolve = null;
+        window.dispatchEvent(new Event("reanimdb:ready"));
+      }
+    }
+  );
+}
+
+startListener();
+
+/* ─────────────────────────────────────────────────────────────
    API PUBLICA
 ───────────────────────────────────────────────────────────── */
 
-/* loadUserData
-   1ro: cache (0ms)
-   2do: Firestore (solo si no hay cache)
-   3ro: localStorage como fallback si Firestore falla */
+/* loadUserData — sincrono si ya hay datos, async solo la primera vez */
 async function loadUserData() {
-  if (!discordUser) {
-    return JSON.parse(localStorage.getItem("user_data") || "null") || { ...DEFAULT_DATA };
-  }
-
-  const cached = cacheRead();
-  if (cached) return cached;                 // hit instantaneo
-
-  try {
-    const snap = await getDoc(userRef());
-    let data;
-    if (snap.exists()) {
-      data = { ...DEFAULT_DATA, ...snap.data() };
-    } else {
-      data = { discordId: discordUser.id, ...DEFAULT_DATA };
-      await setDoc(userRef(), data);
-    }
-    cacheWrite(data);
-    return data;
-  } catch (err) {
-    console.warn("[Re:Anime] loadUserData:", err);
-    return JSON.parse(localStorage.getItem("user_data") || "null") || { ...DEFAULT_DATA };
-  }
+  if (_localData) return _localData;
+  await _readyPromise;
+  return _localData;
 }
 
-/* addToList — usa arrayUnion (atomico en Firestore) y actualiza cache local */
+/* addToList */
 async function addToList(listName, animeId) {
   if (!discordUser) {
-    const data = await loadUserData();
-    if (!(data[listName] || []).includes(animeId)) {
-      data[listName] = [...(data[listName] || []), animeId];
-      localStorage.setItem("user_data", JSON.stringify(data));
-    }
+    _localData[listName] = [...new Set([...(_localData[listName] || []), animeId])];
+    localStorage.setItem("user_data", JSON.stringify(_localData));
     return;
   }
+  /* Optimistic local update — onSnapshot confirmara desde el servidor */
+  _localData[listName] = [...new Set([...(_localData[listName] || []), animeId])];
+  window.dispatchEvent(new CustomEvent("reanimdb:update", { detail: _localData }));
   try {
     await ensureDoc();
     await updateDoc(userRef(), { [listName]: arrayUnion(animeId) });
-    /* actualizar cache sin nueva lectura de red */
-    const cached = cacheRead();
-    if (cached) {
-      cached[listName] = [...new Set([...(cached[listName] || []), animeId])];
-      cacheWrite(cached);
-    }
-  } catch (err) { console.warn("[Re:Anime] addToList:", err); }
+  } catch (e) { console.warn("[Re:Anime] addToList:", e); }
 }
 
-/* removeFromList — usa arrayRemove y actualiza cache local */
+/* removeFromList */
 async function removeFromList(listName, animeId) {
   if (!discordUser) {
-    const data = await loadUserData();
-    data[listName] = (data[listName] || []).filter(id => id !== animeId);
-    localStorage.setItem("user_data", JSON.stringify(data));
+    _localData[listName] = (_localData[listName] || []).filter(id => id !== animeId);
+    localStorage.setItem("user_data", JSON.stringify(_localData));
     return;
   }
+  _localData[listName] = (_localData[listName] || []).filter(id => id !== animeId);
+  window.dispatchEvent(new CustomEvent("reanimdb:update", { detail: _localData }));
   try {
     await ensureDoc();
     await updateDoc(userRef(), { [listName]: arrayRemove(animeId) });
-    const cached = cacheRead();
-    if (cached) {
-      cached[listName] = (cached[listName] || []).filter(id => id !== animeId);
-      cacheWrite(cached);
-    }
-  } catch (err) { console.warn("[Re:Anime] removeFromList:", err); }
+  } catch (e) { console.warn("[Re:Anime] removeFromList:", e); }
 }
 
-/* toggleAnimeInList — lee cache (instantaneo) para saber estado actual */
+/* toggleAnimeInList */
 async function toggleAnimeInList(listName, animeId) {
-  const data   = await loadUserData();
-  const inList = (data[listName] || []).includes(animeId);
+  await _readyPromise;
+  const inList = (_localData[listName] || []).includes(animeId);
   if (inList) { await removeFromList(listName, animeId); return false; }
   else        { await addToList(listName, animeId);      return true;  }
 }
 
 /* isInList */
 async function isInList(listName, animeId) {
-  const data = await loadUserData();
-  return (data[listName] || []).includes(animeId);
+  await _readyPromise;
+  return (_localData[listName] || []).includes(animeId);
 }
 
-/* markEpisodeSeen — dot notation para no pisar otros episodios */
+/* markEpisodeSeen */
 async function markEpisodeSeen(animeId, episodeIndex) {
+  await _readyPromise;
+  _localData.episodesSeen = _localData.episodesSeen || {};
+  _localData.episodesSeen[animeId] = _localData.episodesSeen[animeId] || [];
+  if (!_localData.episodesSeen[animeId].includes(episodeIndex)) {
+    _localData.episodesSeen[animeId].push(episodeIndex);
+  }
   if (!discordUser) {
-    const data = await loadUserData();
-    const seen = data.episodesSeen || {};
-    seen[animeId] = seen[animeId] || [];
-    if (!seen[animeId].includes(episodeIndex)) seen[animeId].push(episodeIndex);
-    data.episodesSeen = seen;
-    localStorage.setItem("user_data", JSON.stringify(data));
+    localStorage.setItem("user_data", JSON.stringify(_localData));
     return;
   }
   try {
@@ -159,28 +179,17 @@ async function markEpisodeSeen(animeId, episodeIndex) {
     await updateDoc(userRef(), {
       [`episodesSeen.${animeId}`]: arrayUnion(episodeIndex)
     });
-    const cached = cacheRead();
-    if (cached) {
-      cached.episodesSeen = cached.episodesSeen || {};
-      cached.episodesSeen[animeId] = cached.episodesSeen[animeId] || [];
-      if (!cached.episodesSeen[animeId].includes(episodeIndex)) {
-        cached.episodesSeen[animeId].push(episodeIndex);
-      }
-      cacheWrite(cached);
-    }
-  } catch (err) { console.warn("[Re:Anime] markEpisodeSeen:", err); }
+  } catch (e) { console.warn("[Re:Anime] markEpisodeSeen:", e); }
 }
 
 /* getSeenEpisodes */
 async function getSeenEpisodes(animeId) {
-  const data = await loadUserData();
-  return (data.episodesSeen || {})[animeId] || [];
+  await _readyPromise;
+  return (_localData.episodesSeen || {})[animeId] || [];
 }
 
 /* ─────────────────────────────────────────────────────────────
-   EXPONER AL SCOPE GLOBAL
-   Las otras paginas usan scripts normales (no module),
-   por eso se expone en window.ReAnimeDB
+   EXPONER
 ───────────────────────────────────────────────────────────── */
 window.ReAnimeDB = {
   loadUserData,
@@ -189,8 +198,5 @@ window.ReAnimeDB = {
   toggleAnimeInList,
   isInList,
   markEpisodeSeen,
-  getSeenEpisodes,
-  cacheClear  // expuesto por si necesitas forzar un refresh
+  getSeenEpisodes
 };
-
-window.dispatchEvent(new Event("reanimdb:ready"));

@@ -257,46 +257,33 @@
     } else {
       buildProfileShell();
 
-      /* Leer cache sincrono — mismo key que usa user_data.js */
-      const CACHE_KEY  = `reanime_${user.id}`;
-      const cacheRaw   = sessionStorage.getItem(CACHE_KEY);
-      const cacheData  = cacheRaw ? JSON.parse(cacheRaw) : null;
-
-      /* Pedir animes.json una sola vez */
+      /* animes.json se pide una sola vez */
       const animesP = fetch('animes.json').then(r => r.json());
 
-      /* Si hay cache: render inmediato sin esperar nada */
-      if (cacheData) {
+      function renderAll(userData) {
         animesP.then(all => {
-          renderSection('favorites', all, cacheData.favorites || []);
-          renderSection('watchlist', all, cacheData.watchlist || []);
-          renderSection('watched',   all, cacheData.completed || []);
+          renderSection('favorites', all, userData.favorites || []);
+          renderSection('watchlist', all, userData.watchlist || []);
+          renderSection('watched',   all, userData.completed || []);
         });
       }
 
-      /* Firebase: si ya cargo usar directamente, si no escuchar evento.
-         Cuando llegue, actualizar silenciosamente (captura cambios de otro dispositivo). */
-      function onDBReady() {
-        animesP.then(async all => {
-          try {
-            const userData = await window.ReAnimeDB.loadUserData();
-            renderSection('favorites', all, userData.favorites || []);
-            renderSection('watchlist', all, userData.watchlist || []);
-            renderSection('watched',   all, userData.completed || []);
-          } catch (e) {
-            console.warn('[Re:Anime] profile refresh error:', e);
-            if (!cacheData) {
-              ['favorites','watchlist','watched'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.innerHTML = `<p class="no-data">Error al cargar.</p>`;
-              });
-            }
-          }
+      /* reanimdb:ready → primer render (datos de IndexedDB, casi instantaneo) */
+      function onReady() {
+        window.ReAnimeDB.loadUserData().then(renderAll).catch(e => {
+          console.warn('[Re:Anime] profile load error:', e);
+          ['favorites','watchlist','watched'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = `<p class="no-data">Error al cargar.</p>`;
+          });
         });
       }
+      if (window.ReAnimeDB) onReady();
+      else window.addEventListener('reanimdb:ready', onReady, { once: true });
 
-      if (window.ReAnimeDB) onDBReady();
-      else window.addEventListener('reanimdb:ready', onDBReady, { once: true });
+      /* reanimdb:update → re-render automatico cuando cambia algo
+         en cualquier dispositivo (onSnapshot lo dispara en tiempo real) */
+      window.addEventListener('reanimdb:update', e => renderAll(e.detail));
     }
 
     function buildProfileShell() {

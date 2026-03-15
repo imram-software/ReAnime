@@ -421,13 +421,24 @@
         ? epList.children[last.index] : epList.children[0];
       target?.click();
 
-      /* Botones: leer cache sincrono primero (0ms), luego Firebase si hace falta */
-      applyButtonsFromCache();
-      function onDBReady() {
-        if (window.ReAnimeDB) refreshButtonsFromDB();
-        else window.addEventListener('reanimdb:ready', refreshButtonsFromDB, { once: true });
+      /* Botones: esperar a que onSnapshot tenga datos (casi instantaneo por IndexedDB)
+         y luego escuchar actualizaciones en tiempo real */
+      function applyButtons(data) {
+        if (!animeId) return;
+        Object.entries(BTN_MAP).forEach(([btnId, listName]) => {
+          const btn = document.getElementById(btnId);
+          if (btn) btn.classList.toggle('active', (data[listName] || []).includes(animeId));
+        });
       }
-      onDBReady();
+
+      function initButtons() {
+        window.ReAnimeDB.loadUserData().then(applyButtons);
+      }
+      if (window.ReAnimeDB) initButtons();
+      else window.addEventListener('reanimdb:ready', initButtons, { once: true });
+
+      /* Actualizacion en tiempo real desde otro dispositivo */
+      window.addEventListener('reanimdb:update', e => applyButtons(e.detail));
     }
 
     const BTN_MAP = {
@@ -436,50 +447,23 @@
       'btn-watched': 'completed'
     };
 
-    /* Lee sessionStorage directamente — sincrono, no necesita await */
-    function applyButtonsFromCache() {
-      if (!savedUser || !animeId) return;
-      try {
-        const raw = sessionStorage.getItem(`reanime_${savedUser.id}`);
-        if (!raw) return;
-        const data = JSON.parse(raw);
-        Object.entries(BTN_MAP).forEach(([btnId, listName]) => {
-          const btn = document.getElementById(btnId);
-          if (btn) btn.classList.toggle('active', (data[listName] || []).includes(animeId));
-        });
-      } catch {}
-    }
-
-    /* Cuando Firebase carga, confirmar estado real (por si cambio en otro dispositivo) */
-    async function refreshButtonsFromDB() {
-      if (!window.ReAnimeDB || !animeId) return;
-      const data = await window.ReAnimeDB.loadUserData();
-      Object.entries(BTN_MAP).forEach(([btnId, listName]) => {
-        const btn = document.getElementById(btnId);
-        if (btn) btn.classList.toggle('active', (data[listName] || []).includes(animeId));
-      });
-    }
-
     /* ── LIST MANAGEMENT ── */
     async function toggleList(listName) {
       if (!savedUser) { alert('Inicia sesion con Discord primero.'); return; }
+      if (!window.ReAnimeDB) {
+        await new Promise(res => window.addEventListener('reanimdb:ready', res, { once: true }));
+      }
 
-      /* Optimistic UI: cambiar estado visual al instante sin esperar red */
+      /* Optimistic UI: toggle visual instantaneo */
       const btnId = Object.entries(BTN_MAP).find(([, v]) => v === listName)?.[0];
       const btn   = btnId ? document.getElementById(btnId) : null;
       if (btn) btn.classList.toggle('active');
-
-      if (!window.ReAnimeDB) {
-        /* Firebase aun no cargo, esperar y guardar */
-        await new Promise(res => window.addEventListener('reanimdb:ready', res, { once: true }));
-      }
 
       const btns = document.querySelectorAll('.action-btn');
       btns.forEach(b => b.disabled = true);
       try {
         await window.ReAnimeDB.toggleAnimeInList(listName, animeId);
-        /* Confirmar estado real desde cache actualizado */
-        applyButtonsFromCache();
+        /* onSnapshot confirmara el estado real y disparara reanimdb:update */
       } finally {
         btns.forEach(b => b.disabled = false);
       }
