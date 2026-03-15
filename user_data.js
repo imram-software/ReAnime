@@ -44,12 +44,12 @@ import {
 
 /* ── CONFIG ── */
 const firebaseConfig = {
-  apiKey: "AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU",
-  authDomain: "reanime-1a781.firebaseapp.com",
-  projectId: "reanime-1a781",
-  storageBucket: "reanime-1a781.firebasestorage.app",
+  apiKey:            "AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU",
+  authDomain:        "reanime-1a781.firebaseapp.com",
+  projectId:         "reanime-1a781",
+  storageBucket:     "reanime-1a781.firebasestorage.app",
   messagingSenderId: "129737601446",
-  appId: "1:129737601446:web:721e6601c2f5ba0bb35f67"
+  appId:             "1:129737601446:web:721e6601c2f5ba0bb35f67"
 };
 
 const app = initializeApp(firebaseConfig);
