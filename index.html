@@ -258,460 +258,89 @@
        NEWS SLIDER
     ───────────────────────────────────────── */
     .news-track-wrap {
-      position: relative; overflow: hidden;
-      padding: 0 2rem;
+      overflow: hidden; padding: 0 2rem;
       cursor: grab; user-select: none;
     }
     .news-track-wrap.dragging { cursor: grabbing; }
 
     #news-track {
-      display: flex; gap: 1.5rem;
-      /* Sin transition aqui — se agrega via JS solo al soltar */
+      display: flex; gap: 1rem;
+      /* transition se aplica via JS al soltar */
     }
 
+    /* Card — cover completo con overlay igual que anime-card */
     .news-card {
-      flex: 0 0 380px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      position: relative;
-      transition: border-color 0.3s, transform 0.3s;
-      display: flex;
-      flex-direction: column;
-      min-height: 260px;
-    }
-    .news-card:hover { border-color: var(--pink); transform: translateY(-3px); }
-    .news-card > a {
-      text-decoration: none; color: inherit;
-      display: flex; flex-direction: column;
-      width: 100%; height: 100%;
-    }
-
-    /* Imagen arriba — cover vertical */
-    .news-card-img {
-      width: 100%; height: 160px; flex-shrink: 0;
-      position: relative; overflow: hidden;
-    }
-    .news-card-img img {
-      width: 100%; height: 100%; object-fit: cover; object-position: top;
-      display: block;
-      transition: transform 0.45s;
-    }
-    .news-card:hover .news-card-img img { transform: scale(1.05); }
-
-    /* Texto abajo */
-    .news-card-body {
-      flex: 1; padding: 1rem 1.1rem 1.1rem;
-      display: flex; flex-direction: column;
-    }
-    .news-card-tag {
-      font-size: 0.6rem; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--pink);
-      margin-bottom: 0.45rem;
-      font-family: var(--font-jp);
-    }
-    .news-card-body h3 {
-      font-family: var(--font-head);
-      font-size: 1.15rem; letter-spacing: 1px;
-      line-height: 1.15; color: var(--text);
-      margin-bottom: 0.5rem;
-    }
-    .news-card-body p {
-      font-size: 0.78rem; color: var(--muted);
-      line-height: 1.5; flex: 1;
-    }
-    .news-card-meta {
-      font-size: 0.68rem; color: var(--muted);
-      margin-top: 0.75rem;
-    }
-    .news-card-meta span { color: var(--pink); }
-
-    /* Barra lateral rosa en hover */
-    .news-card::before {
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-      width: 3px; background: var(--pink);
-      transform: scaleY(0); transform-origin: bottom;
-      transition: transform 0.3s;
-    }
-    .news-card:hover::before { transform: scaleY(1); }
-
-    /* Featured: primera card mas grande */
-    .news-card.featured { flex: 0 0 460px; min-height: 300px; }
-    .news-card.featured .news-card-img { height: 200px; }
-    .news-card.featured .news-card-body h3 { font-size: 1.6rem; }
-
-    .slider-controls {
-      display: flex; justify-content: flex-end;
-      padding: 0.5rem 2rem 0; gap: 0.5rem;
-    }
-    .slider-btn {
-      width: 36px; height: 36px;
-      border: 1px solid var(--border); border-radius: 50%;
-      background: none; color: var(--muted);
-      cursor: pointer; font-size: 1rem;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-    }
-    .slider-btn:hover { border-color: var(--pink); color: var(--pink); }
-
- name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Re:Anime</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;700&display=swap" rel="stylesheet" />
-  <style>
-    /* ─────────────────────────────────────────
-       TOKENS & RESET
-    ───────────────────────────────────────── */
-    :root {
-      --bg:        #080808;
-      --bg2:       #111111;
-      --bg3:       #1a1a1a;
-      --surface:   #161616;
-      --border:    #222222;
-      --pink:      #ff2d78;
-      --pink-dim:  #ff2d7822;
-      --pink-glow: #ff2d7855;
-      --rose:      #ff6fa8;
-      --text:      #e8e8e8;
-      --muted:     #666;
-      --radius:    10px;
-      --font-head: 'Bebas Neue', cursive;
-      --font-body: 'DM Sans', sans-serif;
-      --font-jp:   'Noto Sans JP', sans-serif;
-    }
-
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: var(--font-body);
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 2px; }
-
-    /* ─────────────────────────────────────────
-       NOISE OVERLAY (texture)
-    ───────────────────────────────────────── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      background-size: 200px 200px;
-      opacity: 0.4;
-    }
-
-    /* ─────────────────────────────────────────
-       HEADER
-    ───────────────────────────────────────── */
-    header {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
-      height: 56px;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2rem;
-      background: rgba(8,8,8,0.95);
-      /* backdrop-filter solo en dispositivos capaces */
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .logo {
-      font-family: var(--font-head);
-      font-size: 2rem;
-      letter-spacing: 3px;
-      color: var(--pink);
-      text-shadow: 0 0 20px var(--pink-glow);
-      user-select: none;
-    }
-
-    .logo span { color: var(--text); }
-
-    .header-right {
-      display: flex; align-items: center; gap: 1rem;
-    }
-
-    #theme-toggle-btn {
-      background: none; border: 1px solid var(--border);
-      color: var(--muted); border-radius: 6px;
-      padding: 0.35rem 0.7rem; font-size: 0.8rem;
-      cursor: pointer; transition: all 0.2s;
-      font-family: var(--font-body);
-    }
-    #theme-toggle-btn:hover { border-color: var(--pink); color: var(--pink); }
-
-    #login-btn {
-      background: var(--pink); color: #fff;
-      padding: 0.4rem 1.1rem; border-radius: 6px;
-      text-decoration: none; font-size: 0.85rem;
-      font-weight: 700; letter-spacing: 0.5px;
-      transition: opacity 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 16px var(--pink-glow);
-    }
-    #login-btn:hover { opacity: 0.85; }
-
-    #user-info {
-      display: flex; align-items: center; gap: 0.5rem;
-      cursor: pointer; position: relative;
-    }
-    #user-info img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--pink); }
-    #user-info span { font-size: 0.85rem; color: var(--text); }
-
-    #user-popup {
-      position: absolute; top: 44px; right: 0;
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 1rem;
-      min-width: 180px; display: none; z-index: 100;
-    }
-    #user-popup button {
-      display: block; width: 100%; margin-top: 0.5rem;
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text); border-radius: 6px; padding: 0.5rem;
-      cursor: pointer; font-family: var(--font-body); font-size: 0.85rem;
-      transition: border-color 0.2s;
-    }
-    #user-popup button:hover { border-color: var(--pink); color: var(--pink); }
-
-    /* ─────────────────────────────────────────
-       INTRO / HERO
-    ───────────────────────────────────────── */
-    #intro {
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center; padding: 2rem;
-      position: relative; overflow: hidden;
-    }
-
-    .hero-bg {
-      position: absolute; inset: 0; z-index: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 60%, #ff2d7812 0%, transparent 70%);
-    }
-
-    /* Decorative Japanese-style grid lines */
-    .hero-lines {
-      position: absolute; inset: -60px; z-index: 0;
-      overflow: hidden;
-    }
-    .hero-lines::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,45,120,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,45,120,0.04) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
-      will-change: transform;
-      animation: gridDrift 6s linear infinite;
-    }
-    @keyframes gridDrift {
-      0%   { transform: translate(0, 0); }
-      100% { transform: translate(60px, -60px); }
-    }
-
-    .hero-badge {
-      font-family: var(--font-jp);
-      font-size: 0.7rem; letter-spacing: 4px;
-      color: var(--pink); text-transform: uppercase;
-      border: 1px solid var(--pink-dim);
-      padding: 0.3rem 1rem; border-radius: 30px;
-      margin-bottom: 1.5rem; position: relative; z-index: 1;
-    }
-
-    #intro h1 {
-      font-family: var(--font-head);
-      font-size: clamp(5rem, 15vw, 11rem);
-      line-height: 0.9;
-      letter-spacing: 8px;
-      color: var(--text);
-      position: relative; z-index: 1;
-    }
-
-    #intro h1 em {
-      color: var(--pink);
-      font-style: normal;
-      text-shadow: 0 0 40px var(--pink-glow), 0 0 80px var(--pink-dim);
-    }
-
-    .hero-sub {
-      font-size: 1rem; color: var(--muted);
-      margin: 1.5rem 0 2.5rem;
-      max-width: 420px; line-height: 1.6;
-      position: relative; z-index: 1;
-    }
-
-    .btn-enter {
-      position: relative; z-index: 1;
-      background: transparent;
-      border: 1px solid var(--pink);
-      color: var(--pink); font-family: var(--font-head);
-      font-size: 1.3rem; letter-spacing: 3px;
-      padding: 0.9rem 3rem; border-radius: 4px;
-      cursor: pointer; overflow: hidden;
-      transition: color 0.3s;
-    }
-    .btn-enter::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: var(--pink);
-      transform: scaleX(0); transform-origin: left;
-      transition: transform 0.35s cubic-bezier(.77,0,.18,1);
-      z-index: -1;
-    }
-    .btn-enter:hover::before { transform: scaleX(1); }
-    .btn-enter:hover { color: #fff; }
-
-    /* Scroll indicator */
-    .scroll-hint {
-      position: absolute; bottom: 2rem; left: 50%;
-      transform: translateX(-50%); z-index: 1;
-      display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
-    }
-    .scroll-hint span { font-size: 0.65rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
-    .scroll-line {
-      width: 1px; height: 40px;
-      background: linear-gradient(var(--pink), transparent);
-      animation: scrollPulse 2s ease-in-out infinite;
-    }
-    @keyframes scrollPulse {
-      0%,100% { opacity: 0.3; transform: scaleY(0.7); }
-      50% { opacity: 1; transform: scaleY(1); }
-    }
-
-    /* ─────────────────────────────────────────
-       MAIN APP (hidden until enter)
-    ───────────────────────────────────────── */
-    #app { display: none; padding-top: 56px; }
-
-    /* Section wrapper */
-    .section { padding: 2rem 0 1rem; }
-    .section-header {
-      padding: 0 2rem 0.75rem;
-      display: flex; align-items: baseline; gap: 1rem;
-    }
-    .section-title {
-      font-family: var(--font-head);
-      font-size: 2rem; letter-spacing: 3px; color: var(--text);
-    }
-    .section-title em { color: var(--pink); font-style: normal; }
-    .section-line {
-      flex: 1; height: 1px; background: var(--border);
-    }
-    .section-count { font-size: 0.75rem; color: var(--muted); letter-spacing: 2px; }
-
-    /* ─────────────────────────────────────────
-       NEWS SLIDER — estilo editorial grande
-    ───────────────────────────────────────── */
-    .news-track-wrap {
-      position: relative; overflow: hidden;
-      padding: 0 2rem;
-      cursor: grab; user-select: none;
-    }
-    .news-track-wrap.dragging { cursor: grabbing; }
-
-    #news-track {
-      display: flex; gap: 1.5rem;
-      transition: transform 0.45s cubic-bezier(.77,0,.18,1);
-    }
-
-    /* Card grande con imagen vertical */
-    .news-card {
-      flex: 0 0 420px;
-      background: var(--surface);
-      border: 1px solid var(--border);
+      flex: 0 0 240px;
+      aspect-ratio: 2/3;
       border-radius: var(--radius);
       overflow: hidden;
       position: relative;
       cursor: pointer;
-      transition: border-color 0.3s, transform 0.3s;
-      display: flex;
-      flex-direction: row;
-      min-height: 220px;
+      border: 1px solid var(--border);
+      transition: transform 0.3s, border-color 0.3s;
+      background: var(--surface);
     }
-    .news-card:hover { border-color: var(--pink); transform: translateY(-3px); }
-    .news-card a {
-      text-decoration: none; color: inherit;
-      display: flex; width: 100%;
-    }
+    .news-card:hover { transform: translateY(-5px) scale(1.02); border-color: var(--pink); }
 
-    /* Imagen vertical a la derecha */
+    .news-card > a { display: block; width: 100%; height: 100%; text-decoration: none; color: inherit; }
+
     .news-card-img {
-      width: 140px; flex-shrink: 0;
-      position: relative; overflow: hidden;
+      position: absolute; inset: 0;
     }
     .news-card-img img {
-      width: 100%; height: 100%; object-fit: cover;
+      width: 100%; height: 100%; object-fit: cover; object-position: top;
       display: block;
-      filter: brightness(0.9);
-      transition: filter 0.3s, transform 0.4s;
+      transition: transform 0.45s, filter 0.3s;
+      filter: brightness(0.85);
     }
-    .news-card:hover .news-card-img img {
-      filter: brightness(1.05);
-      transform: scale(1.04);
-    }
+    .news-card:hover .news-card-img img { transform: scale(1.06); filter: brightness(0.65); }
 
-    /* Contenido a la izquierda */
-    .news-card-body {
-      flex: 1; padding: 1.4rem 1.2rem;
+    /* Gradiente y texto — exactamente como anime-card */
+    .news-card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.3) 45%, transparent 70%);
       display: flex; flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-end; padding: 0.9rem;
     }
     .news-card-tag {
-      font-size: 0.65rem; letter-spacing: 2px;
+      font-size: 0.58rem; letter-spacing: 2px;
       text-transform: uppercase; color: var(--pink);
-      margin-bottom: 0.5rem;
-      font-family: var(--font-jp);
+      margin-bottom: 0.3rem;
     }
-    .news-card-body h3 {
+    .news-card-title {
       font-family: var(--font-head);
-      font-size: 1.45rem; letter-spacing: 1px;
-      line-height: 1.1; color: var(--text);
-      margin-bottom: 0.7rem;
+      font-size: 1.05rem; letter-spacing: 1px;
+      line-height: 1.15; color: #fff;
+      margin-bottom: 0.35rem;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.8);
     }
-    .news-card-body p {
-      font-size: 0.8rem; color: var(--muted);
-      line-height: 1.55; flex: 1;
+    .news-card-desc {
+      font-size: 0.72rem; color: rgba(255,255,255,0.65);
+      line-height: 1.45;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+      overflow: hidden;
+      opacity: 0; transform: translateY(6px);
+      transition: opacity 0.3s, transform 0.3s;
     }
+    .news-card:hover .news-card-desc { opacity: 1; transform: translateY(0); }
     .news-card-meta {
-      display: flex; align-items: center;
-      gap: 0.5rem; margin-top: 1rem;
-      font-size: 0.7rem; color: var(--muted);
+      font-size: 0.65rem; color: rgba(255,255,255,0.4);
+      margin-top: 0.4rem;
     }
-    .news-card-meta span { color: var(--pink); }
 
-    /* Barra lateral rosa */
-    .news-card::before {
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-      width: 3px; background: var(--pink);
-      transform: scaleY(0); transform-origin: bottom;
-      transition: transform 0.35s;
+    /* Acento corner rosa igual que anime-card */
+    .news-card::after {
+      content: ''; position: absolute; top: 0; right: 0;
+      width: 0; height: 0; border-style: solid;
+      border-width: 0 24px 24px 0;
+      border-color: transparent var(--pink) transparent transparent;
+      opacity: 0; transition: opacity 0.3s; z-index: 2;
     }
-    .news-card:hover::before { transform: scaleY(1); }
-
-    /* Card featured (primera) — mas grande */
-    .news-card.featured {
-      flex: 0 0 560px;
-      flex-direction: column;
-      min-height: 340px;
-    }
-    .news-card.featured a { flex-direction: column; }
-    .news-card.featured .news-card-img {
-      width: 100%; height: 200px;
-    }
-    .news-card.featured .news-card-body h3 { font-size: 2rem; }
-    .news-card.featured .news-card-body { padding: 1.5rem; }
+    .news-card:hover::after { opacity: 1; }
 
     .slider-controls {
       display: flex; justify-content: flex-end;
-      padding: 0.5rem 2rem 0; gap: 0.5rem;
+      padding: 0.6rem 2rem 0; gap: 0.5rem;
     }
     .slider-btn {
       width: 36px; height: 36px;
@@ -1035,8 +664,7 @@
       .detail-cover { width: 100%; }
       .detail-cover img { height: 200px; }
       #anime-directory { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
-      .news-card { flex: 0 0 280px; }
-      .news-card.featured { flex: 0 0 300px; }
+      .news-card { flex: 0 0 180px; }
       footer { flex-direction: column; text-align: center; }
       #mascot-chat { width: calc(100vw - 2rem); right: 1rem; }
     }
@@ -1297,7 +925,7 @@
       const items = data.data.Page.media;
       items.forEach((anime, idx) => {
         const card = document.createElement('div');
-        card.className = idx === 0 ? 'news-card featured' : 'news-card';
+        card.className = 'news-card';
 
         const title = anime.title.english || anime.title.romaji;
         const desc  = translateDesc(anime.description || '').slice(0, idx === 0 ? 180 : 120);
@@ -1310,13 +938,11 @@
             <div class="news-card-img">
               <img src="${img}" alt="${title}" loading="lazy" />
             </div>
-            <div class="news-card-body">
+            <div class="news-card-overlay">
               <div class="news-card-tag">Anime · ${genre}</div>
-              <h3>${title}</h3>
-              <p>${desc}${desc.length >= (idx===0?180:120) ? '…' : ''}</p>
-              <div class="news-card-meta">
-                <span>${date}</span>
-              </div>
+              <div class="news-card-title">${title}</div>
+              <div class="news-card-desc">${desc}</div>
+              <div class="news-card-meta">${date}</div>
             </div>
           </a>
         `;
@@ -1329,67 +955,65 @@
     }
   }
 
-  /* ── NEWS SLIDER — infinito, snap por card ── */
+  /* ── NEWS SLIDER — cover overlay, infinito, snap preciso ── */
   const newsWrap  = document.querySelector('.news-track-wrap');
   const newsTrack = document.getElementById('news-track');
+  let newsTotal = 0;
+  let newsPos   = 0; // px actual del translateX (negativo = mover a izquierda)
 
-  /* newsCards y CARD_W se calculan despues de cargar los items */
-  let newsTotal = 0; // items originales (sin clones)
-  let CARD_W    = 0;
-  let newsPos   = 0; // posicion actual en px
-
-  function calcCardW() {
+  function getCardW() {
     const first = newsTrack.querySelector('.news-card');
-    if (!first) return;
-    CARD_W = first.getBoundingClientRect().width + 24; // gap 1.5rem=24px
+    if (!first) return 260;
+    return first.getBoundingClientRect().width + 16; // gap 1rem=16px
   }
 
-  /* ── Infinite loop: clonar items al inicio y al final ── */
   function setupInfinite() {
     const originals = Array.from(newsTrack.children);
     newsTotal = originals.length;
     if (newsTotal < 2) return;
-
-    // Clonar todos al final y al principio
+    // Clonar todos al final y al principio para loop infinito
     originals.forEach(el => newsTrack.appendChild(el.cloneNode(true)));
-    originals.slice().reverse().forEach(el => newsTrack.insertBefore(el.cloneNode(true), newsTrack.firstChild));
-
-    // Arrancar en el primer item real (despues de los clones del inicio)
-    calcCardW();
-    newsPos = newsTotal * CARD_W;
-    newsTrack.style.transform = `translateX(-${newsPos}px)`;
+    originals.slice().reverse().forEach(el =>
+      newsTrack.insertBefore(el.cloneNode(true), newsTrack.firstChild)
+    );
+    // Arrancar en el primer item real (index = newsTotal en el DOM)
+    newsPos = newsTotal * getCardW();
+    newsTrack.style.transition = 'none';
+    newsTrack.style.transform  = `translateX(-${newsPos}px)`;
   }
 
-  function newsMoveTo(px, animated) {
-    if (animated) newsTrack.style.transition = 'transform 0.42s cubic-bezier(.77,0,.18,1)';
-    else          newsTrack.style.transition = 'none';
+  function newsSet(px, animated) {
+    newsTrack.style.transition = animated
+      ? 'transform 0.42s cubic-bezier(.77,0,.18,1)' : 'none';
     newsTrack.style.transform = `translateX(-${px}px)`;
     newsPos = px;
   }
 
-  /* Ir al siguiente o anterior card */
-  function newsStep(dir) {
-    calcCardW();
-    newsMoveTo(newsPos + dir * CARD_W, true);
+  function newsWrap_() {
+    // Reposicionar si estamos en zona de clones
+    const totalW = newsTotal * getCardW();
+    if (newsPos >= totalW * 2) newsSet(newsPos - totalW, false);
+    else if (newsPos < totalW)  newsSet(newsPos + totalW, false);
+  }
 
-    // Reposicionar silenciosamente despues de la transicion si llegamos a clones
-    setTimeout(() => {
-      const totalW = newsTotal * CARD_W;
-      if (newsPos >= totalW * 2) newsMoveTo(totalW + (newsPos - totalW * 2), false);
-      if (newsPos <= 0)          newsMoveTo(totalW + newsPos, false);
-    }, 450);
+  function newsStep(dir) {
+    const cw = getCardW();
+    newsSet(newsPos + dir * cw, true);
+    setTimeout(newsWrap_, 450);
   }
 
   document.getElementById('news-prev').onclick = () => newsStep(-1);
   document.getElementById('news-next').onclick = () => newsStep(1);
 
   /* ── Mouse drag ── */
-  let dragStart = null, dragDelta = 0, dragActive = false;
+  let dragStart = null, dragBase = 0, dragDelta = 0, dragActive = false;
+  let blockNextClick = false;
 
   newsWrap.addEventListener('mousedown', e => {
     if (e.button !== 0) return;
     e.preventDefault();
     dragStart  = e.clientX;
+    dragBase   = newsPos; // posicion al empezar — clave para snap correcto
     dragDelta  = 0; dragActive = false;
     newsTrack.style.transition = 'none';
     newsWrap.classList.add('dragging');
@@ -1400,27 +1024,25 @@
     dragDelta = e.clientX - dragStart;
     if (Math.abs(dragDelta) > 8) {
       dragActive = true;
-      newsTrack.style.transform = `translateX(-${newsPos - dragDelta}px)`;
+      newsTrack.style.transform = `translateX(-${dragBase - dragDelta}px)`;
     }
   });
 
-  let blockNextClick = false;
   window.addEventListener('mouseup', () => {
     if (dragStart === null) return;
     newsWrap.classList.remove('dragging');
     const wasDrag = dragActive;
     dragStart = null; dragActive = false;
+
     if (wasDrag) {
       blockNextClick = true;
-      calcCardW();
-      if      (dragDelta < -60) newsMoveTo(newsPos + CARD_W, true);
-      else if (dragDelta >  60) newsMoveTo(newsPos - CARD_W, true);
-      else                      newsMoveTo(newsPos, true);
-      setTimeout(() => {
-        const totalW = newsTotal * CARD_W;
-        if (newsPos >= totalW * 2) newsMoveTo(totalW + (newsPos - totalW * 2), false);
-        if (newsPos <= 0)          newsMoveTo(totalW + newsPos, false);
-      }, 450);
+      const cw = getCardW();
+      // Snap al card mas cercano desde la posicion de arrastre
+      const rawPos = dragBase - dragDelta;
+      const snapped = Math.round(rawPos / cw) * cw;
+      newsSet(snapped, true);
+      newsPos = snapped;
+      setTimeout(newsWrap_, 450);
     }
     dragDelta = 0;
   });
@@ -1433,28 +1055,30 @@
   }, true);
 
   /* ── Touch ── */
-  let touchStartX = null, touchDelta = 0;
+  let touchStartX = null, touchBase = 0, touchDelta = 0;
+
   newsWrap.addEventListener('touchstart', e => {
-    touchStartX = e.touches[0].clientX; touchDelta = 0;
+    touchStartX = e.touches[0].clientX;
+    touchBase   = newsPos;
+    touchDelta  = 0;
     newsTrack.style.transition = 'none';
   }, { passive: true });
+
   newsWrap.addEventListener('touchmove', e => {
     if (touchStartX === null) return;
     touchDelta = e.touches[0].clientX - touchStartX;
-    newsTrack.style.transform = `translateX(-${newsPos - touchDelta}px)`;
+    newsTrack.style.transform = `translateX(-${touchBase - touchDelta}px)`;
   }, { passive: true });
+
   newsWrap.addEventListener('touchend', () => {
     if (touchStartX === null) return;
     touchStartX = null;
-    calcCardW();
-    if      (touchDelta < -50) newsMoveTo(newsPos + CARD_W, true);
-    else if (touchDelta >  50) newsMoveTo(newsPos - CARD_W, true);
-    else                       newsMoveTo(newsPos, true);
-    setTimeout(() => {
-      const totalW = newsTotal * CARD_W;
-      if (newsPos >= totalW * 2) newsMoveTo(totalW + (newsPos - totalW * 2), false);
-      if (newsPos <= 0)          newsMoveTo(totalW + newsPos, false);
-    }, 450);
+    const cw = getCardW();
+    const rawPos  = touchBase - touchDelta;
+    const snapped = Math.round(rawPos / cw) * cw;
+    newsSet(snapped, true);
+    newsPos = snapped;
+    setTimeout(newsWrap_, 450);
     touchDelta = 0;
   });
 
