@@ -416,42 +416,68 @@
         ? epList.children[last.index] : epList.children[0];
       target?.click();
 
-      /* Cargar estado de botones cuando firebase este listo */
-      window.addEventListener('reanimdb:ready', () => refreshButtons(), { once: true });
-      /* Por si ya estaba listo antes de que llego este listener */
-      if (window.ReAnimeDB) refreshButtons();
+      /* Botones: leer cache sincrono primero (0ms), luego Firebase si hace falta */
+      applyButtonsFromCache();
+      function onDBReady() {
+        if (window.ReAnimeDB) refreshButtonsFromDB();
+        else window.addEventListener('reanimdb:ready', refreshButtonsFromDB, { once: true });
+      }
+      onDBReady();
     }
 
-    /* ── LIST MANAGEMENT — usa Firestore via window.ReAnimeDB ── */
+    const BTN_MAP = {
+      'btn-fav':     'favorites',
+      'btn-watch':   'watchlist',
+      'btn-watched': 'completed'
+    };
+
+    /* Lee sessionStorage directamente — sincrono, no necesita await */
+    function applyButtonsFromCache() {
+      if (!savedUser || !animeId) return;
+      try {
+        const raw = sessionStorage.getItem(`reanime_${savedUser.id}`);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        Object.entries(BTN_MAP).forEach(([btnId, listName]) => {
+          const btn = document.getElementById(btnId);
+          if (btn) btn.classList.toggle('active', (data[listName] || []).includes(animeId));
+        });
+      } catch {}
+    }
+
+    /* Cuando Firebase carga, confirmar estado real (por si cambio en otro dispositivo) */
+    async function refreshButtonsFromDB() {
+      if (!window.ReAnimeDB || !animeId) return;
+      const data = await window.ReAnimeDB.loadUserData();
+      Object.entries(BTN_MAP).forEach(([btnId, listName]) => {
+        const btn = document.getElementById(btnId);
+        if (btn) btn.classList.toggle('active', (data[listName] || []).includes(animeId));
+      });
+    }
+
+    /* ── LIST MANAGEMENT ── */
     async function toggleList(listName) {
       if (!savedUser) { alert('Inicia sesion con Discord primero.'); return; }
-      if (!window.ReAnimeDB) { alert('Cargando, intenta de nuevo.'); return; }
 
-      /* Deshabilitar botones mientras guarda */
+      /* Optimistic UI: cambiar estado visual al instante sin esperar red */
+      const btnId = Object.entries(BTN_MAP).find(([, v]) => v === listName)?.[0];
+      const btn   = btnId ? document.getElementById(btnId) : null;
+      if (btn) btn.classList.toggle('active');
+
+      if (!window.ReAnimeDB) {
+        /* Firebase aun no cargo, esperar y guardar */
+        await new Promise(res => window.addEventListener('reanimdb:ready', res, { once: true }));
+      }
+
       const btns = document.querySelectorAll('.action-btn');
       btns.forEach(b => b.disabled = true);
-
       try {
         await window.ReAnimeDB.toggleAnimeInList(listName, animeId);
-        await refreshButtons();
+        /* Confirmar estado real desde cache actualizado */
+        applyButtonsFromCache();
       } finally {
         btns.forEach(b => b.disabled = false);
       }
-    }
-
-    async function refreshButtons() {
-      if (!window.ReAnimeDB || !animeId) return;
-      const data = await window.ReAnimeDB.loadUserData();
-      const map = {
-        'btn-fav':     'favorites',
-        'btn-watch':   'watchlist',
-        'btn-watched': 'completed'
-      };
-      Object.entries(map).forEach(([btnId, listName]) => {
-        const btn = document.getElementById(btnId);
-        if (!btn) return;
-        btn.classList.toggle('active', (data[listName] || []).includes(animeId));
-      });
     }
 
     /* ── RAM PANEL ── */

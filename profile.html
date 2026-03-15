@@ -212,11 +212,10 @@
     <p>© 2025 Re:Anime — <a href="https://discord.com/users/781172416218136577" target="_blank">Ream</a></p>
   </footer>
 
-  <!-- Firebase data layer — debe cargarse antes del script principal -->
   <script type="module" src="user_data.js"></script>
 
   <script>
-    /* ── AUTH HEADER ── */
+    /* ── AUTH ── */
     const clientId    = "1390810180823945350";
     const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
     document.getElementById('login-btn').href =
@@ -244,10 +243,10 @@
     function logout() {
       localStorage.removeItem('user');
       localStorage.removeItem('user_data');
+      if (user) sessionStorage.removeItem(`reanime_${user.id}`);
       location.href = 'index.html';
     }
 
-    /* ── PROFILE — espera a que firebase-data.js este listo ── */
     if (!user) {
       document.getElementById('profile-content').innerHTML = `
         <button class="back-btn" onclick="location.href='index.html'">← Volver al inicio</button>
@@ -256,30 +255,50 @@
         </p>
       `;
     } else {
-      /* Construir el esqueleto HTML de inmediato con spinners */
       buildProfileShell();
 
-      /* Cuando firebase-data.js haya cargado, buscar los datos reales */
-      window.addEventListener('reanimdb:ready', async () => {
-        try {
-          const [allAnimes, userData] = await Promise.all([
-            fetch('animes.json').then(r => r.json()),
-            window.ReAnimeDB.loadUserData()
-          ]);
-          renderSection('favorites', allAnimes, userData.favorites  || []);
-          renderSection('watchlist', allAnimes, userData.watchlist  || []);
-          renderSection('watched',   allAnimes, userData.completed  || []);
-        } catch (err) {
-          console.error('[Re:Anime] profile load error:', err);
-          ['favorites','watchlist','watched'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.innerHTML = `<p class="no-data">Error cargando datos.</p>`;
-          });
-        }
-      });
+      /* Leer cache sincrono — mismo key que usa user_data.js */
+      const CACHE_KEY  = `reanime_${user.id}`;
+      const cacheRaw   = sessionStorage.getItem(CACHE_KEY);
+      const cacheData  = cacheRaw ? JSON.parse(cacheRaw) : null;
+
+      /* Pedir animes.json una sola vez */
+      const animesP = fetch('animes.json').then(r => r.json());
+
+      /* Si hay cache: render inmediato sin esperar nada */
+      if (cacheData) {
+        animesP.then(all => {
+          renderSection('favorites', all, cacheData.favorites || []);
+          renderSection('watchlist', all, cacheData.watchlist || []);
+          renderSection('watched',   all, cacheData.completed || []);
+        });
+      }
+
+      /* Firebase: si ya cargo usar directamente, si no escuchar evento.
+         Cuando llegue, actualizar silenciosamente (captura cambios de otro dispositivo). */
+      function onDBReady() {
+        animesP.then(async all => {
+          try {
+            const userData = await window.ReAnimeDB.loadUserData();
+            renderSection('favorites', all, userData.favorites || []);
+            renderSection('watchlist', all, userData.watchlist || []);
+            renderSection('watched',   all, userData.completed || []);
+          } catch (e) {
+            console.warn('[Re:Anime] profile refresh error:', e);
+            if (!cacheData) {
+              ['favorites','watchlist','watched'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = `<p class="no-data">Error al cargar.</p>`;
+              });
+            }
+          }
+        });
+      }
+
+      if (window.ReAnimeDB) onDBReady();
+      else window.addEventListener('reanimdb:ready', onDBReady, { once: true });
     }
 
-    /* ── SHELL ── */
     function buildProfileShell() {
       const av = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
       document.getElementById('profile-content').innerHTML = `
@@ -292,58 +311,45 @@
           </div>
           <button class="logout-btn" onclick="logout()">Cerrar sesion</button>
         </div>
-
         <div class="section-wrap">
           <div class="section-header">
             <h2 class="section-title"><em>Favoritos</em></h2>
             <div class="section-line"></div>
             <span class="section-count" id="count-favorites"></span>
           </div>
-          <div id="favorites" class="anime-grid">
-            <p class="no-data">Cargando...</p>
-          </div>
+          <div id="favorites" class="anime-grid"><p class="no-data">Cargando...</p></div>
         </div>
-
         <div class="section-wrap">
           <div class="section-header">
             <h2 class="section-title">Ver <em>despues</em></h2>
             <div class="section-line"></div>
             <span class="section-count" id="count-watchlist"></span>
           </div>
-          <div id="watchlist" class="anime-grid">
-            <p class="no-data">Cargando...</p>
-          </div>
+          <div id="watchlist" class="anime-grid"><p class="no-data">Cargando...</p></div>
         </div>
-
         <div class="section-wrap">
           <div class="section-header">
             <h2 class="section-title"><em>Vistos</em></h2>
             <div class="section-line"></div>
             <span class="section-count" id="count-watched"></span>
           </div>
-          <div id="watched" class="anime-grid">
-            <p class="no-data">Cargando...</p>
-          </div>
+          <div id="watched" class="anime-grid"><p class="no-data">Cargando...</p></div>
         </div>
       `;
     }
 
-    /* ── RENDER SECTION ── */
     function renderSection(sectionId, allAnimes, ids) {
       const container = document.getElementById(sectionId);
       const countEl   = document.getElementById('count-' + sectionId);
       if (!container) return;
-
       if (!ids.length) {
         if (countEl) countEl.textContent = '0 titulos';
         container.innerHTML = `<p class="no-data">Sin animes en esta lista todavia.</p>`;
         return;
       }
-
       const filtered = allAnimes.filter(a => ids.includes(a.id));
       if (countEl) countEl.textContent = `${filtered.length} titulo${filtered.length !== 1 ? 's' : ''}`;
       container.innerHTML = '';
-
       filtered.forEach(anime => {
         const card = document.createElement('div');
         card.className = 'anime-card';
