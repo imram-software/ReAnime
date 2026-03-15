@@ -375,14 +375,19 @@
 
         <div class="comments-wrap">
           <div class="comments-title"><em>Comentarios</em></div>
-          <script src="https://utteranc.es/client.js"
-            repo="imram-software/ReAnime"
-            issue-term="url"
-            theme="github-dark"
-            crossorigin="anonymous"
-            async><\/script>
+          <div id="utterances-container"></div>
         </div>
       `;
+
+      /* Inyectar Utterances via createElement — innerHTML no ejecuta scripts */
+      const utterances = document.createElement('script');
+      utterances.src = 'https://utteranc.es/client.js';
+      utterances.setAttribute('repo', 'imram-software/ReAnime');
+      utterances.setAttribute('issue-term', 'url');
+      utterances.setAttribute('theme', 'github-dark');
+      utterances.setAttribute('crossorigin', 'anonymous');
+      utterances.async = true;
+      document.getElementById('utterances-container').appendChild(utterances);
 
       /* Build episode list */
       const epList = document.getElementById('ep-list');
