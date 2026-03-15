@@ -149,6 +149,11 @@
         linear-gradient(90deg, rgba(255,45,120,0.04) 1px, transparent 1px);
       background-size: 60px 60px;
       mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+      animation: gridDrift 18s linear infinite;
+    }
+    @keyframes gridDrift {
+      0%   { background-position: 0 0; }
+      100% { background-position: 60px -60px; }
     }
 
     .hero-badge {
@@ -226,9 +231,9 @@
     #app { display: none; padding-top: 56px; }
 
     /* Section wrapper */
-    .section { padding: 3rem 0; }
+    .section { padding: 2rem 0 1rem; }
     .section-header {
-      padding: 0 2rem 1.5rem;
+      padding: 0 2rem 0.75rem;
       display: flex; align-items: baseline; gap: 1rem;
     }
     .section-title {
@@ -247,7 +252,10 @@
     .news-track-wrap {
       position: relative; overflow: hidden;
       padding: 0 2rem;
+      cursor: grab;
+      user-select: none;
     }
+    .news-track-wrap.dragging { cursor: grabbing; }
     #news-track {
       display: flex; gap: 1.2rem;
       transition: transform 0.55s cubic-bezier(.77,0,.18,1);
@@ -289,7 +297,7 @@
 
     .slider-controls {
       display: flex; justify-content: flex-end;
-      padding: 1rem 2rem 0; gap: 0.5rem;
+      padding: 0.5rem 2rem 0; gap: 0.5rem;
     }
     .slider-btn {
       width: 36px; height: 36px;
@@ -653,7 +661,7 @@
   <div id="app">
 
     <!-- NEWS -->
-    <div class="section">
+    <div class="section" style="padding-bottom:0.5rem;">
       <div class="section-header">
         <h2 class="section-title">Últimas <em>noticias</em></h2>
         <div class="section-line"></div>
@@ -869,14 +877,64 @@
     }
   }
 
-  document.getElementById('news-prev').onclick = () => {
-    newsIndex = Math.max(0, newsIndex - 1);
-    document.getElementById('news-track').style.transform = `translateX(-${newsIndex * CARD_W}px)`;
-  };
-  document.getElementById('news-next').onclick = () => {
-    if (newsIndex < newsCards - 1) newsIndex++;
-    document.getElementById('news-track').style.transform = `translateX(-${newsIndex * CARD_W}px)`;
-  };
+  /* ── NEWS SLIDER: drag + touch + button ── */
+  const newsWrap  = document.querySelector('.news-track-wrap');
+  const newsTrack = document.getElementById('news-track');
+
+  function newsGoTo(idx) {
+    newsIndex = Math.max(0, Math.min(idx, newsCards - 1));
+    newsTrack.style.transition = 'transform 0.45s cubic-bezier(.77,0,.18,1)';
+    newsTrack.style.transform  = `translateX(-${newsIndex * CARD_W}px)`;
+  }
+
+  document.getElementById('news-prev').onclick = () => newsGoTo(newsIndex - 1);
+  document.getElementById('news-next').onclick = () => newsGoTo(newsIndex + 1);
+
+  /* Mouse drag */
+  let dragStart = null, dragDelta = 0, isDragging = false;
+  newsWrap.addEventListener('mousedown', e => {
+    dragStart = e.clientX; dragDelta = 0; isDragging = false;
+    newsWrap.classList.add('dragging');
+    newsTrack.style.transition = 'none';
+  });
+  window.addEventListener('mousemove', e => {
+    if (dragStart === null) return;
+    dragDelta = e.clientX - dragStart;
+    isDragging = Math.abs(dragDelta) > 4;
+    if (isDragging) {
+      newsTrack.style.transform = `translateX(${-newsIndex * CARD_W + dragDelta}px)`;
+    }
+  });
+  window.addEventListener('mouseup', () => {
+    if (dragStart === null) return;
+    newsWrap.classList.remove('dragging');
+    dragStart = null;
+    if (!isDragging) return;
+    if      (dragDelta < -60) newsGoTo(newsIndex + 1);
+    else if (dragDelta >  60) newsGoTo(newsIndex - 1);
+    else newsGoTo(newsIndex);
+    isDragging = false;
+  });
+
+  /* Touch */
+  let touchStart = null;
+  newsWrap.addEventListener('touchstart', e => {
+    touchStart = e.touches[0].clientX;
+    newsTrack.style.transition = 'none';
+  }, { passive: true });
+  newsWrap.addEventListener('touchmove', e => {
+    if (touchStart === null) return;
+    const d = e.touches[0].clientX - touchStart;
+    newsTrack.style.transform = `translateX(${-newsIndex * CARD_W + d}px)`;
+  }, { passive: true });
+  newsWrap.addEventListener('touchend', e => {
+    if (touchStart === null) return;
+    const d = e.changedTouches[0].clientX - touchStart;
+    touchStart = null;
+    if      (d < -50) newsGoTo(newsIndex + 1);
+    else if (d >  50) newsGoTo(newsIndex - 1);
+    else newsGoTo(newsIndex);
+  });
 
   /* ══════════════════════════════════════════════
      GENRES
