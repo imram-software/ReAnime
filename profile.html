@@ -212,36 +212,43 @@
     <p>© 2025 Re:Anime — <a href="https://discord.com/users/781172416218136577" target="_blank">Ream</a></p>
   </footer>
 
+  <!-- Firebase data layer — debe cargarse antes del script principal -->
+  <script type="module" src="firebase-data.js"></script>
+
   <script>
     /* ── AUTH HEADER ── */
-    const clientId   = "1390810180823945350";
+    const clientId    = "1390810180823945350";
     const redirectUri = "https://imram-software.github.io/ReAnime/callback.html";
     document.getElementById('login-btn').href =
       `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=identify`;
 
-    const savedUser = JSON.parse(localStorage.getItem('user'));
-    if (savedUser) {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (user) {
       document.getElementById('login-btn').classList.add('hidden');
       const ui = document.getElementById('user-info');
       ui.classList.remove('hidden');
-      const av = `https://cdn.discordapp.com/avatars/${savedUser.id}/${savedUser.avatar}.png`;
-      ui.innerHTML = `<img src="${av}"/><span>${savedUser.username}</span><div id="user-popup"></div>`;
+      const av = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+      ui.innerHTML = `<img src="${av}"/><span>${user.username}</span><div id="user-popup"></div>`;
       ui.onclick = () => {
         const p = document.getElementById('user-popup');
         p.style.display = p.style.display === 'block' ? 'none' : 'block';
         p.innerHTML = `
-          <strong>${savedUser.username}</strong><br>
+          <strong>${user.username}</strong><br>
           <img src="${av}" width="60" style="border-radius:50%;margin:0.5rem 0"><br>
           <button onclick="logout()">Cerrar sesion</button>
         `;
       };
     }
 
-    /* ── PROFILE ── */
-    const user   = JSON.parse(localStorage.getItem('user'));
-    const userId = user?.id;
+    function logout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('user_data');
+      location.href = 'index.html';
+    }
 
-    if (!userId) {
+    /* ── PROFILE — espera a que firebase-data.js este listo ── */
+    if (!user) {
       document.getElementById('profile-content').innerHTML = `
         <button class="back-btn" onclick="location.href='index.html'">← Volver al inicio</button>
         <p style="color:var(--muted);margin-top:4rem;text-align:center;">
@@ -249,13 +256,33 @@
         </p>
       `;
     } else {
-      fetch('animes.json').then(r => r.json()).then(renderProfile);
+      /* Construir el esqueleto HTML de inmediato con spinners */
+      buildProfileShell();
+
+      /* Cuando firebase-data.js haya cargado, buscar los datos reales */
+      window.addEventListener('reanimdb:ready', async () => {
+        try {
+          const [allAnimes, userData] = await Promise.all([
+            fetch('animes.json').then(r => r.json()),
+            window.ReAnimeDB.loadUserData()
+          ]);
+          renderSection('favorites', allAnimes, userData.favorites  || []);
+          renderSection('watchlist', allAnimes, userData.watchlist  || []);
+          renderSection('watched',   allAnimes, userData.completed  || []);
+        } catch (err) {
+          console.error('[Re:Anime] profile load error:', err);
+          ['favorites','watchlist','watched'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = `<p class="no-data">Error cargando datos.</p>`;
+          });
+        }
+      });
     }
 
-    function renderProfile(allAnimes) {
+    /* ── SHELL ── */
+    function buildProfileShell() {
       const av = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-      const container = document.getElementById('profile-content');
-      container.innerHTML = `
+      document.getElementById('profile-content').innerHTML = `
         <button class="back-btn" onclick="location.href='index.html'">← Volver al inicio</button>
         <div class="user-card">
           <img src="${av}" alt="Avatar" />
@@ -265,53 +292,58 @@
           </div>
           <button class="logout-btn" onclick="logout()">Cerrar sesion</button>
         </div>
+
         <div class="section-wrap">
           <div class="section-header">
             <h2 class="section-title"><em>Favoritos</em></h2>
             <div class="section-line"></div>
             <span class="section-count" id="count-favorites"></span>
           </div>
-          <div id="favorites" class="anime-grid"></div>
+          <div id="favorites" class="anime-grid">
+            <p class="no-data">Cargando...</p>
+          </div>
         </div>
+
         <div class="section-wrap">
           <div class="section-header">
             <h2 class="section-title">Ver <em>despues</em></h2>
             <div class="section-line"></div>
             <span class="section-count" id="count-watchlist"></span>
           </div>
-          <div id="watchlist" class="anime-grid"></div>
+          <div id="watchlist" class="anime-grid">
+            <p class="no-data">Cargando...</p>
+          </div>
         </div>
+
         <div class="section-wrap">
           <div class="section-header">
             <h2 class="section-title"><em>Vistos</em></h2>
             <div class="section-line"></div>
             <span class="section-count" id="count-watched"></span>
           </div>
-          <div id="watched" class="anime-grid"></div>
+          <div id="watched" class="anime-grid">
+            <p class="no-data">Cargando...</p>
+          </div>
         </div>
       `;
-      renderSection('favorites', allAnimes);
-      renderSection('watchlist', allAnimes);
-      renderSection('watched',   allAnimes);
     }
 
-    function getUserList(type) {
-      const all = JSON.parse(localStorage.getItem(type) || '{}');
-      return all[user.id] || [];
-    }
+    /* ── RENDER SECTION ── */
+    function renderSection(sectionId, allAnimes, ids) {
+      const container = document.getElementById(sectionId);
+      const countEl   = document.getElementById('count-' + sectionId);
+      if (!container) return;
 
-    function renderSection(type, allAnimes) {
-      const container = document.getElementById(type);
-      const ids = getUserList(type);
-      const countEl = document.getElementById('count-' + type);
       if (!ids.length) {
         if (countEl) countEl.textContent = '0 titulos';
         container.innerHTML = `<p class="no-data">Sin animes en esta lista todavia.</p>`;
         return;
       }
+
       const filtered = allAnimes.filter(a => ids.includes(a.id));
-      if (countEl) countEl.textContent = `${filtered.length} titulos`;
+      if (countEl) countEl.textContent = `${filtered.length} titulo${filtered.length !== 1 ? 's' : ''}`;
       container.innerHTML = '';
+
       filtered.forEach(anime => {
         const card = document.createElement('div');
         card.className = 'anime-card';
@@ -324,12 +356,6 @@
         `;
         container.appendChild(card);
       });
-    }
-
-    function logout() {
-      localStorage.removeItem('user');
-      localStorage.removeItem('user_data');
-      location.href = 'index.html';
     }
   </script>
 </body>

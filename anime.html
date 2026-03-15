@@ -298,6 +298,9 @@
     <p>© 2025 Re:Anime — <a href="https://discord.com/users/781172416218136577" target="_blank">Ream</a></p>
   </footer>
 
+  <!-- Firebase data layer -->
+  <script type="module" src="firebase-data.js"></script>
+
   <script>
     /* ── AUTH ── */
     const clientId    = "1390810180823945350";
@@ -351,9 +354,9 @@
             </div>
             <p class="anime-description">${anime.description || ''}</p>
             <div class="anime-actions">
-              <button class="action-btn" id="btn-fav"    onclick="toggleList('favorites')">Favorito</button>
-              <button class="action-btn" id="btn-watch"  onclick="toggleList('watchlist')">Ver despues</button>
-              <button class="action-btn" id="btn-watched" onclick="toggleList('watched')">Visto</button>
+              <button class="action-btn" id="btn-fav"     onclick="toggleList('favorites')">Favorito</button>
+              <button class="action-btn" id="btn-watch"   onclick="toggleList('watchlist')">Ver despues</button>
+              <button class="action-btn" id="btn-watched" onclick="toggleList('completed')">Visto</button>
             </div>
           </div>
         </div>
@@ -381,9 +384,6 @@
         </div>
       `;
 
-      /* Update list buttons */
-      updateListButtons(anime.id);
-
       /* Build episode list */
       const epList = document.getElementById('ep-list');
       anime.episodes?.forEach((ep, i) => {
@@ -393,8 +393,7 @@
         btn.onclick = () => {
           document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
-          document.getElementById('ep-title').innerHTML =
-            `Ep ${ep.number}: <em>${ep.title}</em>`;
+          document.getElementById('ep-title').innerHTML = `Ep ${ep.number}: <em>${ep.title}</em>`;
           const tmp = document.createElement('div'); tmp.innerHTML = ep.embed;
           const iframe = tmp.querySelector('iframe');
           const player = document.getElementById('video-player');
@@ -414,38 +413,44 @@
       /* Auto-select last watched or first */
       const last = JSON.parse(localStorage.getItem('lastWatched') || 'null');
       const target = (last?.id === anime.id && epList.children[last.index])
-        ? epList.children[last.index]
-        : epList.children[0];
+        ? epList.children[last.index] : epList.children[0];
       target?.click();
+
+      /* Cargar estado de botones cuando firebase este listo */
+      window.addEventListener('reanimdb:ready', () => refreshButtons(), { once: true });
+      /* Por si ya estaba listo antes de que llego este listener */
+      if (window.ReAnimeDB) refreshButtons();
     }
 
-    /* ── LIST MANAGEMENT ── */
-    function getList(type) {
-      if (!savedUser) return [];
-      const all = JSON.parse(localStorage.getItem(type) || '{}');
-      return all[savedUser.id] || [];
-    }
-    function setList(type, arr) {
-      if (!savedUser) return;
-      const all = JSON.parse(localStorage.getItem(type) || '{}');
-      all[savedUser.id] = arr;
-      localStorage.setItem(type, JSON.stringify(all));
-    }
-    function toggleList(type) {
+    /* ── LIST MANAGEMENT — usa Firestore via window.ReAnimeDB ── */
+    async function toggleList(listName) {
       if (!savedUser) { alert('Inicia sesion con Discord primero.'); return; }
-      const list = getList(type);
-      const idx  = list.indexOf(animeId);
-      if (idx > -1) list.splice(idx, 1);
-      else list.push(animeId);
-      setList(type, list);
-      updateListButtons(animeId);
+      if (!window.ReAnimeDB) { alert('Cargando, intenta de nuevo.'); return; }
+
+      /* Deshabilitar botones mientras guarda */
+      const btns = document.querySelectorAll('.action-btn');
+      btns.forEach(b => b.disabled = true);
+
+      try {
+        await window.ReAnimeDB.toggleAnimeInList(listName, animeId);
+        await refreshButtons();
+      } finally {
+        btns.forEach(b => b.disabled = false);
+      }
     }
-    function updateListButtons(id) {
-      const map = { 'btn-fav': 'favorites', 'btn-watch': 'watchlist', 'btn-watched': 'watched' };
-      Object.entries(map).forEach(([btnId, type]) => {
+
+    async function refreshButtons() {
+      if (!window.ReAnimeDB || !animeId) return;
+      const data = await window.ReAnimeDB.loadUserData();
+      const map = {
+        'btn-fav':     'favorites',
+        'btn-watch':   'watchlist',
+        'btn-watched': 'completed'
+      };
+      Object.entries(map).forEach(([btnId, listName]) => {
         const btn = document.getElementById(btnId);
         if (!btn) return;
-        btn.classList.toggle('active', getList(type).includes(id));
+        btn.classList.toggle('active', (data[listName] || []).includes(animeId));
       });
     }
 
