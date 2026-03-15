@@ -2,147 +2,675 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Re:Anime · Ver con Ram</title>
+  <title>Re:Anime · Modo Cine</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;700&display=swap" rel="stylesheet" />
   <style>
-    body{margin:0;background:#0b0b10;color:#fff;font-family:system-ui,sans-serif}
-    .stage{display:grid;grid-template-columns:1fr 340px;height:100vh}
-    .video-zone{display:flex;justify-content:center;align-items:center;background:#000}
-    .video-wrapper{width:100%;max-width:1100px;aspect-ratio:16/9}
-    iframe{width:100%;height:100%;border:none}
+    :root {
+      --bg:      #080808;
+      --panel:   #101010;
+      --border:  #1e1e1e;
+      --pink:    #ff2d78;
+      --rose:    #ff6fa8;
+      --dim:     #ff2d7822;
+      --glow:    #ff2d7844;
+      --text:    #e8e8e8;
+      --muted:   #555;
+      --font-h:  'Bebas Neue', cursive;
+      --font-b:  'DM Sans', sans-serif;
+      --radius:  10px;
+    }
 
-    .ram-zone{background:#141421;border-left:1px solid #222;display:flex;flex-direction:column;padding:1rem}
-    .ram-head{display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem}
-    .ram-head img{width:56px;height:56px}
-    .ram-name{color:#ff4ecd;font-weight:bold}
-    .ram-sub{font-size:.75rem;color:#aaa}
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--pink); }
 
-    .ram-chat{flex:1;background:#0f0f18;border-radius:14px;padding:.6rem;overflow:auto;font-size:.85rem}
-    .msg{margin-bottom:.35rem}
-    .ram{color:#ffb6d9}
-    .sys{color:#9aa0ff}
+    body {
+      font-family: var(--font-b);
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+    }
 
-    .ram-controls{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.6rem}
-    .ram-controls button{background:#ff4ecd;color:#fff;border:none;border-radius:10px;padding:.4rem;font-size:.75rem;cursor:pointer}
+    /* ── LAYOUT ── */
+    .stage {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      height: 100vh;
+    }
 
-    @media(max-width:900px){.stage{grid-template-columns:1fr}.ram-zone{height:48vh}}
+    /* ── VIDEO ── */
+    .video-zone {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      position: relative;
+    }
+    .video-wrapper {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .video-wrapper iframe {
+      width: 100%; height: 100%;
+      border: none; display: block;
+    }
+
+    /* Overlay de pausa — visible cuando el usuario pulsa sync */
+    #pause-hint {
+      position: absolute;
+      top: 1rem; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.4rem 1rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #pause-hint.show { opacity: 1; }
+
+    /* ── PANEL ── */
+    .panel {
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .panel-head {
+      padding: 0.9rem 1rem 0.7rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .panel-head-top {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 0.4rem;
+    }
+    .ram-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--pink);
+      box-shadow: 0 0 12px var(--glow);
+      object-fit: cover;
+    }
+    .ram-name {
+      font-family: var(--font-h);
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+      color: var(--pink);
+    }
+    .ram-status {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+    .ep-badge {
+      font-size: 0.72rem;
+      color: var(--rose);
+      background: var(--dim);
+      border: 1px solid var(--pink);
+      border-radius: 20px;
+      padding: 0.2rem 0.7rem;
+      display: inline-block;
+    }
+
+    /* Sync bar */
+    .sync-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      background: #0c0c0c;
+    }
+    .sync-bar span {
+      font-size: 0.72rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    #time-display {
+      font-family: var(--font-h);
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      color: var(--pink);
+      min-width: 60px;
+    }
+    .sync-input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: var(--font-b);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.5rem;
+      width: 70px;
+      text-align: center;
+      outline: none;
+    }
+    .sync-input:focus { border-color: var(--pink); }
+    .sync-btn {
+      background: var(--pink);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      font-family: var(--font-b);
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .sync-btn:hover { opacity: 0.8; }
+
+    /* ── CHAT ── */
+    .chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .msg {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      animation: msgIn 0.3s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+    .msg-author {
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .msg-author.ram  { color: var(--pink); }
+    .msg-author.sys  { color: #6677ff; }
+    .msg-author.user { color: var(--muted); }
+    .msg-time {
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-family: var(--font-h);
+      letter-spacing: 1px;
+    }
+    .msg-text {
+      font-size: 0.83rem;
+      color: var(--text);
+      line-height: 1.45;
+      padding-left: 0.1rem;
+    }
+    .msg.sys .msg-text { color: #8899ff; }
+
+    /* ── ACTIONS ── */
+    .actions {
+      padding: 0.7rem;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+    .act-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 0.45rem 0.5rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: var(--font-b);
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .act-btn:hover { border-color: var(--pink); color: var(--rose); }
+    .act-btn.wide { grid-column: 1 / 3; }
+    .act-btn.danger { border-color: #333; }
+    .act-btn.danger:hover { border-color: #ff4444; color: #ff4444; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 860px) {
+      .stage { grid-template-columns: 1fr; grid-template-rows: 55vw 1fr; }
+      body { overflow: auto; }
+      .video-zone { height: 55vw; }
+      .panel { height: calc(100vh - 55vw); }
+    }
   </style>
 </head>
 <body>
 
 <div class="stage">
-  <div class="video-zone"><div class="video-wrapper" id="video"></div></div>
 
-  <div class="ram-zone">
-    <div class="ram-head">
-      <img src="Assets/ReAnime-Mascot.png" alt="Ram">
-      <div>
-        <div class="ram-name">Ram</div>
-        <div class="ram-sub" id="ram-info">Cargando…</div>
+  <!-- VIDEO -->
+  <div class="video-zone">
+    <div class="video-wrapper" id="video"></div>
+    <div id="pause-hint">Pausa detectada — Ram espera</div>
+  </div>
+
+  <!-- PANEL -->
+  <div class="panel">
+
+    <div class="panel-head">
+      <div class="panel-head-top">
+        <img class="ram-avatar" src="Assets/ReAnime-Mascot.png" alt="Ram" />
+        <div>
+          <div class="ram-name">Ram</div>
+          <div class="ram-status" id="ram-status">Cargando...</div>
+        </div>
       </div>
+      <div class="ep-badge" id="ep-badge">—</div>
     </div>
 
-    <div class="ram-chat" id="chat"></div>
-
-    <div class="ram-controls">
-      <button data-a="comment">💬 Comentar</button>
-      <button data-a="fact">📌 Dato</button>
-      <button data-a="opinion">💭 Opinión</button>
-      <button data-a="react">😮 Reacción</button>
-      <button data-a="next">⏭ Siguiente</button>
-      <button data-a="back">⬅ Volver</button>
+    <!-- SYNC BAR
+         Como los iframes externos bloquean acceso al tiempo,
+         hay dos modos:
+         A) YouTube embed → YouTube IFrame API detecta tiempo y pausa automaticamente
+         B) Cualquier otro embed → el usuario sincroniza manualmente con mm:ss
+    -->
+    <div class="sync-bar">
+      <span>Tiempo:</span>
+      <div id="time-display">00:00</div>
+      <input class="sync-input" id="sync-input" type="text" placeholder="mm:ss" title="Escribe el tiempo actual del video para sincronizar a Ram" />
+      <button class="sync-btn" id="sync-btn">Sync</button>
     </div>
+
+    <div class="chat" id="chat"></div>
+
+    <div class="actions">
+      <button class="act-btn" data-a="fact">Dato</button>
+      <button class="act-btn" data-a="opinion">Opinion</button>
+      <button class="act-btn" data-a="react">Reaccion</button>
+      <button class="act-btn" data-a="comment">Comentario</button>
+      <button class="act-btn" data-a="next">Siguiente ep</button>
+      <button class="act-btn" data-a="pause">Pausar / Seguir</button>
+      <button class="act-btn wide danger" data-a="back">Volver</button>
+    </div>
+
   </div>
 </div>
 
+<!-- YouTube IFrame API (para embeds de YouTube) -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
-const chat = document.getElementById('chat');
-const video = document.getElementById('video');
-const info = document.getElementById('ram-info');
-const params = new URLSearchParams(location.search);
-const animeId = params.get('id');
+/* ══════════════════════════════════════════════════════
+   ESTADO
+══════════════════════════════════════════════════════ */
+let anime        = null;
+let episode      = null;
+let epIndex      = 0;
+let ramTime      = 0;      // segundos — reloj interno de Ram
+let timerRunning = false;
+let timerInterval= null;
+let isPaused     = false;
+let ytPlayer     = null;   // instancia YouTube IFrame API (si aplica)
+let isYoutube    = false;
+let lastActivity = Date.now();
+let tcUsed       = new Set(); // timestamps ya usados este episodio
 
-let fakeTime = 0;
-let currentAnime, currentEpisode, episodeIndex = 0;
-let lastInteraction = Date.now();
+const chat      = document.getElementById('chat');
+const timeDisp  = document.getElementById('time-display');
+const pauseHint = document.getElementById('pause-hint');
+const syncInput = document.getElementById('sync-input');
+const syncBtn   = document.getElementById('sync-btn');
 
-const format = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-
-const say = (txt,type='ram') =>{
-  const d=document.createElement('div');
-  d.className='msg '+type;
-  d.textContent = type==='ram' ? `Ram [${format(fakeTime)}]: ${txt}` : txt;
-  chat.appendChild(d);
-  chat.scrollTop=chat.scrollHeight;
+/* ══════════════════════════════════════════════════════
+   UTILIDADES
+══════════════════════════════════════════════════════ */
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+const rand = a => a[Math.floor(Math.random()*a.length)];
+const parseTime = str => {
+  const p = str.trim().split(':').map(Number);
+  if (p.length === 2) return p[0]*60 + (p[1]||0);
+  if (p.length === 1 && !isNaN(p[0])) return p[0];
+  return null;
 };
 
-const rand = a => a[Math.floor(Math.random()*a.length)];
+function say(text, type = 'ram') {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + type;
+  const meta = document.createElement('div');
+  meta.className = 'msg-meta';
+  const author = document.createElement('span');
+  author.className = 'msg-author ' + type;
+  author.textContent = type === 'ram' ? 'Ram' : type === 'sys' ? 'Sistema' : 'Tu';
+  const ts = document.createElement('span');
+  ts.className = 'msg-time';
+  ts.textContent = fmt(ramTime);
+  meta.append(author, ts);
+  const txt = document.createElement('div');
+  txt.className = 'msg-text';
+  txt.textContent = text;
+  wrap.append(meta, txt);
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+}
 
-fetch('animes.json').then(r=>r.json()).then(list=>{
-  currentAnime = list.find(a=>a.id===animeId);
-  if(!currentAnime){ say('No sé qué anime es este…'); return; }
+/* ══════════════════════════════════════════════════════
+   RELOJ INTERNO
+   Se detiene cuando el usuario pausa manualmente
+   o cuando el bot nota inactividad prolongada.
+══════════════════════════════════════════════════════ */
+function startTimer() {
+  if (timerRunning) return;
+  timerRunning = true;
+  isPaused = false;
+  timerInterval = setInterval(() => {
+    ramTime++;
+    timeDisp.textContent = fmt(ramTime);
+    checkTimedComments();
+    checkIdleComment();
+  }, 1000);
+}
 
-  const last = JSON.parse(localStorage.getItem('lastWatched')||'null');
-  episodeIndex = last && last.id===currentAnime.id ? last.index : 0;
-  currentEpisode = currentAnime.episodes[episodeIndex];
+function stopTimer() {
+  timerRunning = false;
+  isPaused = true;
+  clearInterval(timerInterval);
+}
 
-  info.textContent = `${currentAnime.name} · Ep ${currentEpisode.number}`;
-  say(`Bien… ${currentAnime.name}, episodio ${currentEpisode.number}.`);
+function togglePause() {
+  if (isPaused) {
+    startTimer();
+    say('Seguimos.', 'sys');
+    showPauseHint(false);
+  } else {
+    stopTimer();
+    say('Pausado. Ram espera.', 'sys');
+    showPauseHint(true);
+  }
+}
 
-  const tmp=document.createElement('div');
-  tmp.innerHTML=currentEpisode.embed;
-  const iframe=tmp.querySelector('iframe');
-  iframe.loading='lazy';
-  video.appendChild(iframe);
+function showPauseHint(show) {
+  pauseHint.classList.toggle('show', show);
+  if (show) setTimeout(() => pauseHint.classList.remove('show'), 4000);
+}
 
-  setInterval(()=>fakeTime++,1000);
+/* ══════════════════════════════════════════════════════
+   SYNC MANUAL
+   El usuario escribe el tiempo actual del video (mm:ss)
+   para que Ram sepa donde esta aunque sea un iframe externo.
+══════════════════════════════════════════════════════ */
+syncBtn.onclick = () => {
+  const t = parseTime(syncInput.value);
+  if (t === null) { say('Escribe el tiempo en formato mm:ss', 'sys'); return; }
+  ramTime = t;
+  timeDisp.textContent = fmt(ramTime);
+  syncInput.value = '';
+  tcUsed.clear(); // resetear timestamps pasados
+  if (!timerRunning) startTimer();
+  say(`Sincronizado a ${fmt(t)}. Ram retoma desde aqui.`, 'sys');
+  lastActivity = Date.now();
+};
+syncInput.addEventListener('keydown', e => { if (e.key === 'Enter') syncBtn.click(); });
 
-  const timedComments = [
-    {t:60, m:'Ya estamos entrando en calor.'},
-    {t:300, m:'Aquí empieza el desarrollo.'},
-    {t:600, m:'Este momento es clave.'},
-    {t:900, m:'Presta atención a los detalles.'}
-  ];
+/* ══════════════════════════════════════════════════════
+   YOUTUBE IFRAME API
+   Si el embed es de YouTube, la API detecta play/pause
+   y tiempo real sin que el usuario tenga que sincronizar.
+══════════════════════════════════════════════════════ */
+function tryYouTubeAPI(iframe) {
+  const src = iframe.src || '';
+  if (!src.includes('youtube.com') && !src.includes('youtu.be')) return false;
 
-  const generic = [
-    'Hmm… interesante.','Esto explica muchas cosas.','No esperaba eso.','Esto es muy humano.','Ram ya lo sospechaba.'
-  ];
+  /* Asegurarse de que la URL tenga enablejsapi=1 */
+  const url = new URL(src);
+  url.searchParams.set('enablejsapi', '1');
+  url.searchParams.set('origin', location.origin);
+  iframe.src = url.toString();
 
-  const reactions = ['😮','😄','😐','😴','😳','😡'];
+  isYoutube = true;
+  return true;
+}
 
-  let tcIndex = 0;
+/* Callback global de YouTube IFrame API */
+window.onYouTubeIframeAPIReady = function() {
+  if (!isYoutube) return;
+  const iframe = document.querySelector('#video iframe');
+  if (!iframe) return;
 
-  setInterval(()=>{
-    if(timedComments[tcIndex] && fakeTime >= timedComments[tcIndex].t){
-      say(timedComments[tcIndex].m);
-      tcIndex++;
-    }
-
-    if(Date.now()-lastInteraction>45000){
-      say(rand(generic));
-    }
-  },5000);
-
-  document.querySelectorAll('.ram-controls button').forEach(b=>{
-    b.onclick=()=>{
-      lastInteraction = Date.now();
-      const a=b.dataset.a;
-      if(a==='back') history.back();
-      if(a==='fact') say(rand(currentAnime.dato||['No tengo un dato ahora.']));
-      if(a==='opinion') say(rand(currentAnime.opinion||['Es interesante.']));
-      if(a==='comment') say(rand(generic));
-      if(a==='react') say(rand(reactions));
-      if(a==='next'){
-        if(currentAnime.episodes[episodeIndex+1]){
-          localStorage.setItem('lastWatched',JSON.stringify({id:currentAnime.id,index:episodeIndex+1}));
-          location.reload();
-        }else{
-          say('No hay más episodios por ahora.');
+  ytPlayer = new YT.Player(iframe, {
+    events: {
+      onStateChange: (e) => {
+        if (e.data === YT.PlayerState.PLAYING) {
+          startTimer();
+          lastActivity = Date.now();
+        } else if (e.data === YT.PlayerState.PAUSED) {
+          stopTimer();
+          say('Pausa detectada. Cuando quieras seguimos.', 'sys');
+          showPauseHint(true);
+        } else if (e.data === YT.PlayerState.ENDED) {
+          stopTimer();
+          say('Episodio terminado. Bien visto.', 'sys');
         }
       }
-    };
+    }
   });
+
+  /* Sincronizar tiempo real de YouTube cada 3s */
+  setInterval(() => {
+    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+    const yt = Math.floor(ytPlayer.getCurrentTime());
+    if (Math.abs(yt - ramTime) > 4) {
+      ramTime = yt;
+      timeDisp.textContent = fmt(ramTime);
+    }
+  }, 3000);
+};
+
+/* ══════════════════════════════════════════════════════
+   COMENTARIOS POR TIEMPO
+   Estructura en animes.json (opcional pero recomendada):
+   {
+     "episodes": [{
+       "number": 1,
+       "comments": [
+         { "t": 60,  "text": "Ya empieza lo bueno." },
+         { "t": 300, "text": "Este personaje es clave." }
+       ]
+     }]
+   }
+   Si no hay comments en el JSON, usa frases genericas del anime.
+══════════════════════════════════════════════════════ */
+const GENERIC_COMMENTS = [
+  'Interesante desarrollo.',
+  'Esto cambia las cosas.',
+  'No habia considerado eso.',
+  'Este momento importa.',
+  'Presta atencion a los detalles.',
+  'La animacion en esta escena es buena.',
+  'Este es uno de los momentos clave del episodio.'
+];
+
+/* Comentarios genericos por tramo de tiempo, si no hay timestamps en el JSON */
+const FALLBACK_TIMED = [
+  { t: 30,  m: 'Primer minuto. Ram esta prestando atencion.' },
+  { t: 90,  m: 'El opening termino. Empieza lo importante.' },
+  { t: 240, m: 'Este es el punto de giro del episodio normalmente.' },
+  { t: 480, m: 'A mitad del episodio. ¿Como va todo?' },
+  { t: 900, m: 'Ya casi termina. Atencion al final.' },
+  { t: 1080,m: 'El ending esta cerca.' }
+];
+
+function checkTimedComments() {
+  if (!episode) return;
+  const comments = episode.comments || [];
+
+  if (comments.length) {
+    /* Usar los timestamps del JSON */
+    for (const c of comments) {
+      const key = `ep${epIndex}_t${c.t}`;
+      if (!tcUsed.has(key) && ramTime >= c.t && ramTime < c.t + 10) {
+        tcUsed.add(key);
+        say(c.text);
+        lastActivity = Date.now();
+        return;
+      }
+    }
+  } else {
+    /* Fallback: frases genericas en tiempos fijos */
+    for (const fc of FALLBACK_TIMED) {
+      const key = `ep${epIndex}_ft${fc.t}`;
+      if (!tcUsed.has(key) && ramTime >= fc.t && ramTime < fc.t + 10) {
+        tcUsed.add(key);
+        say(fc.m);
+        lastActivity = Date.now();
+        return;
+      }
+    }
+  }
+}
+
+/* Si lleva 50s sin hablar, decir algo del anime */
+function checkIdleComment() {
+  if (Date.now() - lastActivity < 50000) return;
+  if (isPaused) return;
+  lastActivity = Date.now();
+  const pool = [
+    ...(anime?.dato   || []),
+    ...(anime?.opinion|| []),
+    ...GENERIC_COMMENTS
+  ];
+  say(rand(pool));
+}
+
+/* ══════════════════════════════════════════════════════
+   CARGAR EPISODIO
+══════════════════════════════════════════════════════ */
+function loadEpisode(index) {
+  const ep = anime.episodes[index];
+  if (!ep) return;
+  episode   = ep;
+  epIndex   = index;
+  ramTime   = 0;
+  tcUsed.clear();
+  stopTimer();
+  isYoutube = false;
+  ytPlayer  = null;
+
+  document.getElementById('ep-badge').textContent =
+    `${anime.name} · Ep ${ep.number}: ${ep.title}`;
+  document.getElementById('ram-status').textContent =
+    `Viendo episodio ${ep.number}`;
+  document.title = `${anime.name} Ep${ep.number} · Re:Anime`;
+  timeDisp.textContent = '00:00';
+
+  /* Renderizar embed */
+  const videoDiv = document.getElementById('video');
+  videoDiv.innerHTML = '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = ep.embed;
+  const iframe = tmp.querySelector('iframe');
+  if (iframe) {
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
+    iframe.allow = 'autoplay; fullscreen';
+    /* Intentar YouTube API */
+    const isYT = tryYouTubeAPI(iframe);
+    videoDiv.appendChild(iframe);
+    if (!isYT) {
+      /* Embed externo: mostrar hint de sync */
+      say(`Episodio ${ep.number}: ${ep.title}. Cuando empiece el video, escribe el tiempo en el campo Sync para que Ram sepa donde estas.`, 'sys');
+    } else {
+      say(`Episodio ${ep.number}: ${ep.title}. Ram detectara el tiempo automaticamente.`, 'sys');
+    }
+  } else {
+    videoDiv.innerHTML = ep.embed;
+    say('Video cargado.', 'sys');
+  }
+
+  localStorage.setItem('lastWatched', JSON.stringify({ id: anime.id, index }));
+  say(`${anime.name}, episodio ${ep.number}. Ram lista.`);
+}
+
+/* ══════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════ */
+const animeId = new URLSearchParams(location.search).get('id');
+
+fetch('animes.json').then(r => r.json()).then(list => {
+  anime = list.find(a => a.id === animeId);
+  if (!anime) { say('Anime no encontrado.', 'sys'); return; }
+
+  const last = JSON.parse(localStorage.getItem('lastWatched') || 'null');
+  const startIdx = (last?.id === anime.id) ? (last.index || 0) : 0;
+  loadEpisode(startIdx);
+});
+
+/* ══════════════════════════════════════════════════════
+   BOTONES
+══════════════════════════════════════════════════════ */
+document.querySelectorAll('.act-btn').forEach(btn => {
+  btn.onclick = () => {
+    const a = btn.dataset.a;
+    lastActivity = Date.now();
+
+    if (a === 'back') {
+      history.length > 1 ? history.back() : location.href = 'index.html';
+      return;
+    }
+    if (a === 'pause') {
+      togglePause();
+      return;
+    }
+    if (a === 'next') {
+      if (anime?.episodes[epIndex + 1]) {
+        say('Siguiente episodio.', 'sys');
+        loadEpisode(epIndex + 1);
+      } else {
+        say('No hay mas episodios disponibles por ahora.');
+      }
+      return;
+    }
+    if (a === 'fact') {
+      const pool = anime?.dato || [];
+      say(pool.length ? rand(pool) : 'No tengo datos guardados para este anime.');
+      return;
+    }
+    if (a === 'opinion') {
+      const pool = anime?.opinion || [];
+      say(pool.length ? rand(pool) : 'Sin opinion guardada para este anime.');
+      return;
+    }
+    if (a === 'react') {
+      const reactions = [
+        'Eso no lo esperaba.', 'Tipico de este personaje.', 'La animacion en este frame es notable.',
+        'Este momento va a importar despues.', 'Bien ejecutado.', 'Predecible.',
+        'Interesante eleccion de musica aqui.', 'El director sabe lo que hace.'
+      ];
+      say(rand(reactions));
+      return;
+    }
+    if (a === 'comment') {
+      const pool = [
+        ...(anime?.dato || []),
+        ...(anime?.opinion || []),
+        ...GENERIC_COMMENTS
+      ];
+      say(rand(pool));
+      return;
+    }
+  };
 });
 </script>
 
