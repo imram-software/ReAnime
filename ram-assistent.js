@@ -1,3 +1,10 @@
+/* Guard: previene doble carga si hay otro script de mascota en el repo */
+if (window._ramAssistantLoaded) {
+  console.warn('[Re:Anime] mascot script already loaded, skipping.');
+} else {
+  window._ramAssistantLoaded = true;
+  (function() {
+
 /* ══════════════════════════════════════════════════════════════
    RAM — ASISTENTE COMPLETO
    Personalidad: Ram de Re:Zero. Directa, sin emojis, sin exceso.
@@ -800,4 +807,8 @@ function handleChat(rawInput) {
   ];
   ramSay(fallbacks[Math.floor(Math.random() * fallbacks.length)]);
   showQuickReplies(['Recomiendame algo', 'Busco por genero', 'Ver los populares', 'Que generos hay']);
+}
+
+
+  })(); // end IIFE
 }
