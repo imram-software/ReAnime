@@ -890,64 +890,74 @@
   document.getElementById('news-prev').onclick = () => newsGoTo(newsIndex - 1);
   document.getElementById('news-next').onclick = () => newsGoTo(newsIndex + 1);
 
-  /* Mouse drag */
-  let dragStart = null, dragDelta = 0, isDragging = false;
+  /* ── Mouse drag ──
+     Threshold de 8px antes de activar drag.
+     preventDefault en mousedown evita que el browser
+     arrastre el link como objeto nativo.
+     Links solo se abren si no hubo movimiento real. */
+  let dragStart = null, dragDelta = 0, dragActive = false;
+
   newsWrap.addEventListener('mousedown', e => {
-    dragStart = e.clientX; dragDelta = 0; isDragging = false;
-    newsWrap.classList.add('dragging');
+    // Solo boton izquierdo
+    if (e.button !== 0) return;
+    e.preventDefault(); // evita drag nativo del link/imagen
+    dragStart  = e.clientX;
+    dragDelta  = 0;
+    dragActive = false;
     newsTrack.style.transition = 'none';
+    newsWrap.classList.add('dragging');
   });
+
   window.addEventListener('mousemove', e => {
     if (dragStart === null) return;
     dragDelta = e.clientX - dragStart;
-    isDragging = Math.abs(dragDelta) > 4;
-    if (isDragging) {
+    if (Math.abs(dragDelta) > 8) {
+      dragActive = true;
       newsTrack.style.transform = `translateX(${-newsIndex * CARD_W + dragDelta}px)`;
     }
   });
-  window.addEventListener('mouseup', () => {
+
+  window.addEventListener('mouseup', e => {
     if (dragStart === null) return;
     newsWrap.classList.remove('dragging');
-    dragStart = null;
-    const wasDragging = isDragging;
-    isDragging = false;
-    if (!wasDragging) return;
-    if      (dragDelta < -60) newsGoTo(newsIndex + 1);
-    else if (dragDelta >  60) newsGoTo(newsIndex - 1);
-    else newsGoTo(newsIndex);
+    const wasDrag = dragActive;
+    dragStart  = null;
+    dragActive = false;
+
+    if (wasDrag) {
+      // Soltar: snappear al card correcto
+      if      (dragDelta < -60) newsGoTo(newsIndex + 1);
+      else if (dragDelta >  60) newsGoTo(newsIndex - 1);
+      else                      newsGoTo(newsIndex);
+    } else {
+      // Sin drag real: abrir el link manualmente
+      const link = e.target.closest('a[href]');
+      if (link) window.open(link.href, link.target || '_self');
+    }
+    dragDelta = 0;
   });
 
-  /* Bloquear clicks en links si hubo drag */
-  newsWrap.addEventListener('click', e => {
-    if (Math.abs(dragDelta) > 10) {
-      e.preventDefault();
-      e.stopPropagation();
-      dragDelta = 0;
-    }
-  }, true);
-
   /* Touch */
-  let touchStart = null;
+  let touchStartX = null, touchDelta = 0;
   newsWrap.addEventListener('touchstart', e => {
-    touchStart = e.touches[0].clientX;
+    touchStartX = e.touches[0].clientX;
+    touchDelta  = 0;
     newsTrack.style.transition = 'none';
   }, { passive: true });
+
   newsWrap.addEventListener('touchmove', e => {
-    if (touchStart === null) return;
-    const d = e.touches[0].clientX - touchStart;
-    newsTrack.style.transform = `translateX(${-newsIndex * CARD_W + d}px)`;
+    if (touchStartX === null) return;
+    touchDelta = e.touches[0].clientX - touchStartX;
+    newsTrack.style.transform = `translateX(${-newsIndex * CARD_W + touchDelta}px)`;
   }, { passive: true });
-  newsWrap.addEventListener('touchend', e => {
-    if (touchStart === null) return;
-    const d = e.changedTouches[0].clientX - touchStart;
-    touchStart = null;
-    if (Math.abs(d) > 50) {
-      e.preventDefault(); // bloquear tap si fue swipe
-      if (d < 0) newsGoTo(newsIndex + 1);
-      else       newsGoTo(newsIndex - 1);
-    } else {
-      newsGoTo(newsIndex);
-    }
+
+  newsWrap.addEventListener('touchend', () => {
+    if (touchStartX === null) return;
+    touchStartX = null;
+    if      (touchDelta < -50) newsGoTo(newsIndex + 1);
+    else if (touchDelta >  50) newsGoTo(newsIndex - 1);
+    else                       newsGoTo(newsIndex);
+    touchDelta = 0;
   });
 
   /* ══════════════════════════════════════════════
