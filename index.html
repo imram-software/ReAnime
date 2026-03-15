@@ -149,7 +149,7 @@
         linear-gradient(90deg, rgba(255,45,120,0.04) 1px, transparent 1px);
       background-size: 60px 60px;
       mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
-      animation: gridDrift 18s linear infinite;
+      animation: gridDrift 6s linear infinite;
     }
     @keyframes gridDrift {
       0%   { background-position: 0 0; }
@@ -909,12 +909,22 @@
     if (dragStart === null) return;
     newsWrap.classList.remove('dragging');
     dragStart = null;
-    if (!isDragging) return;
+    const wasDragging = isDragging;
+    isDragging = false;
+    if (!wasDragging) return;
     if      (dragDelta < -60) newsGoTo(newsIndex + 1);
     else if (dragDelta >  60) newsGoTo(newsIndex - 1);
     else newsGoTo(newsIndex);
-    isDragging = false;
   });
+
+  /* Bloquear clicks en links si hubo drag */
+  newsWrap.addEventListener('click', e => {
+    if (Math.abs(dragDelta) > 10) {
+      e.preventDefault();
+      e.stopPropagation();
+      dragDelta = 0;
+    }
+  }, true);
 
   /* Touch */
   let touchStart = null;
@@ -931,9 +941,13 @@
     if (touchStart === null) return;
     const d = e.changedTouches[0].clientX - touchStart;
     touchStart = null;
-    if      (d < -50) newsGoTo(newsIndex + 1);
-    else if (d >  50) newsGoTo(newsIndex - 1);
-    else newsGoTo(newsIndex);
+    if (Math.abs(d) > 50) {
+      e.preventDefault(); // bloquear tap si fue swipe
+      if (d < 0) newsGoTo(newsIndex + 1);
+      else       newsGoTo(newsIndex - 1);
+    } else {
+      newsGoTo(newsIndex);
+    }
   });
 
   /* ══════════════════════════════════════════════
