@@ -991,116 +991,584 @@
     document.querySelector('.section-header').style.display = 'flex';
   });
 
-  /* ══════════════════════════════════════════════
-     MASCOT
-  ══════════════════════════════════════════════ */
-  const mascotCont = document.getElementById('mascot-container');
-  const mascotImg  = document.getElementById('mascot-img');
-  const mascotSpeech = document.getElementById('mascot-speech');
-  const mascotChat = document.getElementById('mascot-chat');
-  const chatMessages = document.getElementById('mascot-chat-messages');
-  const chatInput = document.getElementById('mascot-chat-input');
+  /* ══════════════════════════════════════════════════════════════
+   RAM — ENHANCED MASCOT CHAT
+   Reemplaza todo el bloque de mascota en tu index.html con esto.
+   Requiere que allAnimes[] ya esté cargado en el scope global.
+══════════════════════════════════════════════════════════════ */
 
-  let mPos = 10, mDir = 1;
-  function walkMascot() {
-    mPos += mDir * 0.12;
-    if (mPos > 75) mDir = -1;
-    if (mPos < 5)  mDir =  1;
-    mascotCont.style.left = mPos + 'vw';
-    mascotImg.style.transform = `scaleX(${mDir})`;
+/* ─── ESTADO DE MEMORIA ─── */
+const ram = {
+  memory: {
+    name: null,               // nombre del usuario si lo dijo
+    likedGenres: [],          // géneros que dijo que le gustan
+    dislikedGenres: [],       // géneros que rechazó
+    seenAnimes: [],           // animes ya recomendados
+    lastRecommended: null,    // último anime sugerido (objeto)
+    lastGenreAsked: null,     // último género que usamos para recomendar
+    askedForRec: false,       // está esperando si quiere recomendación
+    askedForAnother: false,   // está esperando si quiere otra rec
+    askedName: false,         // le preguntamos el nombre?
+    mood: null,               // "bored", "happy", "sad", etc.
+    sessionCount: 0,          // cuántas veces abrió el chat
+    lastTopic: null,          // último tema hablado
+  },
+
+  /* Pending state: qué está esperando Ram de respuesta */
+  pending: null,
+  /*
+    pending puede ser:
+    - 'confirm_rec'      → preguntó si quiere recomendación
+    - 'confirm_another'  → preguntó si quiere otra
+    - 'confirm_goto'     → preguntó si quiere ir al anime
+    - 'ask_genre'        → preguntó qué género quiere
+    - 'ask_name'         → preguntó el nombre
+    - 'confirm_good'     → preguntó si le gustó la recomendación
+  */
+};
+
+/* ─── DOM ─── */
+const mascotCont    = document.getElementById('mascot-container');
+const mascotImg     = document.getElementById('mascot-img');
+const mascotSpeech  = document.getElementById('mascot-speech');
+const mascotChat    = document.getElementById('mascot-chat');
+const chatMessages  = document.getElementById('mascot-chat-messages');
+const chatInput     = document.getElementById('mascot-chat-input');
+const chatSend      = document.getElementById('mascot-chat-send');
+const chatClose     = document.getElementById('mascot-chat-close');
+const chatActions   = document.getElementById('mascot-chat-actions');
+
+/* ─── MASCOT WALK ─── */
+let mPos = 10, mDir = 1;
+function walkMascot() {
+  mPos += mDir * 0.12;
+  if (mPos > 75) mDir = -1;
+  if (mPos < 5)  mDir =  1;
+  mascotCont.style.left = mPos + 'vw';
+  mascotImg.style.transform = `scaleX(${mDir})`;
+}
+setInterval(walkMascot, 30);
+
+/* ─── BUBBLES ALEATORIAS ─── */
+const idleBubbles = [
+  '¿Quieres una recomendación? 🌸',
+  '¡Hola! Soy Ram~',
+  '¿Buscas algo para ver hoy?',
+  '¡Haz clic en mí para chatear!',
+  '¿Isekai, romance o acción?',
+  'Tengo animes para todos los gustos 💖',
+  '¿Sabías que puedes filtrar por género?',
+  '¡Pregúntame lo que quieras!',
+];
+setInterval(() => {
+  if (mascotChat.classList.contains('hidden')) {
+    const msg = idleBubbles[Math.floor(Math.random() * idleBubbles.length)];
+    mascotSpeech.textContent = msg;
+    mascotSpeech.classList.remove('hidden');
+    setTimeout(() => mascotSpeech.classList.add('hidden'), 5000);
   }
-  setInterval(walkMascot, 30);
+}, 9000);
 
-  const mascotLines = [
-    '¿Quieres una recomendación?',
-    '¡Hola! Soy Ram 🌸',
-    '¿Buscas isekai, romance o acción?',
-    '¡Haz clic en mí para chatear!',
-    '¿Sabías que puedes filtrar por género?',
-    'Pregúntame lo que quieras~'
-  ];
-  setInterval(() => {
-    if (mascotChat.classList.contains('hidden')) {
-      mascotSpeech.textContent = mascotLines[Math.floor(Math.random() * mascotLines.length)];
-      mascotSpeech.classList.remove('hidden');
-      setTimeout(() => mascotSpeech.classList.add('hidden'), 5000);
-    }
-  }, 8000);
+/* ─── ABRIR / CERRAR CHAT ─── */
+mascotImg.onclick = () => {
+  mascotChat.classList.remove('hidden');
+  ram.memory.sessionCount++;
+  chatMessages.innerHTML = '';
 
-  mascotImg.onclick = () => {
-    mascotChat.classList.remove('hidden');
-    chatMessages.innerHTML = '';
-    addChatMsg('¡Hola! ¿En qué puedo ayudarte? 🌸', false);
-    chatInput.focus();
-  };
-  document.getElementById('mascot-chat-close').onclick = () => mascotChat.classList.add('hidden');
-  document.getElementById('mascot-chat-send').onclick = () => {
-    const v = chatInput.value.trim(); if (!v) return;
-    addChatMsg(v, true); chatInput.value = ''; handleChat(v);
-  };
-  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('mascot-chat-send').click(); });
-
-  function addChatMsg(text, isUser) {
-    const d = document.createElement('div');
-    d.className = `chat-msg ${isUser ? 'user' : 'bot'}`;
-    d.innerHTML = `<b>${isUser ? 'Tú' : 'Ram'}:</b> ${text}`;
-    chatMessages.appendChild(d);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+  if (ram.memory.sessionCount === 1) {
+    ramSay('¡Hola! Soy Ram, tu guía kawaii 🌸 ¿Cómo te puedo ayudar?');
+    setTimeout(() => {
+      ramSay('Puedo recomendarte animes, buscar por género, o simplemente charlar~');
+      setTimeout(() => {
+        ramSay('¿Quieres que te recomiende algo ahora?');
+        ram.pending = 'confirm_rec';
+        showQuickReplies(['Sí, recomiéndame', 'No por ahora', '¿Qué géneros hay?']);
+      }, 700);
+    }, 500);
+  } else if (ram.memory.name) {
+    ramSay(`¡Bienvenido de vuelta, ${ram.memory.name}! 💕 ¿Quieres otra recomendación?`);
+    ram.pending = 'confirm_rec';
+    showQuickReplies(['Sí!', 'No gracias', 'Busco por género']);
+  } else {
+    ramSay('¡Hola de nuevo! ¿Qué buscamos hoy? 🌸');
+    showQuickReplies(['Recomiéndame algo', 'Busco por género', '¿Qué hay de nuevo?']);
   }
 
-  function handleChat(raw) {
-    const msg = raw.toLowerCase();
-    const bad = ['puta','mierda','pendejo','idiot','imbecil','fuck','shit','bitch','asshole'];
-    if (bad.some(w => msg.includes(w))) {
-      addChatMsg('¡Eso no se dice! 😤', false);
-      return;
-    }
-    if (/^(hola|hello|hey|hi|buenas)/i.test(msg)) { addChatMsg('¡Hola! ¿Quieres una recomendación de anime? 🌸', false); return; }
-    if (/(gracias|thanks)/i.test(msg)) { addChatMsg('¡De nada! Aquí estaré siempre 💖', false); return; }
-    if (/(adiós|bye|chau)/i.test(msg)) { addChatMsg('¡Hasta luego! 👋', false); return; }
-    if (/(quién eres|quien eres|ram|mascota)/i.test(msg)) { addChatMsg('¡Soy Ram, tu guía kawaii de Re:Anime! 💕', false); return; }
+  chatInput.focus();
+};
 
-    if (!allAnimes.length) { addChatMsg('Aún estoy cargando los datos, ¡un momento!', false); return; }
+chatClose.onclick = () => {
+  mascotChat.classList.add('hidden');
+  ram.pending = null;
+  clearGoBtn();
+};
 
-    const allGenres = Array.from(new Set(allAnimes.flatMap(a => a.genre.map(g => g.toLowerCase()))));
-    const found = allGenres.find(g => msg.includes(g));
+/* ─── SEND ─── */
+chatSend.onclick = sendChat;
+chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
 
-    if (found) {
-      const matches = allAnimes.filter(a => a.genre.map(x => x.toLowerCase()).includes(found));
-      if (!matches.length) { addChatMsg(`No encontré animes de <b>${found}</b>. Intenta con otro género.`, false); return; }
-      const pick = matches[Math.floor(Math.random() * matches.length)];
-      addChatMsg(`Para <b>${found}</b> te recomiendo: <b>${pick.name}</b> 🎌`, false);
-      addGoBtn(pick);
-      return;
-    }
+function sendChat() {
+  const v = chatInput.value.trim();
+  if (!v) return;
+  addMsg(v, true);
+  chatInput.value = '';
+  clearQuickReplies();
+  handleChat(v);
+}
 
-    if (/(recomiéndame|recomienda|dame|anime|ver|suggestion)/i.test(msg)) {
-      const pick = allAnimes[Math.floor(Math.random() * allAnimes.length)];
-      addChatMsg(`¡Te recomiendo: <b>${pick.name}</b>! ¿Lo vemos? 👀`, false);
-      addGoBtn(pick);
-      return;
-    }
-
-    if (/(género|genero|tipos)/i.test(msg)) {
-      const glist = Array.from(new Set(allAnimes.flatMap(a => a.genre))).join(', ');
-      addChatMsg(`Los géneros disponibles son: <b>${glist}</b>`, false);
-      return;
-    }
-
-    addChatMsg('No entendí del todo, pero puedo recomendarte un anime. ¿Quieres uno? 🌸', false);
-  }
-
-  function addGoBtn(anime) {
-    const actions = document.getElementById('mascot-chat-actions');
-    const old = document.getElementById('mascot-go-btn');
-    if (old) old.remove();
+/* ─── QUICK REPLIES ─── */
+function showQuickReplies(options) {
+  clearQuickReplies();
+  const wrap = document.createElement('div');
+  wrap.id = 'quick-replies';
+  wrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.5rem;';
+  options.forEach(opt => {
     const btn = document.createElement('button');
-    btn.id = 'mascot-go-btn';
-    btn.textContent = `→ Ver ${anime.name}`;
-    btn.style.cssText = 'background:var(--pink);border:none;color:#fff;border-radius:6px;padding:0.4rem 0.8rem;cursor:pointer;font-size:0.8rem;font-family:var(--font-body)';
-    btn.onclick = () => window.location.href = `anime.html?id=${anime.id}`;
-    actions.insertBefore(btn, actions.firstChild);
+    btn.textContent = opt;
+    btn.style.cssText = `
+      background:var(--bg3); border:1px solid var(--border);
+      color:var(--rose); border-radius:20px; padding:0.3rem 0.75rem;
+      font-size:0.75rem; cursor:pointer; font-family:var(--font-body);
+      transition:all 0.2s;
+    `;
+    btn.onmouseover = () => { btn.style.borderColor = 'var(--pink)'; btn.style.color = 'var(--pink)'; };
+    btn.onmouseout  = () => { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--rose)'; };
+    btn.onclick = () => {
+      addMsg(opt, true);
+      clearQuickReplies();
+      handleChat(opt);
+    };
+    wrap.appendChild(btn);
+  });
+  chatActions.insertBefore(wrap, chatActions.firstChild);
+}
+
+function clearQuickReplies() {
+  const old = document.getElementById('quick-replies');
+  if (old) old.remove();
+}
+
+/* ─── GO BTN ─── */
+function showGoBtn(anime) {
+  clearGoBtn();
+  const btn = document.createElement('button');
+  btn.id = 'mascot-go-btn';
+  btn.textContent = `→ Ver "${anime.name}"`;
+  btn.style.cssText = `
+    background:var(--pink); border:none; color:#fff; border-radius:6px;
+    padding:0.45rem 0.9rem; cursor:pointer; font-size:0.8rem;
+    font-family:var(--font-body); font-weight:700; width:100%;
+    margin-bottom:0.3rem; transition:opacity 0.2s;
+  `;
+  btn.onmouseover = () => btn.style.opacity = '0.85';
+  btn.onmouseout  = () => btn.style.opacity = '1';
+  btn.onclick = () => window.location.href = `anime.html?id=${anime.id}`;
+  chatActions.insertBefore(btn, chatActions.firstChild);
+}
+function clearGoBtn() {
+  const old = document.getElementById('mascot-go-btn');
+  if (old) old.remove();
+}
+
+/* ─── ADD MESSAGE ─── */
+function addMsg(text, isUser) {
+  const d = document.createElement('div');
+  d.className = `chat-msg ${isUser ? 'user' : 'bot'}`;
+  d.innerHTML = `<b>${isUser ? 'Tú' : 'Ram'}:</b> ${text}`;
+  chatMessages.appendChild(d);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+function ramSay(text, delay = 0) {
+  if (delay) { setTimeout(() => addMsg(text, false), delay); }
+  else addMsg(text, false);
+}
+
+/* ─── UTILITIES ─── */
+const YES = /^(sí|si|sip|claro|dale|ok|okay|sí!|si!|yeah|yep|quiero|anda|por favor|ofc|obvio|bueno|va|va!|venga|yes|yep|sure|ofc|obvio|dale!|sigo|más|mas|otra|otro|otro!|otra!)/i;
+const NO  = /^(no|nel|nop|nope|no gracias|no quiero|paso|better not|nah|ni|never|jamás|jamas)/i;
+const BAD = ['puta','mierda','pendejo','idiot','imbecil','fuck','shit','bitch','asshole','hdp','ojete'];
+
+function pickAnime(genreFilter = null, exclude = []) {
+  let pool = allAnimes.filter(a => !exclude.includes(a.id));
+  if (genreFilter) pool = pool.filter(a => a.genre.map(g=>g.toLowerCase()).includes(genreFilter.toLowerCase()));
+  if (!pool.length) pool = allAnimes.filter(a => !exclude.includes(a.id));
+  if (!pool.length) pool = allAnimes;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function getAnimesByGenre(g) {
+  return allAnimes.filter(a => a.genre.map(x=>x.toLowerCase()).includes(g.toLowerCase()));
+}
+
+function detectGenre(msg) {
+  if (!allAnimes.length) return null;
+  const all = Array.from(new Set(allAnimes.flatMap(a => a.genre.map(g=>g.toLowerCase()))));
+  return all.find(g => msg.toLowerCase().includes(g)) || null;
+}
+
+function detectMood(msg) {
+  if (/(aburr|bored|no sé qué ver|qué veo|no sé)/i.test(msg)) return 'bored';
+  if (/(triste|sad|mal|depre|llorar)/i.test(msg))               return 'sad';
+  if (/(feliz|contento|buenas|excelente|happy)/i.test(msg))     return 'happy';
+  if (/(estresad|cansad|tired|exhaust)/i.test(msg))             return 'stressed';
+  return null;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MAIN HANDLER
+═══════════════════════════════════════════════════════ */
+function handleChat(rawInput) {
+  const msg = rawInput.trim();
+  const lo  = msg.toLowerCase();
+
+  /* ── FILTRO DE GROSERÍAS ── */
+  if (BAD.some(w => lo.includes(w))) {
+    ramSay('¡Eso no se dice! 😤 Sigo aquí si me tratas bien~');
+    ram.pending = null;
+    return;
   }
+
+  /* ── RESPONDER SEGÚN PENDING ── */
+  if (ram.pending) {
+
+    /* Esperando confirmación de recomendación */
+    if (ram.pending === 'confirm_rec') {
+      if (YES.test(msg)) {
+        ram.pending = null;
+        ram.memory.askedForRec = true;
+        if (ram.memory.likedGenres.length) {
+          const g = ram.memory.likedGenres[Math.floor(Math.random() * ram.memory.likedGenres.length)];
+          const pick = pickAnime(g, ram.memory.seenAnimes);
+          ram.memory.lastRecommended = pick;
+          ram.memory.seenAnimes.push(pick.id);
+          ramSay(`Sé que te gusta el <b>${g}</b>, así que... 🎌 te recomiendo: <b>${pick.name}</b>!`);
+          showGoBtn(pick);
+          setTimeout(() => {
+            ramSay('¿Le diste play? ¿Qué te pareció?', 1200);
+            ram.pending = 'confirm_good';
+            setTimeout(() => showQuickReplies(['¡Me encantó!', 'No era para mí', 'Aún no lo veo', 'Dame otro']), 1300);
+          }, 800);
+        } else {
+          ramSay('¿Tienes algún género favorito? 🎌');
+          ram.pending = 'ask_genre';
+          buildGenreQuickReplies();
+        }
+        return;
+      }
+      if (NO.test(msg)) {
+        ram.pending = null;
+        ramSay('¡Está bien! Aquí estaré cuando quieras~');
+        showQuickReplies(['Busco por género', '¿Qué es popular?', '¿Cuántos animes hay?']);
+        return;
+      }
+    }
+
+    /* Esperando género */
+    if (ram.pending === 'ask_genre') {
+      const g = detectGenre(msg) || lo.replace(/[^a-záéíóú\s]/gi,'').trim();
+      if (g && getAnimesByGenre(g).length) {
+        if (!ram.memory.likedGenres.includes(g)) ram.memory.likedGenres.push(g);
+        ram.memory.lastGenreAsked = g;
+        const pick = pickAnime(g, ram.memory.seenAnimes);
+        ram.memory.lastRecommended = pick;
+        ram.memory.seenAnimes.push(pick.id);
+        ram.pending = null;
+        ramSay(`¡Perfecto! Para <b>${g}</b> te recomiendo: <b>${pick.name}</b> 🌸`);
+        showGoBtn(pick);
+        setTimeout(() => {
+          ramSay('¿Lo quieres ver? 🎌', 600);
+          ram.pending = 'confirm_goto';
+          setTimeout(() => showQuickReplies(['Sí, vamos!', 'Dame otro', 'No por ahora']), 700);
+        }, 400);
+        return;
+      } else {
+        ramSay(`Mmm, no encontré animes de <b>${g || msg}</b>. ¿Probamos con otro género?`);
+        buildGenreQuickReplies();
+        return;
+      }
+    }
+
+    /* Esperando si va al anime */
+    if (ram.pending === 'confirm_goto') {
+      if (YES.test(msg) && ram.memory.lastRecommended) {
+        window.location.href = `anime.html?id=${ram.memory.lastRecommended.id}`;
+        return;
+      }
+      if (/otro|another|more|más|mas/i.test(msg)) {
+        ram.pending = null;
+        giveAnotherRec();
+        return;
+      }
+      if (NO.test(msg)) {
+        ram.pending = null;
+        ramSay('¡De acuerdo! Cuando quieras, aquí estaré 💕');
+        showQuickReplies(['Dame otro', 'Cambiar género', 'Gracias']);
+        return;
+      }
+    }
+
+    /* Esperando si quiere otra recomendación */
+    if (ram.pending === 'confirm_another') {
+      if (YES.test(msg)) {
+        ram.pending = null;
+        giveAnotherRec();
+        return;
+      }
+      if (NO.test(msg)) {
+        ram.pending = null;
+        ramSay('¡Perfecto! Espero que disfrutes el anime 🎌');
+        showQuickReplies(['Gracias Ram', 'Buscar otro género']);
+        return;
+      }
+    }
+
+    /* Esperando feedback de si le gustó */
+    if (ram.pending === 'confirm_good') {
+      ram.pending = null;
+      if (/(encantó|loved|amé|me gustó|buenísimo|buenisimo|genial|amazing|great|perfecto)/i.test(msg)) {
+        const g = ram.memory.lastRecommended?.genre?.[0]?.toLowerCase();
+        if (g && !ram.memory.likedGenres.includes(g)) ram.memory.likedGenres.push(g);
+        ramSay(`¡Me alegra mucho! 🎉 Voy anotando que te gusta el <b>${g || 'ese estilo'}</b>~`);
+        setTimeout(() => {
+          ramSay('¿Quieres que te recomiende otro parecido?', 500);
+          ram.pending = 'confirm_another';
+          setTimeout(() => showQuickReplies(['Sí, otro!', 'No por ahora']), 600);
+        }, 300);
+        return;
+      }
+      if (/(no era|no me gustó|no me gusto|malo|aburrido|otro|not good|meh|regular)/i.test(msg)) {
+        const g = ram.memory.lastRecommended?.genre?.[0]?.toLowerCase();
+        if (g && !ram.memory.dislikedGenres.includes(g)) ram.memory.dislikedGenres.push(g);
+        ramSay(`¡Oh no! Lo anoto para no repetir ese estilo 📝`);
+        setTimeout(() => {
+          ramSay('¿Quieres que busque algo diferente?', 400);
+          ram.pending = 'confirm_rec';
+          setTimeout(() => showQuickReplies(['Sí, prueba otro', 'Buscar por género', 'No gracias']), 500);
+        }, 200);
+        return;
+      }
+      if (/(aún no|todavía|still|not yet|después|luego|despues)/i.test(msg)) {
+        ramSay('¡No hay apuro! Aquí estaré cuando lo termines 🌸');
+        showQuickReplies(['Quiero otro anime', 'Dame algo similar', 'Gracias']);
+        return;
+      }
+      if (/dame otro|otro|another/i.test(msg)) {
+        giveAnotherRec();
+        return;
+      }
+      ramSay('¡Bueno! Si quieres más recomendaciones, aquí estaré 💕');
+      showQuickReplies(['Dame otro', 'Buscar por género']);
+      return;
+    }
+
+    /* Esperando nombre */
+    if (ram.pending === 'ask_name') {
+      ram.pending = null;
+      const name = msg.split(' ')[0];
+      ram.memory.name = name.charAt(0).toUpperCase() + name.slice(1);
+      ramSay(`¡Encantada, ${ram.memory.name}! 💖 Ahora te voy a dar las mejores recomendaciones~`);
+      setTimeout(() => {
+        ramSay('¿Quieres que te recomiende algo ahora?', 400);
+        ram.pending = 'confirm_rec';
+        setTimeout(() => showQuickReplies(['Sí!', 'Más tarde']), 500);
+      }, 200);
+      return;
+    }
+  }
+
+  /* ── FLUJO LIBRE (sin pending) ── */
+
+  /* Saludos */
+  if (/^(hola|hello|hey|hi|buenas|holi|buen dia|buenas tardes|buenas noches)/i.test(lo)) {
+    if (ram.memory.name) {
+      ramSay(`¡${ram.memory.name}! Qué bueno verte 💕 ¿Qué buscamos hoy?`);
+      showQuickReplies(['Recomiéndame algo', 'Busco por género', 'Quiero ver algo parecido']);
+    } else {
+      ramSay('¡Hola! ¿Cómo me llamas? Me gustaría saber tu nombre 🌸');
+      ram.pending = 'ask_name';
+    }
+    return;
+  }
+
+  /* Presentación / nombre */
+  if (/(me llamo|soy |mi nombre es|llámame|llamame)/i.test(lo)) {
+    const match = lo.match(/(?:me llamo|soy|mi nombre es|llámame|llamame)\s+(\w+)/i);
+    if (match) {
+      ram.pending = null;
+      const name = match[1].charAt(0).toUpperCase() + match[1].slice(1);
+      ram.memory.name = name;
+      ramSay(`¡Qué bonito nombre, ${name}! 💖 Voy a recordarlo~`);
+      setTimeout(() => {
+        ramSay('¿Quieres que te recomiende algo?', 400);
+        ram.pending = 'confirm_rec';
+        setTimeout(() => showQuickReplies(['Claro!', 'Ahorita no']), 500);
+      }, 200);
+      return;
+    }
+  }
+
+  /* Mood detection */
+  const mood = detectMood(lo);
+  if (mood && mood !== ram.memory.mood) {
+    ram.memory.mood = mood;
+    const moodResponses = {
+      bored:    ['¡Un anime es la solución perfecta! 🎌 ¿Quieres una rec?', 'confirm_rec', ['Sí!', 'Dame algo corto', 'Busco por género']],
+      sad:      ['Aw 💕 ¿Quieres algo reconfortante o prefieres acción para distraerte?', 'ask_genre', ['Romance', 'Comedia', 'Acción', 'Slice of Life']],
+      happy:    ['¡Me alegra! 🎉 ¿Celebramos con un buen anime?', 'confirm_rec', ['Sí, va!', 'Algo épico', 'Algo chill']],
+      stressed: ['Respira~ 🌸 ¿Un anime tranquilo te ayudaría?', 'confirm_rec', ['Sí, algo relajante', 'Prefiero acción', 'No gracias']],
+    };
+    const [reply, pend, qr] = moodResponses[mood];
+    ramSay(reply);
+    ram.pending = pend;
+    setTimeout(() => showQuickReplies(qr), 400);
+    return;
+  }
+
+  /* Detectar si pregunta qué géneros hay */
+  if (/(género|genero|tipos|categoría|categorias)/i.test(lo)) {
+    const all = Array.from(new Set(allAnimes.flatMap(a => a.genre))).sort();
+    ramSay(`Los géneros que tengo son: <b>${all.join(', ')}</b> 🎌`);
+    setTimeout(() => {
+      ramSay('¿Quieres que te recomiende algo de alguno?', 500);
+      ram.pending = 'ask_genre';
+      buildGenreQuickReplies();
+    }, 300);
+    return;
+  }
+
+  /* Detectar género en el mensaje */
+  const foundGenre = detectGenre(lo);
+  if (foundGenre) {
+    if (!ram.memory.likedGenres.includes(foundGenre)) ram.memory.likedGenres.push(foundGenre);
+    ram.memory.lastGenreAsked = foundGenre;
+    const pick = pickAnime(foundGenre, ram.memory.seenAnimes);
+    ram.memory.lastRecommended = pick;
+    ram.memory.seenAnimes.push(pick.id);
+    ramSay(`¡Buen gusto! Para <b>${foundGenre}</b> te recomiendo: <b>${pick.name}</b> 🌸`);
+    showGoBtn(pick);
+    setTimeout(() => {
+      ram.pending = 'confirm_goto';
+      showQuickReplies(['Sí, lo veo!', 'Dame otro', 'Buscar otro género']);
+    }, 500);
+    return;
+  }
+
+  /* Pedir recomendación explícita */
+  if (/(recomiéndame|recomienda|dame|quiero ver|ponme|muéstrame|anime|suggestion|suggest|what to watch)/i.test(lo)) {
+    if (ram.memory.likedGenres.length) {
+      const liked = ram.memory.likedGenres.join(', ');
+      ramSay(`Sé que te gusta: <b>${liked}</b> 📝 ¿Recomiend dentro de eso o pruebas algo nuevo?`);
+      showQuickReplies(
+        [...ram.memory.likedGenres.slice(0,3).map(g => `Sí, de ${g}`), 'Sorpréndeme']
+      );
+      ram.pending = 'ask_genre';
+    } else {
+      ramSay('¡Vamos! ¿Tienes algún género favorito? 🎌');
+      ram.pending = 'ask_genre';
+      buildGenreQuickReplies();
+    }
+    return;
+  }
+
+  /* Quiere otro */
+  if (/(otro|otra|more|another|una más|uno más|diferente|siguiente)/i.test(lo)) {
+    giveAnotherRec();
+    return;
+  }
+
+  /* Preguntas sobre Ram */
+  if (/(quién eres|quien eres|ram|eres real|qué eres|que eres|cómo te llamas|como te llamas)/i.test(lo)) {
+    ramSay('¡Soy Ram, tu asistente kawaii de Re:Anime! 💖');
+    setTimeout(() => ramSay('Puedo recomendarte animes y recordar tus gustos~', 400), 200);
+    if (ram.memory.likedGenres.length) {
+      setTimeout(() => ramSay(`Por cierto, sé que te gustan: <b>${ram.memory.likedGenres.join(', ')}</b> 📝`, 800), 600);
+    }
+    return;
+  }
+
+  /* Cuántos animes */
+  if (/(cuántos|cuantos|how many)/i.test(lo)) {
+    ramSay(`Tengo <b>${allAnimes.length}</b> animes en mi base de datos 🎌 ¡y siguen creciendo!`);
+    setTimeout(() => {
+      ramSay('¿Quieres que te recomiende uno?', 500);
+      ram.pending = 'confirm_rec';
+      setTimeout(() => showQuickReplies(['Sí!', 'Busco por género']), 600);
+    }, 300);
+    return;
+  }
+
+  /* Agradecimiento */
+  if (/(gracias|thanks|thank you|genial|eres la mejor|te quiero|te amo)/i.test(lo)) {
+    const replies = [
+      '¡De nada! Para eso estoy 💖',
+      `¡Gracias a ti${ram.memory.name ? ', '+ram.memory.name : ''}! 🌸`,
+      '¡Con mucho gusto! ¿Algo más? 🎌',
+    ];
+    ramSay(replies[Math.floor(Math.random()*replies.length)]);
+    showQuickReplies(['Dame otro anime', 'Cambiar género', 'No, ya estoy bien']);
+    return;
+  }
+
+  /* Despedidas */
+  if (/(adiós|adios|bye|chau|hasta luego|nos vemos|ciao)/i.test(lo)) {
+    const name = ram.memory.name ? `, ${ram.memory.name}` : '';
+    ramSay(`¡Hasta luego${name}! 💕 Vuelve cuando quieras~`);
+    setTimeout(() => mascotChat.classList.add('hidden'), 1500);
+    return;
+  }
+
+  /* Popular / trending */
+  if (/(popular|trending|top|mejor|mejores|top anime)/i.test(lo)) {
+    ramSay('¡Buena pregunta! Aquí van algunos muy populares 🔥');
+    const tops = allAnimes.slice(0, 3);
+    tops.forEach((a, i) => {
+      setTimeout(() => ramSay(`<b>${i+1}.</b> ${a.name}`), i * 300);
+    });
+    setTimeout(() => {
+      ramSay('¿Quieres ir a uno de ellos?', tops.length * 300 + 200);
+      setTimeout(() => showQuickReplies([...tops.map(a => a.name.slice(0,16)), 'Dame otro género']), tops.length * 300 + 300);
+      ram.pending = null;
+    }, tops.length * 200);
+    return;
+  }
+
+  /* Fallback inteligente */
+  const fallbacks = [
+    'No entendí del todo, pero puedo ayudarte 🌸 ¿Qué buscas?',
+    '¡Pregúntame por género, estado de ánimo o simplemente di "recomiéndame"! 🎌',
+    'Hmm, no entendí... ¿quieres una recomendación?',
+    `¿Me repites eso? A veces soy un poco torpe 😅`,
+  ];
+  ramSay(fallbacks[Math.floor(Math.random() * fallbacks.length)]);
+  showQuickReplies(['Recomiéndame algo', 'Busco por género', '¿Qué géneros hay?']);
+}
+
+/* ─── HELPER: dar otra recomendación ─── */
+function giveAnotherRec() {
+  const g = ram.memory.lastGenreAsked || (ram.memory.likedGenres[0] || null);
+  const avoid = [...ram.memory.seenAnimes, ...(ram.memory.dislikedGenres.length
+    ? allAnimes.filter(a => a.genre.map(x=>x.toLowerCase()).some(x => ram.memory.dislikedGenres.includes(x))).map(a=>a.id)
+    : [])];
+  const pick = pickAnime(g, avoid);
+  ram.memory.lastRecommended = pick;
+  ram.memory.seenAnimes.push(pick.id);
+  const prefix = g ? `Otro de <b>${g}</b>: ` : '';
+  ramSay(`${prefix}<b>${pick.name}</b> 🎌 ¿Qué te parece?`);
+  showGoBtn(pick);
+  setTimeout(() => {
+    ram.pending = 'confirm_good';
+    showQuickReplies(['¡Me interesa!', 'Dame otro', 'Buscar diferente género', 'No gracias']);
+  }, 500);
+}
+
+/* ─── HELPER: quick replies de géneros ─── */
+function buildGenreQuickReplies() {
+  if (!allAnimes.length) return;
+  const all = Array.from(new Set(allAnimes.flatMap(a => a.genre))).sort();
+  const preferred = ram.memory.likedGenres.slice(0, 2);
+  const rest = all.filter(g => !preferred.includes(g)).slice(0, 4 - preferred.length);
+  showQuickReplies([...preferred, ...rest].slice(0, 4));
+}
 
   /* ══════════════════════════════════════════════
      IF URL HAS PARAMS, SKIP INTRO
