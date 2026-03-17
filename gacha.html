@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Re:Anime · Gacha</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;700&family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #080808;
+      --bg2:      #111;
+      --bg3:      #1a1a1a;
+      --surface:  #161616;
+      --border:   #222;
+      --pink:     #ff2d78;
+      --pink-dim: #ff2d7822;
+      --pink-glow:#ff2d7855;
+      --rose:     #ff6fa8;
+      --text:     #e8e8e8;
+      --muted:    #555;
+      --gold:     #fbbf24;
+      --silver:   #94a3b8;
+      --bronze:   #c97f4a;
+      --r5:       #fbbf24;
+      --r4:       #c084fc;
+      --r3:       #38bdf8;
+      --r2:       #86efac;
+      --r1:       #94a3b8;
+      --font-h:   'Bebas Neue', cursive;
+      --font-b:   'DM Sans', sans-serif;
+      --font-jp:  'Noto Sans JP', sans-serif;
+      --radius:   10px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-thumb { background:var(--pink); border-radius:2px; }
+
+    body {
+      font-family: var(--font-b);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Noise texture */
+    body::before {
+      content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-size:200px 200px; opacity:0.4; transform:translateZ(0);
+    }
+
+    /* ── HEADER ── */
+    header {
+      position:fixed; top:0; left:0; right:0; z-index:900;
+      height:56px; display:flex; align-items:center; justify-content:space-between;
+      padding:0 2rem;
+      background:rgba(8,8,8,0.95); backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--border);
+    }
+    .logo {
+      font-family:var(--font-h); font-size:2rem; letter-spacing:3px;
+      color:var(--pink); text-decoration:none;
+      text-shadow:0 0 20px var(--pink-glow);
+    }
+    .logo span { color:var(--text); }
+    .back-header {
+      background:none; border:1px solid var(--border); color:var(--muted);
+      border-radius:6px; padding:0.4rem 0.9rem; font-size:0.82rem;
+      cursor:pointer; font-family:var(--font-b); transition:all 0.2s;
+    }
+    .back-header:hover { border-color:var(--pink); color:var(--pink); }
+
+    /* ── MAIN ── */
+    .page {
+      max-width:1100px; margin:0 auto; padding:80px 2rem 4rem;
+      position:relative; z-index:1;
+    }
+
+    /* Page title */
+    .gacha-title {
+      font-family:var(--font-h); font-size:clamp(2.5rem,6vw,4.5rem);
+      letter-spacing:6px; text-align:center; margin-bottom:0.3rem;
+      background: linear-gradient(135deg, #fff 30%, var(--pink) 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .gacha-sub {
+      text-align:center; color:var(--muted); font-size:0.82rem;
+      letter-spacing:3px; text-transform:uppercase;
+      margin-bottom:2.5rem;
+    }
+
+    /* ── BANNER TABS ── */
+    .banner-tabs {
+      display:flex; gap:0.75rem; justify-content:center;
+      margin-bottom:2rem; flex-wrap:wrap;
+    }
+    .banner-tab {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:0.7rem 1.6rem;
+      cursor:pointer; font-family:var(--font-b); font-size:0.85rem;
+      color:var(--muted); transition:all 0.25s; text-align:center;
+    }
+    .banner-tab .tab-name { font-family:var(--font-h); font-size:1.1rem; letter-spacing:2px; display:block; }
+    .banner-tab .tab-sub  { font-size:0.68rem; letter-spacing:1px; margin-top:0.1rem; opacity:0.6; }
+    .banner-tab:hover { border-color:var(--rose); color:var(--text); }
+    .banner-tab.active { border-color:var(--pink); color:var(--text); background:var(--pink-dim); }
+    .banner-tab.active .tab-name { color:var(--pink); }
+
+    /* ── BANNER DISPLAY ── */
+    .banner-area {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:2rem;
+      margin-bottom:1.5rem; position:relative; overflow:hidden;
+    }
+    .banner-bg {
+      position:absolute; inset:0; opacity:0.04;
+      background:radial-gradient(ellipse 80% 60% at 50% 100%, var(--pink) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    .banner-info {
+      position:relative; z-index:1;
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:1rem;
+    }
+    .banner-name {
+      font-family:var(--font-h); font-size:2rem; letter-spacing:3px; color:var(--text);
+    }
+    .banner-name em { color:var(--pink); font-style:normal; }
+    .banner-desc { color:var(--muted); font-size:0.82rem; margin-top:0.2rem; max-width:480px; }
+
+    /* Pull buttons */
+    .pull-btns { display:flex; gap:0.75rem; flex-wrap:wrap; }
+    .pull-btn {
+      background:var(--pink); border:none; color:#fff;
+      border-radius:var(--radius); padding:0.75rem 1.8rem;
+      font-family:var(--font-h); font-size:1.2rem; letter-spacing:2px;
+      cursor:pointer; transition:all 0.2s;
+      box-shadow:0 0 20px var(--pink-glow);
+      display:flex; flex-direction:column; align-items:center; gap:0.1rem;
+    }
+    .pull-btn:hover { opacity:0.85; transform:translateY(-2px); }
+    .pull-btn:active { transform:translateY(0); }
+    .pull-btn.x10 { background:linear-gradient(135deg, #c026d3, var(--pink)); }
+    .pull-btn .btn-label { font-size:0.65rem; letter-spacing:2px; opacity:0.8; font-family:var(--font-b); }
+    .pull-btn.disabled { opacity:0.35; pointer-events:none; }
+
+    /* ── RESULT AREA ── */
+    #result-area {
+      min-height:320px; position:relative;
+    }
+
+    /* Card grid */
+    .cards-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+      gap:1rem;
+      animation:fadeUp 0.4s ease forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* Character card */
+    .char-card {
+      position:relative; border-radius:var(--radius);
+      overflow:hidden; aspect-ratio:2/3;
+      border:2px solid var(--border);
+      cursor:pointer; background:var(--bg3);
+      transition:transform 0.3s, border-color 0.3s;
+      animation:cardReveal 0.4s cubic-bezier(.34,1.56,.64,1) backwards;
+    }
+    .char-card:hover { transform:translateY(-4px) scale(1.03); }
+
+    @keyframes cardReveal {
+      from { opacity:0; transform:scale(0.7) rotateY(90deg); }
+      to   { opacity:1; transform:scale(1) rotateY(0deg); }
+    }
+
+    .char-card img {
+      width:100%; height:100%; object-fit:cover; object-position:top;
+      display:block; transition:filter 0.3s;
+    }
+    .char-card:hover img { filter:brightness(0.7); }
+
+    .char-overlay {
+      position:absolute; inset:0;
+      background:linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.2) 50%, transparent 70%);
+      display:flex; flex-direction:column; justify-content:flex-end;
+      padding:0.75rem;
+    }
+    .char-stars { font-size:0.65rem; letter-spacing:1px; margin-bottom:0.2rem; }
+    .char-name {
+      font-family:var(--font-h); font-size:0.95rem; letter-spacing:1px;
+      line-height:1.1; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.8);
+    }
+    .char-anime { font-size:0.62rem; color:rgba(255,255,255,0.5); margin-top:0.2rem; }
+
+    /* Rarity borders */
+    .char-card.r5 { border-color:var(--r5); box-shadow:0 0 16px rgba(251,191,36,0.3); }
+    .char-card.r4 { border-color:var(--r4); box-shadow:0 0 12px rgba(192,132,252,0.25); }
+    .char-card.r3 { border-color:var(--r3); }
+    .char-card.r2 { border-color:var(--r2); }
+    .char-card.r1 { border-color:var(--border); }
+
+    .stars-r5 { color:var(--r5); }
+    .stars-r4 { color:var(--r4); }
+    .stars-r3 { color:var(--r3); }
+    .stars-r2 { color:var(--r2); }
+    .stars-r1 { color:var(--r1); }
+
+    /* ── SINGLE PULL BIG REVEAL ── */
+    .single-reveal {
+      display:flex; justify-content:center;
+      animation:fadeUp 0.4s ease forwards;
+    }
+    .single-reveal .char-card {
+      width:260px; max-width:90vw; aspect-ratio:2/3;
+    }
+
+    /* ── LOADING SPINNER ── */
+    .pull-loading {
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:center; gap:1rem; min-height:280px; color:var(--muted);
+    }
+    .spinner {
+      width:48px; height:48px;
+      border:3px solid var(--border);
+      border-top-color:var(--pink);
+      border-radius:50%;
+      animation:spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── EMPTY / INACTIVE BANNER ── */
+    .banner-inactive {
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:center; min-height:280px; gap:1rem;
+      color:var(--muted); text-align:center;
+    }
+    .banner-inactive .bi-icon { font-size:3rem; opacity:0.3; }
+    .banner-inactive p { font-size:0.88rem; max-width:320px; line-height:1.6; }
+
+    /* ── DETAIL MODAL ── */
+    #modal {
+      position:fixed; inset:0; z-index:2000;
+      background:rgba(0,0,0,0.85); backdrop-filter:blur(8px);
+      display:flex; align-items:center; justify-content:center;
+      padding:1rem;
+      opacity:0; pointer-events:none;
+      transition:opacity 0.25s;
+    }
+    #modal.open { opacity:1; pointer-events:auto; }
+    .modal-box {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:var(--radius); overflow:hidden;
+      max-width:420px; width:100%;
+      display:flex; flex-direction:column;
+      animation:modalIn 0.3s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform:scale(0.85); }
+      to   { opacity:1; transform:scale(1); }
+    }
+    .modal-img {
+      width:100%; height:280px; object-fit:cover; object-position:top;
+      display:block;
+    }
+    .modal-body { padding:1.4rem; }
+    .modal-stars { font-size:1rem; margin-bottom:0.4rem; }
+    .modal-name {
+      font-family:var(--font-h); font-size:2rem; letter-spacing:2px;
+      color:var(--text); margin-bottom:0.2rem; line-height:1;
+    }
+    .modal-anime { color:var(--pink); font-size:0.82rem; margin-bottom:0.8rem; }
+    .modal-desc { color:var(--muted); font-size:0.83rem; line-height:1.65; }
+    .modal-close {
+      margin-top:1.2rem; width:100%; background:none;
+      border:1px solid var(--border); color:var(--muted);
+      border-radius:6px; padding:0.55rem;
+      cursor:pointer; font-family:var(--font-b); transition:all 0.2s;
+    }
+    .modal-close:hover { border-color:var(--pink); color:var(--pink); }
+
+    /* ── HISTORY ── */
+    .history-title {
+      font-family:var(--font-h); font-size:1.3rem; letter-spacing:2px;
+      color:var(--text); margin:2rem 0 0.8rem;
+    }
+    .history-title em { color:var(--pink); font-style:normal; }
+    .history-grid {
+      display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.5rem;
+    }
+    .history-grid::-webkit-scrollbar { height:2px; }
+    .history-chip {
+      flex-shrink:0; border-radius:6px; overflow:hidden;
+      width:48px; height:64px; border:1px solid var(--border);
+      cursor:pointer; transition:transform 0.2s;
+    }
+    .history-chip:hover { transform:scale(1.1); }
+    .history-chip img { width:100%; height:100%; object-fit:cover; object-position:top; display:block; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:600px) {
+      .pull-btns { justify-content:center; }
+      .banner-info { flex-direction:column; align-items:flex-start; }
+      .cards-grid { grid-template-columns:repeat(auto-fill, minmax(130px,1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="logo" href="index.html">Re<em style="color:var(--text)">:</em>Anime</a>
+    <button class="back-header" onclick="history.length>1?history.back():location.href='index.html'">← Volver</button>
+  </header>
+
+  <div class="page">
+    <div class="gacha-title">GACHA</div>
+    <div class="gacha-sub">アニメ · Invocaciones · Re:Anime</div>
+
+    <!-- BANNER TABS -->
+    <div class="banner-tabs" id="banner-tabs"></div>
+
+    <!-- ACTIVE BANNER DISPLAY -->
+    <div class="banner-area" id="banner-area">
+      <div class="banner-bg"></div>
+      <div class="banner-info">
+        <div>
+          <div class="banner-name" id="banner-name">Banner <em>Común</em></div>
+          <div class="banner-desc" id="banner-desc">Personajes aleatorios de anime y manga de todas las series.</div>
+        </div>
+        <div class="pull-btns">
+          <button class="pull-btn" id="btn-x1" onclick="doPull(1)">
+            <span>×1 INVOCAR</span>
+            <span class="btn-label">GIRO INFINITO (TEST)</span>
+          </button>
+          <button class="pull-btn x10" id="btn-x10" onclick="doPull(10)">
+            <span>×10 INVOCAR</span>
+            <span class="btn-label">GIRO INFINITO (TEST)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT AREA -->
+    <div id="result-area"></div>
+
+    <!-- HISTORY -->
+    <div class="history-title"><em>Recientes</em></div>
+    <div class="history-grid" id="history-grid"></div>
+  </div>
+
+  <!-- DETAIL MODAL -->
+  <div id="modal" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <img id="modal-img" src="" alt="" class="modal-img" />
+      <div class="modal-body">
+        <div class="modal-stars" id="modal-stars"></div>
+        <div class="modal-name" id="modal-name"></div>
+        <div class="modal-anime" id="modal-anime"></div>
+        <div class="modal-desc" id="modal-desc"></div>
+        <button class="modal-close" onclick="closeModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ══════════════════════════════════════
+     CONFIG
+  ══════════════════════════════════════ */
+  const BANNERS = [
+    {
+      id:       'common',
+      name:     'Banner',
+      nameEm:   'Común',
+      desc:     'Personajes aleatorios de anime y manga. Cualquier personaje puede aparecer.',
+      color:    '#ff2d78',
+      active:   true,
+      type:     'jikan', // usa Jikan API
+    }
+  ];
+
+  let activeBanner = BANNERS[0];
+  let customBanners = [];
+  let pullHistory   = JSON.parse(localStorage.getItem('gacha_history') || '[]');
+  let pulling       = false;
+
+  /* ── Rarity weights para banner común ── */
+  const RARITY_WEIGHTS = [
+    { stars: 5, weight: 3  },  // 3%
+    { stars: 4, weight: 12 },  // 12%
+    { stars: 3, weight: 25 },  // 25%
+    { stars: 2, weight: 35 },  // 35%
+    { stars: 1, weight: 25 },  // 25%
+  ];
+
+  function rollRarity() {
+    const total = RARITY_WEIGHTS.reduce((s,r)=>s+r.weight,0);
+    let r = Math.random() * total;
+    for (const rw of RARITY_WEIGHTS) {
+      r -= rw.weight;
+      if (r <= 0) return rw.stars;
+    }
+    return 1;
+  }
+
+  function starsHTML(n, cls) {
+    return `<span class="${cls}">${'★'.repeat(n)}${'☆'.repeat(5-n)}</span>`;
+  }
+
+  /* ══════════════════════════════════════
+     JIKAN API — personaje aleatorio
+     Rate limit: ~3 req/s con delay
+  ══════════════════════════════════════ */
+  async function fetchJikanChar() {
+    /* Jikan v4 random character */
+    const r = await fetch('https://api.jikan.moe/v4/random/characters');
+    if (!r.ok) throw new Error('Jikan error');
+    const j = await r.json();
+    const d = j.data;
+    const anime = d.anime?.[0]?.anime?.title || d.manga?.[0]?.manga?.title || 'Anime/Manga';
+    return {
+      id:          d.mal_id,
+      name:        d.name,
+      anime:       anime,
+      image:       d.images?.jpg?.image_url || d.images?.webp?.image_url || '',
+      description: (d.about || 'Sin informacion adicional.').slice(0, 280).replace(/\n/g,' '),
+      stars:       rollRarity(),
+      source:      'jikan',
+    };
+  }
+
+  /* Delay entre requests para no superar rate limit */
+  function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+  async function fetchMultipleJikan(n) {
+    const results = [];
+    for (let i=0; i<n; i++) {
+      if (i>0) await delay(400); // ~2.5 req/s, bajo el límite de Jikan
+      try {
+        const char = await fetchJikanChar();
+        results.push(char);
+      } catch {
+        // Si falla una, usar fallback con datos mínimos
+        results.push(fallbackChar(rollRarity()));
+      }
+    }
+    return results;
+  }
+
+  function fallbackChar(stars) {
+    const names = ['Yuki','Hana','Rei','Sakura','Akira','Natsuki','Sora','Kira','Miku','Aoi'];
+    const animes = ['Re:Zero','Sword Art Online','Attack on Titan','Naruto','One Piece','Demon Slayer','Jujutsu Kaisen','My Hero Academia'];
+    return {
+      id:          Math.random(),
+      name:        names[Math.floor(Math.random()*names.length)],
+      anime:       animes[Math.floor(Math.random()*animes.length)],
+      image:       '',
+      description: 'Personaje de anime.',
+      stars,
+      source:      'fallback',
+    };
+  }
+
+  /* ══════════════════════════════════════
+     CUSTOM BANNER (gacha.json)
+  ══════════════════════════════════════ */
+  async function loadCustomBanners() {
+    try {
+      const r = await fetch('gacha.json');
+      const j = await r.json();
+      customBanners = (j.banners || []).filter(b => b.active && b.characters?.length);
+      customBanners.forEach(b => {
+        BANNERS.push({
+          id:     b.id,
+          name:   'Banner',
+          nameEm: b.name,
+          desc:   b.subtitle || 'Banner especial.',
+          color:  b.color || '#c084fc',
+          active: true,
+          type:   'custom',
+          chars:  b.characters,
+        });
+      });
+      buildTabs();
+    } catch { /* gacha.json ausente o invalido — solo banner común */ }
+  }
+
+  function pullCustom(banner, n) {
+    const pool = banner.chars;
+    const results = [];
+    for (let i=0; i<n; i++) {
+      const char = pool[Math.floor(Math.random()*pool.length)];
+      results.push({ ...char, stars: char.rarity || rollRarity() });
+    }
+    return results;
+  }
+
+  /* ══════════════════════════════════════
+     PULL LOGIC
+  ══════════════════════════════════════ */
+  async function doPull(n) {
+    if (pulling) return;
+    pulling = true;
+    setBtnsDisabled(true);
+
+    // Mostrar loading
+    document.getElementById('result-area').innerHTML = `
+      <div class="pull-loading">
+        <div class="spinner"></div>
+        <span>Invocando${n>1?' ×'+n:''}...</span>
+      </div>`;
+
+    let chars = [];
+    try {
+      if (activeBanner.type === 'jikan') {
+        chars = await fetchMultipleJikan(n);
+      } else if (activeBanner.type === 'custom') {
+        chars = pullCustom(activeBanner, n);
+        await delay(600); // animacion de espera
+      }
+    } catch {
+      chars = Array.from({length:n}, ()=>fallbackChar(rollRarity()));
+    }
+
+    // Guardar en historial
+    pullHistory = [...chars, ...pullHistory].slice(0, 50);
+    localStorage.setItem('gacha_history', JSON.stringify(pullHistory));
+
+    // Mostrar resultados
+    showResults(chars, n);
+    updateHistory();
+    pulling = false;
+    setBtnsDisabled(false);
+  }
+
+  function setBtnsDisabled(v) {
+    document.getElementById('btn-x1').classList.toggle('disabled', v);
+    document.getElementById('btn-x10').classList.toggle('disabled', v);
+  }
+
+  /* ══════════════════════════════════════
+     RENDER RESULTS
+  ══════════════════════════════════════ */
+  function showResults(chars, n) {
+    const area = document.getElementById('result-area');
+
+    if (n === 1) {
+      const c = chars[0];
+      area.innerHTML = `
+        <div class="single-reveal">
+          ${charCardHTML(c, 0)}
+        </div>`;
+    } else {
+      const cardsHTML = chars.map((c,i)=>charCardHTML(c,i)).join('');
+      area.innerHTML = `<div class="cards-grid">${cardsHTML}</div>`;
+    }
+
+    // Bind click → modal
+    area.querySelectorAll('.char-card').forEach((el,i)=>{
+      el.addEventListener('click', ()=>openModal(chars[i]));
+    });
+  }
+
+  function charCardHTML(c, i) {
+    const rClass = `r${c.stars}`;
+    const delay  = `animation-delay:${i*0.07}s`;
+    const img    = c.image
+      ? `<img src="${c.image}" alt="${c.name}" loading="lazy" />`
+      : `<div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:2.5rem;">✦</div>`;
+
+    return `
+      <div class="char-card ${rClass}" style="${delay}">
+        ${img}
+        <div class="char-overlay">
+          <div class="char-stars">${starsHTML(c.stars,'stars-'+rClass)}</div>
+          <div class="char-name">${c.name}</div>
+          <div class="char-anime">${c.anime}</div>
+        </div>
+      </div>`;
+  }
+
+  /* ══════════════════════════════════════
+     MODAL
+  ══════════════════════════════════════ */
+  function openModal(c) {
+    const rClass = 'stars-r'+c.stars;
+    document.getElementById('modal-img').src   = c.image || '';
+    document.getElementById('modal-img').style.display = c.image ? 'block' : 'none';
+    document.getElementById('modal-stars').innerHTML   = starsHTML(c.stars, rClass);
+    document.getElementById('modal-name').textContent  = c.name;
+    document.getElementById('modal-anime').textContent = c.anime;
+    document.getElementById('modal-desc').textContent  = c.description || '';
+    document.getElementById('modal').classList.add('open');
+  }
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+  }
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+  /* ══════════════════════════════════════
+     HISTORY
+  ══════════════════════════════════════ */
+  function updateHistory() {
+    const grid = document.getElementById('history-grid');
+    grid.innerHTML = pullHistory.slice(0,30).map(c=>`
+      <div class="history-chip r${c.stars}" title="${c.name}" onclick='openModal(${JSON.stringify(c).replace(/'/g,"&#39;")})'>
+        ${c.image
+          ? `<img src="${c.image}" alt="${c.name}" loading="lazy"/>`
+          : `<div style="width:100%;height:100%;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--muted)">✦</div>`
+        }
+      </div>`).join('');
+  }
+
+  /* ══════════════════════════════════════
+     TABS
+  ══════════════════════════════════════ */
+  function buildTabs() {
+    const tabsEl = document.getElementById('banner-tabs');
+    tabsEl.innerHTML = BANNERS.map(b=>`
+      <div class="banner-tab ${b.id===activeBanner.id?'active':''}" onclick="switchBanner('${b.id}')">
+        <span class="tab-name" style="color:${b.id===activeBanner.id?b.color:''}">${b.nameEm}</span>
+        <span class="tab-sub">${b.desc.slice(0,30)}${b.desc.length>30?'…':''}</span>
+      </div>`).join('');
+  }
+
+  function switchBanner(id) {
+    activeBanner = BANNERS.find(b=>b.id===id) || BANNERS[0];
+    buildTabs();
+
+    document.getElementById('banner-name').innerHTML = `${activeBanner.name} <em style="color:${activeBanner.color}">${activeBanner.nameEm}</em>`;
+    document.getElementById('banner-desc').textContent = activeBanner.desc;
+    document.getElementById('result-area').innerHTML = '';
+
+    if (activeBanner.type === 'custom' && !activeBanner.chars?.length) {
+      document.getElementById('result-area').innerHTML = `
+        <div class="banner-inactive">
+          <div class="bi-icon">🎴</div>
+          <p>Este banner no tiene personajes configurados todavia. Edita <b>gacha.json</b> para agregar personajes.</p>
+        </div>`;
+      setBtnsDisabled(true);
+    } else {
+      setBtnsDisabled(false);
+    }
+  }
+
+  /* ══════════════════════════════════════
+     INIT
+  ══════════════════════════════════════ */
+  buildTabs();
+  updateHistory();
+  loadCustomBanners();
+  </script>
+</body>
+</html>

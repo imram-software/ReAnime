@@ -1,0 +1,22 @@
+{
+  "banners": [
+    {
+      "id": "especial-1",
+      "name": "Banner Especial",
+      "subtitle": "Personajes exclusivos",
+      "active": false,
+      "color": "#c084fc",
+      "characters": [
+        {
+          "id": 1,
+          "name": "Nombre del Personaje",
+          "anime": "Nombre del Anime",
+          "rarity": 5,
+          "image": "https://url-de-la-imagen.jpg",
+          "description": "Descripcion del personaje.",
+          "type": "femenino"
+        }
+      ]
+    }
+  ]
+}
