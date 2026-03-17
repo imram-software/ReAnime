@@ -614,21 +614,29 @@
   let pulling       = false;
 
   /* ── Rarity weights para banner común ── */
-  const RARITY_WEIGHTS = [
-    { stars: 5, weight: 0.6 },  // 0.6%
-    { stars: 4, weight: 5.1 },  // 5.1%
-    { stars: 3, weight: 16  },  // 16%
-    { stars: 2, weight: 38  },  // 38%
-    { stars: 1, weight: 40.3},  // 40.3%
-  ];
+  /* Rareza basada en favoritos de MAL (campo favorites de Jikan top/characters)
+     + un toque de azar para que no sea determinista */
+  function rarityFromFavorites(favs) {
+    // Sukuna tiene ~280k favs → deberia ser 5★
+    // Umbrales ajustados a la distribucion real de MAL top characters
+    const r = Math.random(); // factor de suerte (pequeño)
+    if (favs >= 100000) return r < 0.85 ? 5 : 4;   // >100k → 85% 5★
+    if (favs >= 40000)  return r < 0.70 ? 5 : 4;   // >40k  → 70% 5★
+    if (favs >= 15000)  return r < 0.60 ? 4 : 3;   // >15k  → 60% 4★
+    if (favs >= 5000)   return r < 0.65 ? 3 : 4;   // >5k   → 65% 3★
+    if (favs >= 1000)   return r < 0.70 ? 2 : 3;   // >1k   → 70% 2★
+    return r < 0.80 ? 1 : 2;                        // resto → 80% 1★
+  }
 
+  /* Rareza aleatoria para fallbacks sin datos de favoritos */
   function rollRarity() {
-    const total = RARITY_WEIGHTS.reduce((s,r)=>s+r.weight,0);
-    let r = Math.random() * total;
-    for (const rw of RARITY_WEIGHTS) {
-      r -= rw.weight;
-      if (r <= 0) return rw.stars;
-    }
+    const weights = [
+      { stars:5, w:0.6 }, { stars:4, w:5.1 },
+      { stars:3, w:16  }, { stars:2, w:38  }, { stars:1, w:40.3 },
+    ];
+    const total = weights.reduce((s,r)=>s+r.w, 0);
+    let rv = Math.random() * total;
+    for (const rw of weights) { rv -= rw.w; if (rv <= 0) return rw.stars; }
     return 1;
   }
 
@@ -655,13 +663,15 @@
     /* Limpiar descripcion: quitar stats de ficha, quedarse con el primer parrafo de texto real */
     const raw = (d.about || '').replace(/\n/g,' ').trim();
     const desc = cleanDesc(raw);
+    const favs = d.favorites || 0;
     return {
       id:          d.mal_id,
       name:        d.name,
       anime,
       image:       d.images?.jpg?.image_url || d.images?.webp?.image_url || '',
       description: desc,
-      stars:       rollRarity(),
+      stars:       rarityFromFavorites(favs),
+      favs,
       source:      'jikan',
     };
   }
@@ -725,7 +735,7 @@
 
     /* Re-asignar raridad en el momento del pull (el pool guarda stars fijas,
        pero queremos variedad en cada sesion) */
-    return pulled.map(c => ({ ...c, stars: rollRarity() }));
+    return pulled; // stars ya calculadas por rarityFromFavorites en fillPool
   }
 
   function fallbackChar(stars) {
