@@ -18,99 +18,85 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; background: var(--bg); overflow: hidden; font-family: var(--font-b); color: var(--text); }
 
-    /* ── VIDEO ── */
+    /* ── VIDEO — ocupa todo, NUNCA bloqueado ── */
     #video-wrap { position: fixed; inset: 0; z-index: 0; }
     #video-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
 
-    /* ── OVERLAY — se oculta tras 3s sin mover el mouse ── */
+    /* ── TOP BAR — unica zona de controles ── */
+    /* pointer-events: none en el contenedor,
+       auto solo en la barra misma */
     #ui {
-      position: fixed; inset: 0; z-index: 10;
-      display: flex; flex-direction: column;
-      justify-content: space-between;
-      /* Nunca bloquea el area del video — solo las barras capturan clicks */
-      pointer-events: none;
-      opacity: 0; transition: opacity 0.35s;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+      pointer-events: none; /* no bloquea clicks al video debajo */
     }
-    body.active #ui { opacity: 1; }
-    body.active #top-bar,
-    body.active #bottom-bar { pointer-events: auto; }
-    body.active { cursor: default; }
-    body:not(.active) { cursor: none; }
 
-    /* Top */
     #top-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.4rem 2rem;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.8rem 1.4rem;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%);
+      pointer-events: auto; /* solo la barra captura clicks */
+      flex-wrap: wrap;
+      opacity: 0; transition: opacity 0.3s;
     }
+    body.active #top-bar { opacity: 1; }
+
     .cine-title {
-      font-family: var(--font-h); font-size: 1.6rem;
-      letter-spacing: 3px; text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+      font-family: var(--font-h); font-size: 1.3rem;
+      letter-spacing: 2px; white-space: nowrap;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+      margin-right: 0.3rem;
     }
     .cine-title em { color: var(--pink); font-style: normal; }
-    .cine-ep { color: var(--rose); font-size: 0.95rem; }
-
-    .btn-exit {
-      background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12);
-      color: var(--muted); border-radius: 6px;
-      padding: 0.45rem 1rem; font-size: 0.82rem;
-      cursor: pointer; font-family: var(--font-b);
-      transition: all 0.2s; backdrop-filter: blur(10px);
+    .cine-ep {
+      color: var(--rose); font-size: 0.78rem;
+      white-space: nowrap; margin-right: auto;
     }
-    .btn-exit:hover { border-color: var(--pink); color: var(--pink); }
-
-    /* Bottom */
-    #bottom-bar {
-      padding: 1.2rem 2rem 1.6rem;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
-      display: flex; align-items: center; gap: 0.8rem;
-    }
-    .btn-nav {
-      background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12);
-      color: var(--muted); border-radius: 6px;
-      padding: 0.4rem 1rem; font-size: 0.9rem;
-      cursor: pointer; font-family: var(--font-b);
-      transition: all 0.2s; flex-shrink: 0;
-      backdrop-filter: blur(10px);
-    }
-    .btn-nav:hover { border-color: var(--pink); color: var(--pink); }
-    .btn-nav:disabled { opacity: 0.2; pointer-events: none; }
 
     /* Episode chips */
     #ep-scroll {
-      display: flex; gap: 0.45rem;
-      overflow-x: auto; flex: 1;
-      padding: 0.1rem 0;
+      display: flex; gap: 0.4rem;
+      overflow-x: auto; max-width: 50vw;
       scrollbar-width: none;
     }
     #ep-scroll::-webkit-scrollbar { display: none; }
 
     .ep-chip {
       flex-shrink: 0;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--muted); border-radius: 6px;
-      padding: 0.35rem 0.75rem; font-size: 0.78rem;
+      background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.12);
+      color: var(--muted); border-radius: 5px;
+      padding: 0.3rem 0.65rem; font-size: 0.75rem;
       cursor: pointer; font-family: var(--font-b);
       transition: all 0.2s; white-space: nowrap;
-      backdrop-filter: blur(6px);
+      backdrop-filter: blur(8px);
     }
     .ep-chip:hover { border-color: var(--rose); color: var(--rose); }
     .ep-chip.active { background: var(--pink); border-color: var(--pink); color: #fff; font-weight: 700; }
+
+    .btn-ctrl {
+      background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.12);
+      color: var(--muted); border-radius: 5px;
+      padding: 0.3rem 0.75rem; font-size: 0.82rem;
+      cursor: pointer; font-family: var(--font-b);
+      transition: all 0.2s; flex-shrink: 0;
+      backdrop-filter: blur(8px);
+    }
+    .btn-ctrl:hover { border-color: var(--pink); color: var(--pink); }
+    .btn-ctrl:disabled { opacity: 0.2; pointer-events: none; }
+    .btn-ctrl.exit:hover { border-color: #ff4444; color: #ff4444; }
 
     /* Loading */
     #loading {
       position: fixed; inset: 0; z-index: 20;
       display: flex; align-items: center; justify-content: center;
-      background: var(--bg);
-      font-family: var(--font-h); font-size: 2rem;
-      letter-spacing: 5px; color: var(--pink);
+      background: var(--bg); font-family: var(--font-h);
+      font-size: 2rem; letter-spacing: 5px; color: var(--pink);
     }
 
     @media (max-width: 600px) {
-      .cine-title { font-size: 1.1rem; letter-spacing: 2px; }
-      #top-bar, #bottom-bar { padding: 1rem; }
-      .ep-chip { font-size: 0.72rem; padding: 0.3rem 0.6rem; }
+      .cine-title { font-size: 1rem; }
+      #top-bar { padding: 0.6rem 0.8rem; gap: 0.4rem; }
+      #ep-scroll { max-width: 38vw; }
+      .ep-chip { font-size: 0.68rem; padding: 0.25rem 0.5rem; }
     }
   </style>
 </head>
@@ -121,16 +107,12 @@
 
   <div id="ui">
     <div id="top-bar">
-      <div>
-        <div class="cine-title" id="cine-title">Re<em>:</em>Anime</div>
-        <div class="cine-ep" id="cine-ep"></div>
-      </div>
-      <button class="btn-exit" onclick="history.length > 1 ? history.back() : location.href='index.html'">← Salir</button>
-    </div>
-    <div id="bottom-bar">
-      <button class="btn-nav" id="btn-prev" onclick="stepEp(-1)">←</button>
+      <div class="cine-title" id="cine-title">Re<em>:</em>Anime</div>
+      <div class="cine-ep" id="cine-ep"></div>
+      <button class="btn-ctrl" id="btn-prev" onclick="stepEp(-1)">← Ep</button>
       <div id="ep-scroll"></div>
-      <button class="btn-nav" id="btn-next" onclick="stepEp(1)">→</button>
+      <button class="btn-ctrl" id="btn-next" onclick="stepEp(1)">Ep →</button>
+      <button class="btn-ctrl exit" onclick="history.length > 1 ? history.back() : location.href='index.html'">✕ Salir</button>
     </div>
   </div>
 
@@ -142,11 +124,9 @@
     const btnPrev   = document.getElementById('btn-prev');
     const btnNext   = document.getElementById('btn-next');
 
-    let anime   = null;
-    let epIndex = 0;
-    let idleTimer;
+    let anime = null, epIndex = 0, idleTimer;
 
-    /* ── Idle: ocultar UI tras 3s ── */
+    /* Mostrar barra 3s tras cualquier movimiento */
     function wake() {
       document.body.classList.add('active');
       clearTimeout(idleTimer);
@@ -156,27 +136,24 @@
     document.addEventListener('touchstart', wake, { passive: true });
     wake();
 
-    /* ── Carga ── */
     fetch('animes.json').then(r => r.json()).then(list => {
       anime = list.find(a => a.id === animeId);
       if (!anime) { loading.textContent = 'Anime no encontrado.'; return; }
 
-      document.title = `${anime.name} · Modo Cine`;
-      document.getElementById('cine-title').innerHTML =
-        `${anime.name} <em>·</em>`;
+      document.title = anime.name + ' · Modo Cine';
+      document.getElementById('cine-title').innerHTML = anime.name + ' <em>·</em>';
 
       (anime.episodes || []).forEach((ep, i) => {
         const chip = document.createElement('button');
         chip.className = 'ep-chip';
-        chip.textContent = `Ep ${ep.number}`;
+        chip.textContent = 'Ep ' + ep.number;
         chip.title = ep.title;
         chip.onclick = () => loadEp(i);
         epScroll.appendChild(chip);
       });
 
       const last  = JSON.parse(localStorage.getItem('lastWatched') || 'null');
-      const start = (last?.id === anime.id && last.index < anime.episodes.length)
-        ? last.index : 0;
+      const start = (last?.id === anime.id && last.index < anime.episodes.length) ? last.index : 0;
       loadEp(start);
     }).catch(() => { loading.textContent = 'Error cargando datos.'; });
 
@@ -185,19 +162,13 @@
       if (!ep) return;
       epIndex = idx;
 
-      /* Chips */
-      Array.from(epScroll.children).forEach((c, i) =>
-        c.classList.toggle('active', i === idx));
+      Array.from(epScroll.children).forEach((c, i) => c.classList.toggle('active', i === idx));
       epScroll.children[idx]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 
-      /* Nav */
       btnPrev.disabled = idx === 0;
       btnNext.disabled = idx === anime.episodes.length - 1;
+      document.getElementById('cine-ep').textContent = 'Ep ' + ep.number + ': ' + ep.title;
 
-      /* Titulo episodio */
-      document.getElementById('cine-ep').textContent = `Ep ${ep.number}: ${ep.title}`;
-
-      /* Embed */
       videoWrap.innerHTML = '';
       const tmp = document.createElement('div');
       tmp.innerHTML = ep.embed;
@@ -220,7 +191,6 @@
       if (n >= 0 && n < (anime?.episodes?.length || 0)) loadEp(n);
     }
 
-    /* Teclado */
     document.addEventListener('keydown', e => {
       wake();
       if (e.key === 'ArrowRight') stepEp(1);
