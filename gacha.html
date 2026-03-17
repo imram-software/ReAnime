@@ -170,70 +170,138 @@
       border:2px solid var(--border);
       cursor:pointer; background:var(--bg3);
       transition:transform 0.3s, border-color 0.3s;
+      display:flex; flex-direction:column;
     }
     .char-card:hover { transform:translateY(-4px) scale(1.03); }
 
-    /* ── RARITY ANIMATIONS ── */
+    /* Gradient card face — siempre se ve bien */
+    .card-face {
+      flex:1; position:relative; overflow:hidden;
+      min-height:0;
+    }
+    .card-face-img {
+      position:absolute; inset:0;
+      width:100%; height:100%; object-fit:cover; object-position:top;
+      display:block; transition:transform 0.5s, filter 0.3s;
+    }
+    .card-face-img.broken { display:none; }
+    .card-face-gradient {
+      position:absolute; inset:0;
+    }
+    /* Gradients por rareza */
+    .r5 .card-face-gradient { background:linear-gradient(160deg,#1a0a00 0%,#3d1900 40%,#7c3300 70%,#fbbf2422 100%); }
+    .r4 .card-face-gradient { background:linear-gradient(160deg,#0d001a 0%,#1e003d 40%,#3b0080 70%,#c084fc22 100%); }
+    .r3 .card-face-gradient { background:linear-gradient(160deg,#001220 0%,#002444 40%,#003d6e 70%,#38bdf822 100%); }
+    .r2 .card-face-gradient { background:linear-gradient(160deg,#001a0a 0%,#003018 40%,#004d28 70%,#86efac22 100%); }
+    .r1 .card-face-gradient { background:linear-gradient(160deg,#0d0d0d 0%,#181818 50%,#242424 100%); }
 
-    /* 1★ 2★ — fade simple */
+    /* Simbolo decorativo central cuando no hay imagen */
+    .card-symbol {
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      font-size:3.5rem; opacity:0.12; pointer-events:none;
+    }
+    .r5 .card-symbol { color:#fbbf24; font-size:4rem; opacity:0.2; }
+    .r4 .card-symbol { color:#c084fc; opacity:0.18; }
+    .r3 .card-symbol { color:#38bdf8; opacity:0.15; }
+
+    /* Nombre en la carta */
+    .card-info {
+      padding:0.6rem 0.65rem 0.55rem;
+      background:var(--bg);
+      border-top:1px solid rgba(255,255,255,0.06);
+      flex-shrink:0;
+    }
+    .card-stars-row { font-size:0.55rem; margin-bottom:0.15rem; }
+    .card-char-name {
+      font-family:var(--font-h); font-size:0.88rem; letter-spacing:1px;
+      line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .r5 .card-char-name { color:var(--r5); }
+    .r4 .card-char-name { color:var(--r4); }
+    .r3 .card-char-name { color:var(--r3); }
+    .r2 .card-char-name { color:var(--r2); }
+    .r1 .card-char-name { color:var(--muted); }
+    .card-anime-row { font-size:0.6rem; color:var(--muted); margin-top:0.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    /* ── RARITY ANIMATIONS ── */
     @keyframes anim1 {
-      0%   { opacity:0; transform:translateY(30px) scale(0.9); }
+      0%   { opacity:0; transform:translateY(40px) scale(0.88); }
       100% { opacity:1; transform:translateY(0) scale(1); }
     }
-
-    /* 3★ — slide desde la izquierda con giro leve */
     @keyframes anim3 {
-      0%   { opacity:0; transform:translateX(-60px) rotate(-6deg) scale(0.85); }
-      60%  { transform:translateX(8px) rotate(1deg) scale(1.03); }
-      100% { opacity:1; transform:translateX(0) rotate(0) scale(1); }
+      0%   { opacity:0; transform:translateX(-80px) rotate(-10deg) scale(0.8); filter:blur(4px); }
+      55%  { opacity:1; transform:translateX(10px) rotate(1.5deg) scale(1.04); filter:blur(0); }
+      75%  { transform:translateX(-4px) rotate(-0.5deg); }
+      100% { transform:translateX(0) rotate(0) scale(1); }
     }
-
-    /* 4★ — caida desde arriba + rebote */
     @keyframes anim4 {
-      0%   { opacity:0; transform:translateY(-120px) scale(0.7); }
-      55%  { opacity:1; transform:translateY(18px) scale(1.06); }
-      75%  { transform:translateY(-8px) scale(0.98); }
-      90%  { transform:translateY(5px) scale(1.01); }
-      100% { transform:translateY(0) scale(1); }
+      0%   { opacity:0; transform:translateY(-160px) scale(0.6) rotate(8deg); filter:blur(6px); }
+      45%  { opacity:1; transform:translateY(22px) scale(1.08) rotate(-2deg); filter:blur(0); }
+      65%  { transform:translateY(-10px) scale(0.97) rotate(1deg); }
+      80%  { transform:translateY(6px) scale(1.02); }
+      92%  { transform:translateY(-3px); }
+      100% { transform:translateY(0) scale(1) rotate(0); }
     }
-
-    /* 5★ — zoom desde el fondo + latido */
     @keyframes anim5 {
-      0%   { opacity:0; transform:scale(0.1) rotate(-15deg); filter:brightness(5) saturate(0); }
-      35%  { opacity:1; transform:scale(1.2) rotate(3deg); filter:brightness(2.5) saturate(2); }
-      55%  { transform:scale(0.96) rotate(-1deg); filter:brightness(1.5); }
-      70%  { transform:scale(1.06) rotate(0.5deg); }
-      85%  { transform:scale(0.99); filter:brightness(1); }
-      100% { transform:scale(1) rotate(0deg); filter:brightness(1); }
+      0%   { opacity:0; transform:scale(0.05) rotate(-20deg); filter:brightness(8) saturate(0) blur(10px); }
+      25%  { opacity:1; transform:scale(1.3) rotate(4deg); filter:brightness(3) saturate(3) blur(0); }
+      45%  { transform:scale(0.94) rotate(-2deg); filter:brightness(1.8) saturate(1.5); }
+      62%  { transform:scale(1.08) rotate(1deg); filter:brightness(1.3); }
+      78%  { transform:scale(0.98); filter:brightness(1); }
+      88%  { transform:scale(1.03); }
+      100% { transform:scale(1) rotate(0); filter:brightness(1); }
     }
 
-    /* Flash de fondo por rareza — se muestra en el fullscreen overlay */
+    /* Fondo flash */
     @keyframes bgFlash5 {
-      0%   { background:rgba(251,191,36,0); }
-      20%  { background:rgba(251,191,36,0.25); }
-      100% { background:rgba(0,0,0,0.92); }
+      0%,2% { background:rgba(251,191,36,0); }
+      12%   { background:rgba(251,191,36,0.35); }
+      100%  { background:rgba(0,0,0,0.95); }
     }
     @keyframes bgFlash4 {
-      0%   { background:rgba(192,132,252,0); }
-      20%  { background:rgba(192,132,252,0.2); }
-      100% { background:rgba(0,0,0,0.92); }
+      0%,2% { background:rgba(192,132,252,0); }
+      12%   { background:rgba(192,132,252,0.28); }
+      100%  { background:rgba(0,0,0,0.95); }
+    }
+    @keyframes bgFlash3 {
+      0%,2% { background:rgba(56,189,248,0); }
+      12%   { background:rgba(56,189,248,0.15); }
+      100%  { background:rgba(0,0,0,0.95); }
     }
 
-    /* Rays para 5★ */
-    @keyframes rays {
-      0%   { opacity:0; transform:scale(0.5) rotate(0deg); }
-      30%  { opacity:0.7; }
-      100% { opacity:0; transform:scale(2.5) rotate(45deg); }
+    /* Rays rotantes 5★ */
+    @keyframes raysRotate { to { transform:scale(2.8) rotate(60deg); opacity:0; } }
+
+    /* Beams 4★ */
+    @keyframes beamShoot {
+      0%   { transform:scaleY(0) translateY(0); opacity:1; }
+      60%  { transform:scaleY(1) translateY(-100px); opacity:0.8; }
+      100% { transform:scaleY(1.5) translateY(-200px); opacity:0; }
     }
 
-    /* Shake para 4★ */
+    /* Particles */
+    @keyframes ptFly {
+      0%   { transform:translate(0,0) scale(1); opacity:1; }
+      100% { transform:translate(var(--dx),var(--dy)) scale(0); opacity:0; }
+    }
+
+    /* Shake 4★ */
     @keyframes shake4 {
-      0%,100% { transform:translateX(0); }
-      15%  { transform:translateX(-8px) rotate(-2deg); }
-      30%  { transform:translateX(8px) rotate(2deg); }
-      45%  { transform:translateX(-5px) rotate(-1deg); }
-      60%  { transform:translateX(5px) rotate(1deg); }
-      75%  { transform:translateX(-2px); }
+      0%,100% { transform:translateX(0) rotate(0); }
+      10%  { transform:translateX(-10px) rotate(-3deg); }
+      25%  { transform:translateX(10px) rotate(3deg); }
+      40%  { transform:translateX(-7px) rotate(-1.5deg); }
+      55%  { transform:translateX(7px) rotate(1.5deg); }
+      70%  { transform:translateX(-3px); }
+      85%  { transform:translateX(3px); }
+    }
+
+    /* Holographic shimmer 5★ */
+    @keyframes holoShimmer {
+      0%   { background-position:0% 50%; }
+      50%  { background-position:100% 50%; }
+      100% { background-position:0% 50%; }
     }
 
         /* ── SINGLE REVEAL (resultado final en gacha) ── */
@@ -275,16 +343,60 @@
     }
     #reveal-overlay.open { opacity:1; pointer-events:auto; }
 
-    /* Rays de fondo para 5★ */
-    #reveal-rays {
-      position:absolute; inset:0; pointer-events:none;
+    /* Canvas de efectos (rays, beams, particles) */
+    #reveal-effects {
+      position:absolute; inset:0; pointer-events:none; overflow:hidden;
+    }
+    /* Rays cónico para 5★ */
+    .fx-rays {
+      position:absolute; inset:-20%; border-radius:50%;
       background:conic-gradient(
         from 0deg,
-        transparent 0deg, rgba(251,191,36,0.12) 10deg,
-        transparent 20deg, rgba(251,191,36,0.08) 30deg,
-        transparent 40deg
+        transparent 0deg, rgba(251,191,36,0.18) 8deg,
+        transparent 16deg, rgba(251,191,36,0.1) 24deg,
+        transparent 32deg, rgba(251,191,36,0.14) 40deg,
+        transparent 48deg
       );
-      opacity:0;
+      animation:raysRotate 1.4s ease-out forwards;
+    }
+    /* Beam vertical */
+    .fx-beam {
+      position:absolute; bottom:50%; left:50%;
+      width:3px; height:60px; margin-left:-1.5px;
+      border-radius:2px; transform-origin:bottom center;
+      animation:beamShoot 0.6s ease-out forwards;
+    }
+    /* Particle dot */
+    .fx-pt {
+      position:absolute; border-radius:50%;
+      width:6px; height:6px;
+      animation:ptFly 0.8s ease-out forwards;
+    }
+    /* 5★ holo border en la carta */
+    .holo-card {
+      box-shadow:0 0 0 3px #fbbf24,
+                 0 0 30px #fbbf2488,
+                 0 0 60px #fbbf2444,
+                 inset 0 0 20px rgba(251,191,36,0.15);
+    }
+    .holo-card::after {
+      content:''; position:absolute; inset:0; border-radius:var(--radius);
+      background:linear-gradient(105deg,
+        transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+      background-size:200% 200%;
+      animation:holoShimmer 1.8s ease infinite;
+      pointer-events:none;
+    }
+    /* 4★ purple glow */
+    .glow4-card {
+      box-shadow:0 0 0 2px #c084fc,
+                 0 0 20px #c084fc88,
+                 0 0 40px #c084fc44;
+    }
+    /* 3★ blue glow */
+    .glow3-card {
+      box-shadow:0 0 0 2px #38bdf8,
+                 0 0 16px #38bdf844;
     }
 
     /* La carta grande en el center */
@@ -458,7 +570,7 @@
 
   <!-- FULLSCREEN REVEAL OVERLAY -->
   <div id="reveal-overlay">
-    <div id="reveal-rays"></div>
+    <div id="reveal-effects"></div>
     <div id="reveal-card-wrap"></div>
     <div id="reveal-charname"></div>
     <div id="reveal-charanime"></div>
@@ -535,17 +647,39 @@
 
   function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
 
+  /* Traducir texto EN→ES usando MyMemory (gratuito, sin key) */
+  const translateCache = {};
+  async function translateES(text) {
+    if (!text || text.length < 10) return text || '';
+    const key = text.slice(0,40);
+    if (translateCache[key]) return translateCache[key];
+    try {
+      const url = 'https://api.mymemory.translated.net/get?q='
+        + encodeURIComponent(text.slice(0,400))
+        + '&langpair=en|es';
+      const r = await fetch(url);
+      const j = await r.json();
+      const translated = j.responseData?.translatedText || text;
+      translateCache[key] = translated;
+      return translated;
+    } catch { return text; }
+  }
+
   /* Convierte un objeto data de Jikan a nuestro formato */
-  function jikanToChar(d) {
+  async function jikanToChar(d) {
     const anime = d.anime?.[0]?.anime?.title
                || d.manga?.[0]?.manga?.title
                || 'Anime/Manga';
+    const rawDesc = (d.about || '').slice(0, 350).replace(/\n/g,' ').trim();
+    const desc = rawDesc
+      ? await translateES(rawDesc)
+      : 'Sin informacion adicional.';
     return {
       id:          d.mal_id,
       name:        d.name,
       anime,
       image:       d.images?.jpg?.image_url || d.images?.webp?.image_url || '',
-      description: (d.about || 'Sin informacion adicional.').slice(0, 280).replace(/\n/g,' '),
+      description: desc,
       stars:       rollRarity(),
       source:      'jikan',
     };
@@ -561,7 +695,7 @@
       const r = await fetch(`https://api.jikan.moe/v4/top/characters?page=${page}&limit=25`);
       if (!r.ok) throw new Error('Jikan ' + r.status);
       const j = await r.json();
-      const nuevos = (j.data || []).map(jikanToChar);
+      const nuevos = await Promise.all((j.data || []).map(jikanToChar));
       /* Mezclar aleatoriamente y agregar al pool */
       for (let i = nuevos.length - 1; i > 0; i--) {
         const k = Math.floor(Math.random() * (i+1));
@@ -710,7 +844,7 @@
   const revName     = document.getElementById('reveal-charname');
   const revAnime    = document.getElementById('reveal-charanime');
   const revCounter  = document.getElementById('reveal-counter');
-  const revRays     = document.getElementById('reveal-rays');
+  const revEffects  = document.getElementById('reveal-effects');
 
   function revealSkip() {
     revealSkipped = true;
@@ -725,68 +859,156 @@
   }
 
   /* Construir el elemento .char-card (sin animacion — la animacion se aplica en overlay) */
+  /* Simbolos decorativos por rareza */
+  const R_SYMBOL = { 5:'★', 4:'◆', 3:'▲', 2:'●', 1:'─' };
+
   function buildCardEl(ch, clickIdx, chars) {
     const rClass = `r${ch.stars}`;
     const el = document.createElement('div');
     el.className = `char-card ${rClass}`;
-    el.innerHTML = ch.image
-      ? `<img src="${ch.image}" alt="${ch.name}" loading="lazy" />`
-      : `<div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:var(--muted);">✦</div>`;
-    el.innerHTML += `
-      <div class="char-overlay">
-        <div class="char-stars">${starsHTML(ch.stars,'stars-'+rClass)}</div>
-        <div class="char-name">${ch.name}</div>
-        <div class="char-anime">${ch.anime}</div>
-      </div>`;
+
+    /* Face — imagen + gradient de fondo */
+    const face = document.createElement('div');
+    face.className = 'card-face';
+
+    /* Gradient bg siempre presente */
+    const grad = document.createElement('div');
+    grad.className = 'card-face-gradient';
+    face.appendChild(grad);
+
+    /* Simbolo decorativo */
+    const sym = document.createElement('div');
+    sym.className = 'card-symbol';
+    sym.textContent = R_SYMBOL[ch.stars] || '─';
+    face.appendChild(sym);
+
+    /* Imagen — encima del gradient si existe */
+    if (ch.image) {
+      const img = document.createElement('img');
+      img.className = 'card-face-img';
+      img.alt = ch.name;
+      img.loading = 'lazy';
+      img.src = ch.image;
+      img.onerror = () => img.classList.add('broken');
+      face.appendChild(img);
+    }
+
+    el.appendChild(face);
+
+    /* Info row */
+    const info = document.createElement('div');
+    info.className = 'card-info';
+    info.innerHTML = `
+      <div class="card-stars-row">${starsHTML(ch.stars,'stars-'+rClass)}</div>
+      <div class="card-char-name">${ch.name}</div>
+      <div class="card-anime-row">${ch.anime}</div>`;
+    el.appendChild(info);
+
     el.addEventListener('click', ()=>openModal(chars[clickIdx]));
     return el;
   }
 
-  /* Mostrar una carta en el overlay fullscreen */
+  /* ── Helpers de efectos ── */
+  function spawnParticles(container, color, count) {
+    for (let i=0; i<count; i++) {
+      const pt = document.createElement('div');
+      pt.className = 'fx-pt';
+      const angle = (Math.PI*2/count)*i + (Math.random()-0.5)*0.8;
+      const dist  = 70 + Math.random()*130;
+      pt.style.cssText = [
+        'background:'+color,
+        'left:50%','top:50%',
+        '--dx:'+Math.cos(angle)*dist+'px',
+        '--dy:'+Math.sin(angle)*dist+'px',
+        'animation-delay:'+Math.random()*0.2+'s',
+        'animation-duration:'+(0.55+Math.random()*0.5)+'s',
+        'width:'+(3+Math.random()*7)+'px',
+        'height:'+(3+Math.random()*7)+'px',
+        'box-shadow:0 0 5px '+color,
+        'margin-left:-3px','margin-top:-3px',
+      ].join(';');
+      container.appendChild(pt);
+    }
+  }
+
+  function spawnBeams(container, color, count) {
+    for (let i=0; i<count; i++) {
+      const b = document.createElement('div');
+      b.className = 'fx-beam';
+      const angle = (360/count)*i + (Math.random()-0.5)*8;
+      b.style.cssText = [
+        'background:linear-gradient(to top,'+color+'cc,transparent)',
+        'left:50%','bottom:50%','margin-left:-1.5px',
+        'transform:rotate('+angle+'deg) scaleY(0)',
+        'transform-origin:bottom center',
+        'height:'+(70+Math.random()*70)+'px',
+        'width:'+(1.5+Math.random()*3)+'px',
+        'animation-delay:'+Math.random()*0.12+'s',
+        'box-shadow:0 0 8px '+color,
+      ].join(';');
+      container.appendChild(b);
+    }
+  }
+
+  /* Mostrar una carta en el overlay fullscreen con efectos completos */
   async function revealOne(ch, idx, total) {
     if (revealSkipped) return;
 
     const cfg = R_CFG[ch.stars] || R_CFG[1];
+    revEffects.innerHTML = '';
 
-    /* Fondo flash por rareza */
+    /* Fondo flash */
     if (cfg.bgAnim) {
-      overlay.style.animation = `${cfg.bgAnim} 0.8s ease forwards`;
+      overlay.style.animation = `${cfg.bgAnim} 0.9s ease forwards`;
     } else {
       overlay.style.animation = 'none';
-      overlay.style.background = 'rgba(0,0,0,0.92)';
+      overlay.style.background = 'rgba(0,0,0,0.95)';
     }
 
-    /* Rays para 5★ */
-    revRays.style.opacity = cfg.rays ? '1' : '0';
-    if (cfg.rays) {
-      revRays.style.animation = 'rays 1s ease-out forwards';
+    /* Efectos segun rareza */
+    if (ch.stars === 5) {
+      const rays = document.createElement('div');
+      rays.className = 'fx-rays';
+      revEffects.appendChild(rays);
+      spawnBeams(revEffects, '#fbbf24', 16);
+      spawnParticles(revEffects, '#fbbf24', 20);
+      spawnParticles(revEffects, '#fffbeb', 10);
+    } else if (ch.stars === 4) {
+      spawnBeams(revEffects, '#c084fc', 10);
+      spawnParticles(revEffects, '#c084fc', 16);
+      spawnParticles(revEffects, '#ede9fe', 6);
+    } else if (ch.stars === 3) {
+      spawnBeams(revEffects, '#38bdf8', 6);
+      spawnParticles(revEffects, '#38bdf8', 10);
+    } else if (ch.stars === 2) {
+      spawnParticles(revEffects, '#86efac', 7);
     }
 
-    /* Carta en el centro */
+    /* Carta */
     revCardWrap.innerHTML = '';
     const cardEl = buildCardEl(ch, idx, revealChars);
-    cardEl.style.cssText = `animation:${cfg.anim} ${cfg.dur}ms cubic-bezier(.34,1.56,.64,1) both;`;
+    cardEl.style.animation = `${cfg.anim} ${cfg.dur}ms cubic-bezier(.34,1.56,.64,1) both`;
+    if (ch.stars === 5) cardEl.classList.add('holo-card');
+    else if (ch.stars === 4) cardEl.classList.add('glow4-card');
+    else if (ch.stars === 3) cardEl.classList.add('glow3-card');
 
-    /* Shake wrapper para 4★ */
     if (cfg.shake) {
       const shaker = document.createElement('div');
-      shaker.style.cssText = `animation:shake4 0.5s ease ${cfg.dur*0.4}ms both;`;
+      shaker.style.animation = `shake4 0.55s ease ${Math.floor(cfg.dur*0.4)}ms both`;
       shaker.appendChild(cardEl);
       revCardWrap.appendChild(shaker);
     } else {
       revCardWrap.appendChild(cardEl);
     }
 
-    /* Nombre y anime */
-    revName.textContent  = ch.name;
-    revName.style.color  = cfg.nameColor;
-    revName.style.animation = `anim1 0.4s ease ${cfg.dur*0.6}ms both`;
+    revName.textContent = ch.name;
+    revName.style.color = cfg.nameColor;
+    revName.style.animation = `anim1 0.4s ease ${Math.floor(cfg.dur*0.55)}ms both`;
     revAnime.textContent = ch.anime;
-    revAnime.style.animation = `anim1 0.4s ease ${cfg.dur*0.7}ms both`;
+    revAnime.style.animation = `anim1 0.4s ease ${Math.floor(cfg.dur*0.7)}ms both`;
     revCounter.textContent = `${idx+1} / ${total}`;
 
-    /* Esperar duracion de la animacion + tiempo para apreciar la carta */
-    const viewTime = cfg.rays ? 1400 : cfg.shake ? 1100 : ch.stars >= 3 ? 900 : 650;
+    const viewTime = ch.stars === 5 ? 1600 : ch.stars === 4 ? 1200 : ch.stars === 3 ? 900 : 600;
     await delay(cfg.dur + viewTime);
   }
 
