@@ -512,12 +512,55 @@
     .modal-anime { color:var(--pink); font-size:0.82rem; margin-bottom:0.8rem; }
     .modal-desc { color:var(--muted); font-size:0.83rem; line-height:1.65; }
     .modal-close {
-      margin-top:1.2rem; width:100%; background:none;
+      width:100%; background:none;
       border:1px solid var(--border); color:var(--muted);
       border-radius:6px; padding:0.55rem;
       cursor:pointer; font-family:var(--font-b); transition:all 0.2s;
     }
     .modal-close:hover { border-color:var(--pink); color:var(--pink); }
+
+    /* ── FEATURED CARD (destacar en perfil) ── */
+    #featured-section {
+      margin-top:2.5rem; padding-top:2rem;
+      border-top:1px solid var(--border);
+    }
+    .featured-title {
+      font-family:var(--font-h); font-size:1.3rem; letter-spacing:2px;
+      color:var(--text); margin-bottom:1rem;
+    }
+    .featured-title em { color:#a78bfa; font-style:normal; }
+    .featured-wrap {
+      display:flex; align-items:flex-start; gap:1.5rem; flex-wrap:wrap;
+    }
+    .featured-card-slot {
+      width:160px; flex-shrink:0;
+    }
+    .featured-card-slot .char-card { width:100%; }
+    .featured-empty {
+      width:160px; aspect-ratio:2/3; border:2px dashed var(--border);
+      border-radius:var(--radius); display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:0.5rem;
+      color:var(--muted); font-size:0.78rem; text-align:center;
+      padding:1rem;
+    }
+    .featured-empty .fe-icon { font-size:2rem; opacity:0.3; }
+    .featured-info { flex:1; min-width:200px; }
+    .featured-info h3 {
+      font-family:var(--font-h); font-size:1.8rem; letter-spacing:2px;
+      color:var(--text); margin-bottom:0.2rem;
+    }
+    .featured-info .fi-anime { color:#a78bfa; font-size:0.82rem; margin-bottom:0.8rem; }
+    .featured-info .fi-stars { font-size:1rem; margin-bottom:0.6rem; }
+    .featured-info p { font-size:0.82rem; color:var(--muted); line-height:1.6; }
+    .btn-set-featured {
+      margin-top:1rem; background:none;
+      border:1px solid #a78bfa; color:#a78bfa;
+      border-radius:6px; padding:0.45rem 1rem;
+      font-size:0.8rem; cursor:pointer; font-family:var(--font-b);
+      transition:all 0.2s;
+    }
+    .btn-set-featured:hover { background:#a78bfa22; }
+    .btn-set-featured.active { background:#a78bfa; color:#fff; border-color:#a78bfa; }
 
     /* ── HISTORY ── */
     .history-title {
@@ -579,11 +622,11 @@
         <div class="pull-btns">
           <button class="pull-btn" id="btn-x1" onclick="doPull(1)">
             <span>×1 INVOCAR</span>
-            <span class="btn-label">500 Holy</span>
+            <span class="btn-label">GIRO INFINITO (TEST)</span>
           </button>
           <button class="pull-btn x10" id="btn-x10" onclick="doPull(10)">
             <span>×10 INVOCAR</span>
-            <span class="btn-label">5000 Holy</span>
+            <span class="btn-label">GIRO INFINITO (TEST)</span>
           </button>
         </div>
       </div>
@@ -607,6 +650,27 @@
     <button id="reveal-skip" onclick="revealSkip()">Saltar todo</button>
   </div>
 
+  <!-- FEATURED IN PROFILE -->
+  <div class="page" style="padding-top:0;">
+    <div id="featured-section">
+      <div class="featured-title">Personaje <em>Destacado</em></div>
+      <div class="featured-wrap">
+        <div class="featured-card-slot" id="featured-card-slot">
+          <div class="featured-empty">
+            <div class="fe-icon">✦</div>
+            <span>Ningun personaje destacado</span>
+          </div>
+        </div>
+        <div class="featured-info" id="featured-info">
+          <p style="color:var(--muted);font-size:0.85rem;">
+            Haz click en cualquier personaje de tu historial o de los resultados y presiona
+            <b style="color:#a78bfa">Destacar en perfil</b> para mostrarlo en tu página.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- DETAIL MODAL -->
   <div id="modal" onclick="closeModal()">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -616,7 +680,10 @@
         <div class="modal-name" id="modal-name"></div>
         <div class="modal-anime" id="modal-anime"></div>
         <div class="modal-desc" id="modal-desc"></div>
-        <button class="modal-close" onclick="closeModal()">Cerrar</button>
+        <div style="display:flex;gap:0.5rem;margin-top:1.2rem;">
+          <button class="modal-close" onclick="closeModal()" style="margin-top:0;flex:1;">Cerrar</button>
+          <button id="modal-feat-btn" class="btn-set-featured" onclick="setFeatured()">Destacar en perfil</button>
+        </div>
       </div>
     </div>
   </div>
@@ -921,20 +988,104 @@
   /* ══════════════════════════════════════
      MODAL
   ══════════════════════════════════════ */
-  function openModal(c) {
-    const rClass = 'stars-r'+c.stars;
-    document.getElementById('modal-img').src   = c.image || '';
-    document.getElementById('modal-img').style.display = c.image ? 'block' : 'none';
-    document.getElementById('modal-stars').innerHTML   = starsHTML(c.stars, rClass);
-    document.getElementById('modal-name').textContent  = c.name;
-    document.getElementById('modal-anime').textContent = c.anime;
-    document.getElementById('modal-desc').textContent  = c.description || '';
+  let _modalChar = null; // char actualmente en el modal
+
+  function openModal(ch) {
+    _modalChar = ch;
+    const rClass = 'stars-r'+ch.stars;
+    document.getElementById('modal-img').src   = ch.image || '';
+    document.getElementById('modal-img').style.display = ch.image ? 'block' : 'none';
+    document.getElementById('modal-stars').innerHTML   = starsHTML(ch.stars, rClass);
+    document.getElementById('modal-name').textContent  = ch.name;
+    document.getElementById('modal-anime').textContent = ch.anime;
+    document.getElementById('modal-desc').textContent  = ch.description || '';
+
+    /* Boton destacar — actualizar estado segun si ya es el destacado */
+    const featBtn = document.getElementById('modal-feat-btn');
+    if (featBtn) {
+      const cur = getFeatured();
+      const isThis = cur && cur.id == ch.id && cur.name === ch.name;
+      featBtn.textContent = isThis ? '✦ Ya destacado' : 'Destacar en perfil';
+      featBtn.classList.toggle('active', isThis);
+    }
     document.getElementById('modal').classList.add('open');
   }
   function closeModal() {
     document.getElementById('modal').classList.remove('open');
   }
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+  /* ── FEATURED — destacar en perfil ── */
+  const FEATURED_KEY = 'gacha_featured';
+
+  function getFeatured() {
+    try { return JSON.parse(localStorage.getItem(FEATURED_KEY)); } catch { return null; }
+  }
+
+  function setFeatured() {
+    if (!_modalChar) return;
+    const cur = getFeatured();
+    const isThis = cur && cur.id == _modalChar.id && cur.name === _modalChar.name;
+
+    if (isThis) {
+      /* Quitar destacado */
+      localStorage.removeItem(FEATURED_KEY);
+      if (window.ReAnimeDB) window.ReAnimeDB.setFeatured(null).catch(()=>{});
+    } else {
+      /* Guardar en localStorage y Firestore */
+      const data = {
+        id:          _modalChar.id,
+        name:        _modalChar.name,
+        anime:       _modalChar.anime,
+        image:       _modalChar.image || '',
+        stars:       _modalChar.stars,
+        description: _modalChar.description || '',
+      };
+      localStorage.setItem(FEATURED_KEY, JSON.stringify(data));
+      if (window.ReAnimeDB) window.ReAnimeDB.setFeatured(data).catch(()=>{});
+      showToast('✦ ' + data.name + ' destacado en tu perfil');
+    }
+
+    renderFeatured();
+    /* Actualizar boton del modal */
+    const featBtn = document.getElementById('modal-feat-btn');
+    if (featBtn) {
+      const nowFeatured = !isThis;
+      featBtn.textContent = nowFeatured ? '✦ Ya destacado' : 'Destacar en perfil';
+      featBtn.classList.toggle('active', nowFeatured);
+    }
+  }
+
+  function renderFeatured() {
+    const slot = document.getElementById('featured-card-slot');
+    const info = document.getElementById('featured-info');
+    const ch   = getFeatured();
+
+    if (!ch) {
+      slot.innerHTML = `<div class="featured-empty"><div class="fe-icon">✦</div><span>Ningun personaje destacado</span></div>`;
+      info.innerHTML = `<p style="color:var(--muted);font-size:0.85rem;">Haz click en cualquier personaje y presiona <b style="color:#a78bfa">Destacar en perfil</b>.</p>`;
+      return;
+    }
+
+    /* Render card */
+    slot.innerHTML = '';
+    const cardEl = buildCardEl(ch, 0, [ch]);
+    slot.appendChild(cardEl);
+
+    const rClass = 'stars-r'+ch.stars;
+    info.innerHTML = `
+      <div class="fi-stars">${starsHTML(ch.stars, rClass)}</div>
+      <h3>${ch.name}</h3>
+      <div class="fi-anime">${ch.anime}</div>
+      <p>${ch.description || ''}</p>
+      <button class="btn-set-featured active" onclick="setFeaturedFromSlot()">✦ Quitar destacado</button>
+    `;
+  }
+
+  function setFeaturedFromSlot() {
+    _modalChar = getFeatured();
+    setFeatured();
+  }
 
   /* ══════════════════════════════════════
      HISTORY
@@ -1019,6 +1170,9 @@
   /* Cargar holy cuando Firebase este listo */
   if (window.ReAnimeDB) updateHolyDisplay();
   else window.addEventListener('reanimdb:ready', updateHolyDisplay, { once:true });
+
+  /* Render personaje destacado guardado */
+  renderFeatured();
   </script>
 </body>
 </html>

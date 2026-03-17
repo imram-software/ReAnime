@@ -693,6 +693,12 @@
     <div class="logo">Re<span>:</span>Anime</div>
     <div class="header-right">
       <button id="theme-toggle-btn" onclick="toggleTheme()">☀ Tema</button>
+      <a href="gacha.html" id="gacha-header-btn" style="
+        background:none; border:1px solid #a78bfa; color:#a78bfa;
+        padding:0.4rem 0.9rem; border-radius:6px; font-size:0.82rem;
+        text-decoration:none; font-weight:700; letter-spacing:0.5px;
+        transition:all 0.2s; display:none;
+      " onmouseover="this.style.background='#a78bfa22'" onmouseout="this.style.background='none'">✦ Gacha</a>
       <a id="login-btn" href="#">Discord</a>
       <div id="user-info" class="hidden">
         <div id="user-popup"></div>
@@ -862,6 +868,8 @@
       app.style.display = 'block';
       app.classList.add('fade-enter');
       loadApp();
+      const gb = document.getElementById('gacha-header-btn');
+      if (gb) gb.style.display = 'inline-flex';
     }, 500);
   });
 
@@ -1205,6 +1213,8 @@
   if (genreFromURL || animeIdFromURL) {
     document.getElementById('intro').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    const gb = document.getElementById('gacha-header-btn');
+    if (gb) gb.style.display = 'inline-flex';
     loadApp();
   }
   </script>

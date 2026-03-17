@@ -34,7 +34,8 @@ const discordUser = JSON.parse(localStorage.getItem("user")) || null;
 const DEFAULT_DATA = {
   watching: [], completed: [], favorites: [], watchlist: [], episodesSeen: {},
   holy: 0,          // moneda del gacha
-  collection: []    // personajes obtenidos [{id,name,anime,image,stars,obtainedAt}]
+  collection: [],   // personajes obtenidos [{id,name,anime,image,stars,obtainedAt}]
+  featured: null    // personaje destacado en perfil
 };
 
 /* ─────────────────────────────────────────────────────────────
@@ -252,6 +253,22 @@ async function getCollection() {
 /* ─────────────────────────────────────────────────────────────
    EXPONER
 ───────────────────────────────────────────────────────────── */
+async function setFeatured(charData) {
+  await _readyPromise;
+  _localData.featured = charData || null;
+  window.dispatchEvent(new CustomEvent("reanimdb:update", { detail: _localData }));
+  if (!discordUser) { localStorage.setItem("user_data", JSON.stringify(_localData)); return; }
+  try {
+    await ensureDoc();
+    await updateDoc(userRef(), { featured: charData || null });
+  } catch(e) { console.warn("[Re:Anime] setFeatured:", e); }
+}
+
+async function getFeaturedChar() {
+  await _readyPromise;
+  return _localData.featured || null;
+}
+
 window.ReAnimeDB = {
   loadUserData,
   addToList,
@@ -264,5 +281,7 @@ window.ReAnimeDB = {
   addHoly,
   spendHoly,
   addToCollection,
-  getCollection
+  getCollection,
+  setFeatured,
+  getFeaturedChar
 };

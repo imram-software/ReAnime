@@ -261,11 +261,44 @@
       const animesP = fetch('animes.json').then(r => r.json());
 
       function renderAll(userData) {
+        renderFeaturedProfile(userData.featured || null);
         animesP.then(all => {
           renderSection('favorites', all, userData.favorites || []);
           renderSection('watchlist', all, userData.watchlist || []);
           renderSection('watched',   all, userData.completed || []);
         });
+      }
+
+      const R_STARS = { 5:'★★★★★',4:'★★★★☆',3:'★★★☆☆',2:'★★☆☆☆',1:'★☆☆☆☆' };
+      const R_COLOR = { 5:'#fbbf24',4:'#c084fc',3:'#38bdf8',2:'#86efac',1:'#94a3b8' };
+      const R_SYMBOL= { 5:'★',4:'◆',3:'▲',2:'●',1:'─' };
+
+      function renderFeaturedProfile(ch) {
+        const el = document.getElementById('featured-profile-section');
+        if (!el) return;
+        if (!ch) { el.innerHTML = ''; return; }
+
+        const rColor = R_COLOR[ch.stars] || '#94a3b8';
+        const rClass = 'r' + ch.stars;
+        el.innerHTML = `
+          <div class="section-header" style="margin-bottom:0.8rem;">
+            <h2 class="section-title">Personaje <em>Destacado</em></h2>
+            <div class="section-line"></div>
+          </div>
+          <div class="featured-profile-wrap">
+            <div class="featured-profile-card ${rClass}">
+              <div class="fp-gradient"></div>
+              <div class="fp-symbol">${R_SYMBOL[ch.stars]||'─'}</div>
+              ${ch.image ? `<img src="${ch.image}" alt="${ch.name}" loading="lazy" onerror="this.style.display='none'" />` : ''}
+            </div>
+            <div class="featured-profile-info">
+              <div class="fp-badge">✦ Personaje Destacado</div>
+              <div class="fp-stars" style="color:${rColor}">${R_STARS[ch.stars]||'★'}</div>
+              <h3>${ch.name}</h3>
+              <div class="fp-anime">${ch.anime}</div>
+              <p>${ch.description || ''}</p>
+            </div>
+          </div>`;
       }
 
       /* reanimdb:ready → primer render (datos de IndexedDB, casi instantaneo) */
@@ -283,7 +316,10 @@
 
       /* reanimdb:update → re-render automatico cuando cambia algo
          en cualquier dispositivo (onSnapshot lo dispara en tiempo real) */
-      window.addEventListener('reanimdb:update', e => renderAll(e.detail));
+      window.addEventListener('reanimdb:update', e => {
+        renderFeaturedProfile(e.detail.featured || null);
+        renderAll(e.detail);
+      });
     }
 
     function buildProfileShell() {
@@ -299,6 +335,9 @@
           <button class="logout-btn" onclick="logout()">Cerrar sesion</button>
         </div>
         <div class="section-wrap">
+          <!-- FEATURED CHARACTER -->
+          <div id="featured-profile-section"></div>
+
           <div class="section-header">
             <h2 class="section-title"><em>Favoritos</em></h2>
             <div class="section-line"></div>
