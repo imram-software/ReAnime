@@ -32,7 +32,9 @@ enableIndexedDbPersistence(db).catch(() => {
 const discordUser = JSON.parse(localStorage.getItem("user")) || null;
 
 const DEFAULT_DATA = {
-  watching: [], completed: [], favorites: [], watchlist: [], episodesSeen: {}
+  watching: [], completed: [], favorites: [], watchlist: [], episodesSeen: {},
+  holy: 0,          // moneda del gacha
+  collection: []    // personajes obtenidos [{id,name,anime,image,stars,obtainedAt}]
 };
 
 /* ─────────────────────────────────────────────────────────────
@@ -189,6 +191,65 @@ async function getSeenEpisodes(animeId) {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   HOLY — moneda del gacha
+───────────────────────────────────────────────────────────── */
+async function getHoly() {
+  await _readyPromise;
+  return _localData.holy || 0;
+}
+
+async function addHoly(amount) {
+  await _readyPromise;
+  const newVal = (_localData.holy || 0) + amount;
+  _localData.holy = newVal;
+  window.dispatchEvent(new CustomEvent("reanimdb:update", { detail: _localData }));
+  if (!discordUser) { localStorage.setItem("user_data", JSON.stringify(_localData)); return newVal; }
+  try {
+    await ensureDoc();
+    await updateDoc(userRef(), { holy: newVal });
+  } catch(e) { console.warn("[Re:Anime] addHoly:", e); }
+  return newVal;
+}
+
+async function spendHoly(amount) {
+  await _readyPromise;
+  const current = _localData.holy || 0;
+  if (current < amount) return false; // sin fondos
+  const newVal = current - amount;
+  _localData.holy = newVal;
+  window.dispatchEvent(new CustomEvent("reanimdb:update", { detail: _localData }));
+  if (!discordUser) { localStorage.setItem("user_data", JSON.stringify(_localData)); return true; }
+  try {
+    await ensureDoc();
+    await updateDoc(userRef(), { holy: newVal });
+  } catch(e) { console.warn("[Re:Anime] spendHoly:", e); }
+  return true;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLLECTION — personajes del gacha
+───────────────────────────────────────────────────────────── */
+async function addToCollection(chars) {
+  // chars: array de objetos {id, name, anime, image, stars}
+  await _readyPromise;
+  const toAdd = chars.map(c => ({ ...c, obtainedAt: Date.now() }));
+  _localData.collection = [...(_localData.collection || []), ...toAdd];
+  window.dispatchEvent(new CustomEvent("reanimdb:update", { detail: _localData }));
+  if (!discordUser) { localStorage.setItem("user_data", JSON.stringify(_localData)); return; }
+  try {
+    await ensureDoc();
+    // Guardar los ultimos 500 personajes para no superar limite de Firestore
+    const capped = _localData.collection.slice(-500);
+    await updateDoc(userRef(), { collection: capped });
+  } catch(e) { console.warn("[Re:Anime] addToCollection:", e); }
+}
+
+async function getCollection() {
+  await _readyPromise;
+  return _localData.collection || [];
+}
+
+/* ─────────────────────────────────────────────────────────────
    EXPONER
 ───────────────────────────────────────────────────────────── */
 window.ReAnimeDB = {
@@ -198,5 +259,10 @@ window.ReAnimeDB = {
   toggleAnimeInList,
   isInList,
   markEpisodeSeen,
-  getSeenEpisodes
+  getSeenEpisodes,
+  getHoly,
+  addHoly,
+  spendHoly,
+  addToCollection,
+  getCollection
 };

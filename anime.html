@@ -429,6 +429,8 @@
             player.innerHTML = ep.embed;
           }
           localStorage.setItem('lastWatched', JSON.stringify({ id: anime.id, index: i }));
+          /* Iniciar contador de Holy al cambiar de episodio */
+          startHolyEarning(anime.id, i);
         };
         epList.appendChild(btn);
       });
@@ -536,6 +538,69 @@
         ramText.textContent = '¿En que puedo ayudarte?';
       }, 7000);
     }
+
+    /* ═══════════════════════════════════════════════════
+       HOLY EARNING
+       1 episodio = 19 min = 1140 seg = 1000 Holy
+       → 1000 / 1140 ≈ 0.877 Holy/seg
+       → cada 20 seg se otorgan ~17.5 (redondeado 17) Holy
+    ═══════════════════════════════════════════════════ */
+    const HOLY_PER_INTERVAL = 17;  // Holy cada 20 segundos
+    const HOLY_INTERVAL_MS  = 20000;
+    let holyTimer = null;
+    let holySessionKey = null; // evitar duplicar si cambia episodio
+
+    function startHolyEarning(animeId, epIdx) {
+      stopHolyEarning();
+      const key = `${animeId}_${epIdx}`;
+      holySessionKey = key;
+
+      if (!window.ReAnimeDB) {
+        // Esperar a que Firebase cargue y reintentar
+        window.addEventListener('reanimdb:ready', () => {
+          if (holySessionKey === key) startHolyEarning(animeId, epIdx);
+        }, { once: true });
+        return;
+      }
+
+      holyTimer = setInterval(async () => {
+        if (document.hidden) return; // no ganar si la pestaña esta oculta
+        await window.ReAnimeDB.addHoly(HOLY_PER_INTERVAL);
+        showHolyToast(HOLY_PER_INTERVAL);
+      }, HOLY_INTERVAL_MS);
+    }
+
+    function stopHolyEarning() {
+      clearInterval(holyTimer);
+      holyTimer = null;
+    }
+
+    /* Toast mini que aparece en esquina cuando ganas Holy */
+    const holyToastEl = (() => {
+      const el = document.createElement('div');
+      el.style.cssText = `
+        position:fixed; bottom:1.5rem; left:1.5rem; z-index:2000;
+        background:#1a0030; border:1px solid #a78bfa; border-radius:8px;
+        padding:0.5rem 1rem; font-size:0.82rem; color:#e9d5ff;
+        pointer-events:none; opacity:0; transition:opacity 0.3s;
+        font-family:'DM Sans',sans-serif;
+      `;
+      document.body.appendChild(el);
+      return el;
+    })();
+    let holyToastTimer;
+    function showHolyToast(amount) {
+      holyToastEl.textContent = `+${amount} ✦ Holy`;
+      holyToastEl.style.opacity = '1';
+      clearTimeout(holyToastTimer);
+      holyToastTimer = setTimeout(() => holyToastEl.style.opacity = '0', 2000);
+    }
+
+    /* Pausar cuando el usuario cambia de pestaña */
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopHolyEarning();
+      // No reiniciar automaticamente — el usuario tiene que seguir viendo
+    });
   </script>
 </body>
 </html>
