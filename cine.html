@@ -27,10 +27,13 @@
       position: fixed; inset: 0; z-index: 10;
       display: flex; flex-direction: column;
       justify-content: space-between;
+      /* Nunca bloquea el area del video — solo las barras capturan clicks */
       pointer-events: none;
       opacity: 0; transition: opacity 0.35s;
     }
-    body.active #ui { opacity: 1; pointer-events: auto; }
+    body.active #ui { opacity: 1; }
+    body.active #top-bar,
+    body.active #bottom-bar { pointer-events: auto; }
     body.active { cursor: default; }
     body:not(.active) { cursor: none; }
 
