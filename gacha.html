@@ -647,33 +647,14 @@
 
   function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
 
-  /* Traducir texto EN→ES usando MyMemory (gratuito, sin key) */
-  const translateCache = {};
-  async function translateES(text) {
-    if (!text || text.length < 10) return text || '';
-    const key = text.slice(0,40);
-    if (translateCache[key]) return translateCache[key];
-    try {
-      const url = 'https://api.mymemory.translated.net/get?q='
-        + encodeURIComponent(text.slice(0,400))
-        + '&langpair=en|es';
-      const r = await fetch(url);
-      const j = await r.json();
-      const translated = j.responseData?.translatedText || text;
-      translateCache[key] = translated;
-      return translated;
-    } catch { return text; }
-  }
-
   /* Convierte un objeto data de Jikan a nuestro formato */
-  async function jikanToChar(d) {
+  function jikanToChar(d) {
     const anime = d.anime?.[0]?.anime?.title
                || d.manga?.[0]?.manga?.title
                || 'Anime/Manga';
-    const rawDesc = (d.about || '').slice(0, 350).replace(/\n/g,' ').trim();
-    const desc = rawDesc
-      ? await translateES(rawDesc)
-      : 'Sin informacion adicional.';
+    /* Limpiar descripcion: quitar stats de ficha, quedarse con el primer parrafo de texto real */
+    const raw = (d.about || '').replace(/\n/g,' ').trim();
+    const desc = cleanDesc(raw);
     return {
       id:          d.mal_id,
       name:        d.name,
@@ -683,6 +664,24 @@
       stars:       rollRarity(),
       source:      'jikan',
     };
+  }
+
+  /* Limpia descripciones de Jikan:
+     - elimina bloques de stats (Age: / Height: / Birthday: etc.)
+     - queda el primer fragmento de texto narrativo */
+  function cleanDesc(raw) {
+    if (!raw) return 'Sin descripcion disponible.';
+    /* Partir por punto o doble espacio, buscar la primera oracion real */
+    const sentences = raw.split(/(?<=[.!?])\s+/);
+    const narrative = sentences.find(s => {
+      /* Ignorar lineas que son puras estadisticas */
+      const statPattern = /^(Age|Height|Weight|Birthday|Blood|Race|Team|Rank|Specialty|Born|BWH|Family|Familiar):/i;
+      return s.length > 30 && !statPattern.test(s.trim());
+    });
+    if (narrative) return narrative.slice(0, 240).trim();
+    /* Fallback: primer fragmento de mas de 30 chars */
+    const fallback = raw.replace(/\w+:\s*[^.]+/g,'').trim();
+    return (fallback.slice(0, 240) || 'Sin descripcion disponible.').trim();
   }
 
   /* Carga una pagina de personajes top — 1 request, 25 personajes */
@@ -695,7 +694,7 @@
       const r = await fetch(`https://api.jikan.moe/v4/top/characters?page=${page}&limit=25`);
       if (!r.ok) throw new Error('Jikan ' + r.status);
       const j = await r.json();
-      const nuevos = await Promise.all((j.data || []).map(jikanToChar));
+      const nuevos = (j.data || []).map(jikanToChar);
       /* Mezclar aleatoriamente y agregar al pool */
       for (let i = nuevos.length - 1; i > 0; i--) {
         const k = Math.floor(Math.random() * (i+1));
@@ -853,7 +852,7 @@
 
   function finishReveal() {
     overlay.classList.remove('open');
-    revRays.style.animation = 'none';
+    revEffects.innerHTML = ''; // clear effects
     overlay.style.animation = 'none';
     if (revealResolve) { revealResolve(); revealResolve = null; }
   }
