@@ -412,20 +412,25 @@
   }
 
   /* ══════════════════════════════════════
-     JIKAN API — personaje aleatorio
-     Rate limit: ~3 req/s con delay
+     JIKAN API — pool de personajes
+     Estrategia: 1 sola request para llenar
+     un pool local, pulls se sirven del pool.
+     Cuando queda poco, refrescar en segundo plano.
   ══════════════════════════════════════ */
-  async function fetchJikanChar() {
-    /* Jikan v4 random character */
-    const r = await fetch('https://api.jikan.moe/v4/random/characters');
-    if (!r.ok) throw new Error('Jikan error');
-    const j = await r.json();
-    const d = j.data;
-    const anime = d.anime?.[0]?.anime?.title || d.manga?.[0]?.manga?.title || 'Anime/Manga';
+  let charPool   = [];   // personajes ya cargados
+  let poolLoading = false;
+
+  function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+  /* Convierte un objeto data de Jikan a nuestro formato */
+  function jikanToChar(d) {
+    const anime = d.anime?.[0]?.anime?.title
+               || d.manga?.[0]?.manga?.title
+               || 'Anime/Manga';
     return {
       id:          d.mal_id,
       name:        d.name,
-      anime:       anime,
+      anime,
       image:       d.images?.jpg?.image_url || d.images?.webp?.image_url || '',
       description: (d.about || 'Sin informacion adicional.').slice(0, 280).replace(/\n/g,' '),
       stars:       rollRarity(),
@@ -433,26 +438,52 @@
     };
   }
 
-  /* Delay entre requests para no superar rate limit */
-  function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
-
-  async function fetchMultipleJikan(n) {
-    const results = [];
-    for (let i=0; i<n; i++) {
-      if (i>0) await delay(400); // ~2.5 req/s, bajo el límite de Jikan
-      try {
-        const char = await fetchJikanChar();
-        results.push(char);
-      } catch {
-        // Si falla una, usar fallback con datos mínimos
-        results.push(fallbackChar(rollRarity()));
+  /* Carga una pagina de personajes top — 1 request, 25 personajes */
+  async function fillPool() {
+    if (poolLoading) return;
+    poolLoading = true;
+    /* paginas 1-20 al azar para variedad */
+    const page = Math.ceil(Math.random() * 20);
+    try {
+      const r = await fetch(`https://api.jikan.moe/v4/top/characters?page=${page}&limit=25`);
+      if (!r.ok) throw new Error('Jikan ' + r.status);
+      const j = await r.json();
+      const nuevos = (j.data || []).map(jikanToChar);
+      /* Mezclar aleatoriamente y agregar al pool */
+      for (let i = nuevos.length - 1; i > 0; i--) {
+        const k = Math.floor(Math.random() * (i+1));
+        [nuevos[i], nuevos[k]] = [nuevos[k], nuevos[i]];
       }
+      charPool = [...charPool, ...nuevos];
+    } catch(e) {
+      console.warn('Jikan pool fill failed:', e);
+      /* Llenar con fallbacks para no dejar el pool vacío */
+      for (let i=0; i<10; i++) charPool.push(fallbackChar(rollRarity()));
     }
-    return results;
+    poolLoading = false;
+  }
+
+  /* Sacar n personajes del pool; si hay pocos, rellenar en background */
+  async function fetchMultipleJikan(n) {
+    /* Si el pool tiene menos de lo necesario, esperar carga */
+    if (charPool.length < n) {
+      await fillPool();
+    }
+    /* Si aun falta (fillPool fallo), completar con fallbacks */
+    while (charPool.length < n) charPool.push(fallbackChar(rollRarity()));
+
+    const pulled = charPool.splice(0, n);
+
+    /* Rellenar en background cuando queda poco */
+    if (charPool.length < 15) fillPool();
+
+    /* Re-asignar raridad en el momento del pull (el pool guarda stars fijas,
+       pero queremos variedad en cada sesion) */
+    return pulled.map(c => ({ ...c, stars: rollRarity() }));
   }
 
   function fallbackChar(stars) {
-    const names = ['Yuki','Hana','Rei','Sakura','Akira','Natsuki','Sora','Kira','Miku','Aoi'];
+    const names  = ['Yuki','Hana','Rei','Sakura','Akira','Natsuki','Sora','Kira','Miku','Aoi'];
     const animes = ['Re:Zero','Sword Art Online','Attack on Titan','Naruto','One Piece','Demon Slayer','Jujutsu Kaisen','My Hero Academia'];
     return {
       id:          Math.random(),
@@ -520,7 +551,7 @@
         chars = await fetchMultipleJikan(n);
       } else if (activeBanner.type === 'custom') {
         chars = pullCustom(activeBanner, n);
-        await delay(600); // animacion de espera
+        await delay(400); // animacion de espera
       }
     } catch {
       chars = Array.from({length:n}, ()=>fallbackChar(rollRarity()));
@@ -653,6 +684,8 @@
   buildTabs();
   updateHistory();
   loadCustomBanners();
+  /* Pre-cargar pool en cuanto abre la pagina */
+  fillPool();
   </script>
 </body>
 </html>
