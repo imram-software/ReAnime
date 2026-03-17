@@ -2,18 +2,18 @@
   "banners": [
     {
       "id": "especial-1",
-      "name": "Banner Especial",
-      "subtitle": "Personajes exclusivos",
-      "active": false,
+      "name": "From Zero Banner",
+      "subtitle": "Personajes de Re:Zero por la innaución de la tienda Gacha",
+      "active": true,
       "color": "#c084fc",
       "characters": [
         {
           "id": 1,
-          "name": "Nombre del Personaje",
-          "anime": "Nombre del Anime",
+          "name": "Rem",
+          "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
           "rarity": 5,
-          "image": "https://url-de-la-imagen.jpg",
-          "description": "Descripcion del personaje.",
+          "image": "https://imgs.search.brave.com/e7YCBdohsnSkA_-F1_hCGlnxNsue5W09kY01p4l5EEE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzBhLzUz/Lzc0LzBhNTM3NDEz/ZGU3YzcxMjZlOWJi/MjQ2ZWIzYzc2MmYy/LmpwZw",
+          "description": "Rem es un personaje principal de Re:Zero - Starting Life in Another World. Hermana gemela menor de Ram, trabaja como sirvienta en la mansión de Roswaal. Inicialmente desconfía de Subaru por el 'olor de la Bruja', llegando a matarlo dos veces. Tras ser salvada por él en el Bosque de Elior, se enamora profundamente y lo considera su 'héroe', convirtiéndose en una aliada leal.",
           "type": "femenino"
         }
       ]
