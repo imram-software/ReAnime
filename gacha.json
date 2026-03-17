@@ -3,7 +3,7 @@
     {
       "id": "especial-1",
       "name": "From Zero Banner",
-      "subtitle": "Personajes de Re:Zero por la innaución de la tienda Gacha",
+      "subtitle": "Personajes de Re:Zero por la inaguracion de la tienda Gacha",
       "active": true,
       "color": "#c084fc",
       "characters": [
@@ -13,7 +13,16 @@
           "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
           "rarity": 5,
           "image": "https://imgs.search.brave.com/e7YCBdohsnSkA_-F1_hCGlnxNsue5W09kY01p4l5EEE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzBhLzUz/Lzc0LzBhNTM3NDEz/ZGU3YzcxMjZlOWJi/MjQ2ZWIzYzc2MmYy/LmpwZw",
-          "description": "Rem es un personaje principal de Re:Zero - Starting Life in Another World. Hermana gemela menor de Ram, trabaja como sirvienta en la mansión de Roswaal. Inicialmente desconfía de Subaru por el 'olor de la Bruja', llegando a matarlo dos veces. Tras ser salvada por él en el Bosque de Elior, se enamora profundamente y lo considera su 'héroe', convirtiéndose en una aliada leal.",
+          "description": "rem es un personaje de Re:Zero - Starting Life in Another World. Hermana gemela menor de Ram, trabaja como sirvienta en la mansión de Roswaal. Es amable, tímida y dedicada a su trabajo, pero también es una luchadora formidable cuando se trata de proteger a sus seres queridos. A pesar de su apariencia dulce, Rem tiene un pasado oscuro que la ha llevado a desarrollar una fuerte determinación para proteger a aquellos que ama.",
+          "type": "femenino"
+        },
+        {
+          "id": 2,
+          "name": "Ram",
+          "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
+          "rarity": 4,
+          "image": "https://imgs.search.brave.com/l2CgYzii6sEbazo6WxJ4mz9f2JE3UTTeNEA_UmXoNMg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zMy56/ZXJvY2hhbi5uZXQv/MjQwLzI1LzI3LzQ0/NjM4NzUuYXZpZg",
+          "description": "Ram es un personaje de Re:Zero - Starting Life in Another World. Hermana gemela mayor de Rem, trabaja como sirvienta en la mansión de Roswaal. Es orgullosa y sarcástica, pero también leal a su hermana y a Roswaal. A pesar de su actitud fría, se preocupa profundamente por Rem y se muestra protectora hacia ella.",
           "type": "femenino"
         }
       ]
