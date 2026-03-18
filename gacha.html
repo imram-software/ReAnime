@@ -884,10 +884,9 @@
 
   /* Convierte un objeto data de Jikan a nuestro formato */
   function jikanToChar(d) {
-    const anime =
-  (Array.isArray(d.anime) && d.anime.length > 0 && d.anime[0]?.anime?.title) ||
-  (Array.isArray(d.manga) && d.manga.length > 0 && d.manga[0]?.manga?.title) ||
-  'Desconocido';
+    const anime = d.anime?.[0]?.anime?.title
+               || d.manga?.[0]?.manga?.title
+               || 'Anime/Manga';
     /* Limpiar descripcion: quitar stats de ficha, quedarse con el primer parrafo de texto real */
     const raw = (d.about || '').replace(/\n/g,' ').trim();
     const desc = cleanDesc(raw);
@@ -929,7 +928,7 @@
     /* paginas 1-20 al azar para variedad */
     const page = Math.ceil(Math.random() * 20);
     try {
-      const r = await fetch(`https://api.jikan.moe/v4/top/characters?page=${page}&limit=25`);
+      const r = await fetch(`https://api.jikan.moe/v4/top/characters?page=${page}&limit=25/full`);
       if (!r.ok) throw new Error('Jikan ' + r.status);
       const j = await r.json();
       const nuevos = (j.data || []).map(jikanToChar);
