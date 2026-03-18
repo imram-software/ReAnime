@@ -308,6 +308,7 @@
     } else {
       /* Determinar que ID cargar */
       const targetId = viewId || selfUser.id;
+      window._profileTargetId = targetId;
 
       /* animes.json una sola vez */
       const animesP = fetch('animes.json').then(r => r.json());
@@ -516,43 +517,7 @@
         }
       }
 
-      async function handleLike() {
-        const btn = document.getElementById('like-btn');
-        if (!btn || btn.disabled) return;
-        btn.setAttribute('disabled', true);
-        btn.textContent = '...';
 
-        let result;
-        if (window.ReAnimeDB) {
-          result = await window.ReAnimeDB.likeProfile(targetId);
-        } else {
-          // Fallback sin Firebase
-          const today = new Date().toISOString().slice(0,10);
-          const key = 'liked_' + targetId;
-          result = localStorage.getItem(key) === today ? 'already_today' : 'ok';
-          if (result === 'ok') localStorage.setItem(key, today);
-        }
-
-        if (result === 'ok') {
-          btn.textContent = '♥ Liked';
-          btn.classList.add('liked');
-          btn.title = 'Vuelve mañana para dar like de nuevo';
-          // Actualizar contador localmente
-          const countEl = document.getElementById('likes-count');
-          if (countEl) {
-            const cur = parseInt(countEl.textContent.replace(/,/g,'')) || 0;
-            countEl.textContent = (cur + 1).toLocaleString();
-          }
-        } else if (result === 'already_today') {
-          btn.textContent = '♥ Liked';
-          btn.classList.add('liked');
-          btn.title = 'Ya diste like hoy';
-        } else if (result === 'not_logged_in') {
-          btn.textContent = '♡ Like';
-          btn.removeAttribute('disabled');
-          alert('Inicia sesion con Discord para dar like.');
-        }
-      }
 
       /* ── Iniciar carga ── */
       buildProfileShell(targetId);
@@ -658,6 +623,45 @@
         `;
         container.appendChild(card);
       });
+    }
+
+    /* handleLike en scope global — accede a targetId via window */
+    async function handleLike() {
+      const tid = window._profileTargetId;
+      if (!tid) return;
+      const btn = document.getElementById('like-btn');
+      if (!btn || btn.disabled) return;
+      btn.setAttribute('disabled', true);
+      btn.textContent = '...';
+
+      let result;
+      if (window.ReAnimeDB) {
+        result = await window.ReAnimeDB.likeProfile(tid);
+      } else {
+        const today = new Date().toISOString().slice(0,10);
+        const key = 'liked_' + tid;
+        result = localStorage.getItem(key) === today ? 'already_today' : 'ok';
+        if (result === 'ok') localStorage.setItem(key, today);
+      }
+
+      if (result === 'ok') {
+        btn.textContent = '♥ Liked';
+        btn.classList.add('liked');
+        btn.title = 'Vuelve mañana para dar like de nuevo';
+        const countEl = document.getElementById('likes-count');
+        if (countEl) {
+          const cur = parseInt(countEl.textContent.replace(/,/g,'')) || 0;
+          countEl.textContent = (cur + 1).toLocaleString();
+        }
+      } else if (result === 'already_today') {
+        btn.textContent = '♥ Liked';
+        btn.classList.add('liked');
+        btn.title = 'Ya diste like hoy';
+      } else if (result === 'not_logged_in') {
+        btn.textContent = '♡ Like';
+        btn.removeAttribute('disabled');
+        alert('Inicia sesion con Discord para dar like.');
+      }
     }
   </script>
 </body>
