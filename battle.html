@@ -192,6 +192,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
     <div class="conquest-bar">
       <div class="cq-icon">⚔</div>
       <div><div class="cq-val" id="cq-display">0</div><div class="cq-label">Puntos de Conquista</div></div>
+      <a href="pvp.html" style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.4rem .9rem;font-size:.78rem;text-decoration:none;transition:all .2s;font-family:var(--font-b);" onmouseover="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙ Editar Equipos</a>
     </div>
 
     <!-- MATCHMAKING -->
@@ -219,7 +220,10 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
     </div>
 
     <button class="start-btn" id="start-btn" onclick="startBattle()" disabled>Iniciar Batalla ⚔</button>
-    <div style="margin-top:.6rem;text-align:center;color:var(--muted);font-size:.78rem;" id="setup-msg">Cargando...</div>
+    <div style="margin-top:.6rem;text-align:center;font-size:.78rem;" id="setup-msg">Cargando...</div>
+    <div style="text-align:center;margin-top:.5rem;" id="go-pvp-link" hidden>
+      <a href="pvp.html" style="color:var(--pink);font-size:.82rem;text-decoration:none;border-bottom:1px solid var(--pink-dim);">→ Ir al Constructor de Equipos</a>
+    </div>
   </div>
 
   <!-- BATTLE SCREEN -->
@@ -473,13 +477,15 @@ function renderSetup() {
   document.getElementById('setup-msg').textContent = ready
     ? 'Todo listo. Los turnos se ordenan por velocidad (SPD).'
     : myAtkTeam.length === 0
-      ? '⚠ No tienes equipo de ataque. Configúralo en pvp.html.'
+      ? '⚠ No tienes equipo de ataque configurado.'
       : !enemyDefTeam.length
       ? 'Usa "Buscar Rival" para encontrar un oponente.'
       : '⚠ El rival no tiene equipo defensivo.';
 
   renderTeamPreview('atk-preview', myAtkTeam);
   renderTeamPreview('def-preview', enemyDefTeam);
+  const goLink = document.getElementById('go-pvp-link');
+  if (goLink) goLink.hidden = myAtkTeam.length > 0;
 }
 
 function renderTeamPreview(id, team) {
