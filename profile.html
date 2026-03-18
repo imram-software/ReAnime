@@ -191,6 +191,32 @@
       .logout-btn { margin-left: 0; }
       .anime-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
     }
+  /* ── DISPLAY NAME editor ── */
+      .display-name-wrap {
+        display:flex; align-items:center; gap:0.5rem;
+      }
+      .display-name-text {
+        font-size:1.1rem; font-weight:700;
+      }
+      .display-name-input {
+        background:var(--bg3); border:1px solid var(--pink);
+        color:var(--text); border-radius:6px;
+        padding:0.3rem 0.6rem; font-size:1rem;
+        font-family:var(--font-body); outline:none;
+        max-width:200px; display:none;
+      }
+      .edit-name-btn {
+        background:none; border:none; cursor:pointer;
+        color:var(--muted); font-size:0.85rem; padding:0.1rem 0.3rem;
+        transition:color 0.2s; line-height:1;
+      }
+      .edit-name-btn:hover { color:var(--pink); }
+      .save-name-btn {
+        background:var(--pink); border:none; color:#fff;
+        border-radius:5px; padding:0.3rem 0.7rem;
+        font-size:0.78rem; cursor:pointer; display:none;
+        font-family:var(--font-body);
+      }
   </style>
 </head>
 <body>
@@ -466,8 +492,7 @@
               </span>
               ${isSelf ? `<button class="edit-name-btn" id="edit-name-btn" title="Editar nombre">✏</button>` : ''}
             </div>
-            <input class="display-name-input" id="display-name-input" maxlength="32" placeholder="Tu nombre..." />
-            ${isSelf ? `<button class="save-name-btn" id="save-name-btn">Guardar</button>` : ''}
+            ${isSelf ? `<input class="display-name-input" id="display-name-input" maxlength="32" placeholder="Tu nombre..." /><button class="save-name-btn" id="save-name-btn">Guardar</button>` : ''}
             <small id="profile-username" style="color:var(--muted);font-size:0.75rem;display:block;margin-top:0.15rem;"></small>
             <small id="holy-profile-badge" style="color:#a78bfa;font-size:0.78rem;display:block;margin-top:0.1rem;"></small>
           </div>
@@ -529,29 +554,4 @@
     }
   </script>
 </body>
-</html>      /* ── DISPLAY NAME editor ── */
-      .display-name-wrap {
-        display:flex; align-items:center; gap:0.5rem;
-      }
-      .display-name-text {
-        font-size:1.1rem; font-weight:700;
-      }
-      .display-name-input {
-        background:var(--bg3); border:1px solid var(--pink);
-        color:var(--text); border-radius:6px;
-        padding:0.3rem 0.6rem; font-size:1rem;
-        font-family:var(--font-body); outline:none;
-        max-width:200px; display:none;
-      }
-      .edit-name-btn {
-        background:none; border:none; cursor:pointer;
-        color:var(--muted); font-size:0.85rem; padding:0.1rem 0.3rem;
-        transition:color 0.2s; line-height:1;
-      }
-      .edit-name-btn:hover { color:var(--pink); }
-      .save-name-btn {
-        background:var(--pink); border:none; color:#fff;
-        border-radius:5px; padding:0.3rem 0.7rem;
-        font-size:0.78rem; cursor:pointer; display:none;
-        font-family:var(--font-body);
-      }
+</html>
