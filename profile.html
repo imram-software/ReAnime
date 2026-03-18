@@ -239,6 +239,128 @@
         font-size:0.78rem; cursor:pointer; display:none;
         font-family:var(--font-body);
       }
+
+    /* ── FEATURED CHARACTER ── */
+    .featured-profile-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+      flex-wrap: wrap;
+      padding: 1.8rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Fondo decorativo con gradiente radial */
+    .featured-profile-wrap::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 20% 50%, rgba(255,45,120,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    /* Linea decorativa izquierda */
+    .featured-profile-wrap::after {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, transparent, var(--pink), transparent);
+    }
+
+    /* Carta de tamaño fijo */
+    .featured-profile-card {
+      width: 240px;
+      height: 427px; /* 240 * 16/9 → no, 240*(3/2)=360, but user wants 427 ≈ 240*1.78 */
+      flex-shrink: 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      border: 2px solid var(--border);
+      background: var(--bg3);
+    }
+    .featured-profile-card.r5 { border-color: #fbbf24; box-shadow: 0 0 24px rgba(251,191,36,0.25), 0 0 60px rgba(251,191,36,0.08); }
+    .featured-profile-card.r4 { border-color: #c084fc; box-shadow: 0 0 20px rgba(192,132,252,0.2); }
+    .featured-profile-card.r3 { border-color: #38bdf8; box-shadow: 0 0 14px rgba(56,189,248,0.15); }
+
+    .fp-gradient {
+      position: absolute; inset: 0;
+      z-index: 0;
+    }
+    .r5 .fp-gradient { background: linear-gradient(160deg, #1a0a00, #3d1900 45%, #7c3300 80%); }
+    .r4 .fp-gradient { background: linear-gradient(160deg, #0d001a, #1e003d 45%, #3b0080 80%); }
+    .r3 .fp-gradient { background: linear-gradient(160deg, #001220, #002444 45%, #003d6e 80%); }
+    .r2 .fp-gradient { background: linear-gradient(160deg, #001a0a, #003018 50%, #004d28 80%); }
+    .r1 .fp-gradient { background: linear-gradient(160deg, #0d0d0d, #181818 50%); }
+
+    .fp-symbol {
+      position: absolute; inset: 0; z-index: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem; opacity: 0.1; pointer-events: none;
+    }
+    .r5 .fp-symbol { color: #fbbf24; opacity: 0.18; font-size: 6rem; }
+    .r4 .fp-symbol { color: #c084fc; opacity: 0.15; }
+
+    .featured-profile-card img {
+      position: absolute; inset: 0; z-index: 2;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: top;
+      display: block;
+    }
+
+    /* Gradient overlay encima de la imagen */
+    .featured-profile-card .fp-overlay {
+      position: absolute; inset: 0; z-index: 3;
+      background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%);
+    }
+
+    /* Info al lado */
+    .featured-profile-info {
+      flex: 1;
+      min-width: 180px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding-top: 0.5rem;
+    }
+    .fp-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--pink); border: 1px solid var(--pink-dim);
+      border-radius: 20px; padding: 0.2rem 0.7rem;
+      margin-bottom: 1rem; width: fit-content;
+    }
+    .fp-stars { font-size: 1rem; margin-bottom: 0.4rem; }
+    .featured-profile-info h3 {
+      font-family: var(--font-head);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      letter-spacing: 3px; line-height: 1;
+      color: var(--text); margin-bottom: 0.3rem;
+    }
+    .fp-anime { color: var(--pink); font-size: 0.85rem; margin-bottom: 1rem; }
+    .featured-profile-info p {
+      font-size: 0.83rem; color: var(--muted);
+      line-height: 1.65; max-width: 400px;
+    }
+
+    /* Decoracion: numero de estrellas grande como marca de agua */
+    .featured-profile-info::before {
+      content: attr(data-stars);
+      position: absolute; right: 0; top: 0;
+      font-family: var(--font-head);
+      font-size: 8rem; line-height: 1;
+      color: var(--border); opacity: 0.4;
+      pointer-events: none; user-select: none;
+    }
+
+    @media (max-width: 600px) {
+      .featured-profile-card { width: 160px; height: 285px; }
+      .featured-profile-wrap { gap: 1.2rem; padding: 1.2rem; }
+    }
   </style>
 </head>
 <body>
@@ -456,8 +578,9 @@
         if (!ch) { el.innerHTML = ''; return; }
         const rColor = R_COLOR[ch.stars] || '#94a3b8';
         const rClass = 'r' + ch.stars;
+        const starLabel = '★'.repeat(ch.stars) + '☆'.repeat(5-ch.stars);
         el.innerHTML = `
-          <div class="section-header" style="margin-bottom:0.8rem;">
+          <div class="section-header" style="margin-bottom:1rem;">
             <h2 class="section-title">Personaje <em>Destacado</em></h2>
             <div class="section-line"></div>
           </div>
@@ -466,10 +589,11 @@
               <div class="fp-gradient"></div>
               <div class="fp-symbol">${R_SYMBOL[ch.stars]||'─'}</div>
               ${ch.image ? `<img src="${ch.image}" alt="${ch.name}" loading="lazy" onerror="this.style.display='none'" />` : ''}
+              <div class="fp-overlay"></div>
             </div>
-            <div class="featured-profile-info">
+            <div class="featured-profile-info" data-stars="${starLabel}">
               <div class="fp-badge">✦ Personaje Destacado</div>
-              <div class="fp-stars" style="color:${rColor}">${R_STARS[ch.stars]||'★'}</div>
+              <div class="fp-stars" style="color:${rColor};font-size:1.1rem;">${R_STARS[ch.stars]||'★'}</div>
               <h3>${ch.name}</h3>
               <div class="fp-anime">${ch.anime}</div>
               <p>${ch.description || ''}</p>
