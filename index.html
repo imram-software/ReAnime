@@ -821,12 +821,20 @@
     userInfo.onclick = () => {
       const p = document.getElementById('user-popup');
       p.style.display = p.style.display === 'block' ? 'none' : 'block';
-      p.innerHTML = `
-        <strong>${savedUser.username}</strong><br>
-        <img src="${av}" width="60" style="border-radius:50%;margin:0.5rem 0"><br>
-        <button onclick="window.location.href='profile.html'">Perfil</button>
-        <button onclick="localStorage.removeItem('user');location.reload()">Cerrar sesión</button>
-      `;
+      const profileUrl = location.origin + '/ReAnime/profile.html?id=' + savedUser.id;
+      p.innerHTML = '';
+      const items = [
+        { label: 'Mi perfil',        fn: () => location.href='profile.html' },
+        { label: 'Copiar link',      fn: function(){ navigator.clipboard.writeText(profileUrl).catch(()=>{}); this.textContent='Copiado!'; } },
+        { label: 'Cerrar sesión',    fn: () => { localStorage.removeItem('user'); location.reload(); } },
+      ];
+      p.innerHTML = '<strong>' + savedUser.username + '</strong><br><img src="' + av + '" width="60" style="border-radius:50%;margin:0.5rem 0"><br>';
+      items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.textContent = item.label;
+        btn.onclick = item.fn;
+        p.appendChild(btn);
+      });
     };
   }
 
