@@ -296,10 +296,6 @@
 
       /* ── Cargar datos del perfil objetivo directamente de Firestore ── */
       async function loadTargetProfile() {
-        /* Si es el propio perfil y ReAnimeDB esta listo, usarlo */
-        if (isOwnProfile && window.ReAnimeDB) {
-          return await window.ReAnimeDB.loadUserData();
-        }
         /* Para perfil ajeno, leer Firestore directamente via REST API publica */
         try {
           const url = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/users/${targetId}?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
@@ -337,10 +333,17 @@
       /* ── Renderizar todo ── */
       function renderAll(userData) {
         if (!userData) {
-          document.getElementById('profile-content').innerHTML = `
-            <button class="back-btn" onclick="history.back()">← Volver</button>
-            <p style="color:var(--muted);margin-top:4rem;text-align:center;">Perfil no encontrado.</p>`;
-          return;
+          if (isOwnProfile) {
+            /* Usuario nuevo sin doc todavia — mostrar perfil vacio */
+            userData = { discordId: selfUser?.id, discordUsername: selfUser?.username,
+                         discordAvatar: selfUser?.avatar, favorites:[], watchlist:[],
+                         completed:[], holy:0, featured:null, displayName:'' };
+          } else {
+            document.getElementById('profile-content').innerHTML = `
+              <button class="back-btn" onclick="history.back()">← Volver</button>
+              <p style="color:var(--muted);margin-top:4rem;text-align:center;">Perfil no encontrado.</p>`;
+            return;
+          }
         }
 
         /* ── Actualizar avatar y nombres desde datos de Firestore ── */
@@ -456,18 +459,18 @@
 
       /* ── Iniciar carga ── */
       buildProfileShell(targetId);
-      loadTargetProfile().then(renderAll);
 
-      /* Actualizacion en tiempo real solo para perfil propio */
       if (isOwnProfile) {
-        window.addEventListener('reanimdb:update', e => {
-          renderFeaturedProfile(e.detail.featured || null);
-          renderAll(e.detail);
-        });
-        if (window.ReAnimeDB) {}
-        else window.addEventListener('reanimdb:ready', () => {
-          window.ReAnimeDB.loadUserData().then(renderAll);
-        }, { once: true });
+        /* Perfil propio: esperar siempre a ReAnimeDB (crea el doc si no existe) */
+        const doLoad = () => window.ReAnimeDB.loadUserData().then(renderAll);
+        if (window.ReAnimeDB) doLoad();
+        else window.addEventListener('reanimdb:ready', doLoad, { once: true });
+
+        /* Actualizacion en tiempo real */
+        window.addEventListener('reanimdb:update', e => renderAll(e.detail));
+      } else {
+        /* Perfil ajeno: leer via REST */
+        loadTargetProfile().then(renderAll);
       }
     }
 
