@@ -87,6 +87,16 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .skill-btn .sk-type{font-size:.6rem;color:var(--rose);}
 #target-hint{font-size:.75rem;color:var(--rose);margin-top:.5rem;text-align:center;min-height:1.2em;}
 
+/* ── RIVAL CARD ── */
+.rival-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:all .2s;}
+.rival-card:hover{border-color:var(--pink);}
+.rival-card.selected{border-color:var(--pink);background:var(--pink-dim);}
+.rival-avatar{width:44px;height:44px;border-radius:50%;border:2px solid var(--border);object-fit:cover;}
+.rival-name{font-weight:700;font-size:.9rem;}
+.rival-pts{font-family:var(--font-h);font-size:1.2rem;color:#fbbf24;letter-spacing:1px;margin-left:auto;}
+.rival-sub{font-size:.72rem;color:var(--muted);margin-top:.1rem;}
+.rival-def-count{font-size:.7rem;color:var(--rose);}
+
 /* ── SETUP SCREEN ── */
 #setup-screen{padding:2rem 0;}
 .setup-title{font-family:var(--font-h);font-size:clamp(2rem,5vw,3.5rem);letter-spacing:4px;margin-bottom:.3rem;}
@@ -184,21 +194,32 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
       <div><div class="cq-val" id="cq-display">0</div><div class="cq-label">Puntos de Conquista</div></div>
     </div>
 
+    <!-- MATCHMAKING -->
+    <div id="matchmaking-panel" style="margin-bottom:1.5rem;">
+      <button class="start-btn" id="search-btn" onclick="searchOpponent()" style="margin-bottom:.8rem;background:linear-gradient(135deg,#1e3a5f,#2563eb);box-shadow:0 0 20px rgba(37,99,235,.4);">🔍 Buscar Rival</button>
+      <div style="text-align:center;color:var(--muted);font-size:.78rem;" id="search-msg">Busca un rival con puntos similares a los tuyos.</div>
+      
+      <div id="rival-list" style="margin-top:1rem;display:none;">
+        <div style="font-family:var(--font-h);font-size:1rem;letter-spacing:2px;color:var(--muted);margin-bottom:.8rem;">Rivales encontrados</div>
+        <div id="rival-cards" style="display:flex;flex-direction:column;gap:.6rem;"></div>
+      </div>
+    </div>
+
     <div class="setup-grid">
       <div class="setup-panel">
         <div class="setup-panel-title" style="color:var(--pink)">Tu Equipo de Ataque</div>
-        <div class="setup-panel-sub">Guardado en pvp.html</div>
+        <div class="setup-panel-sub">Configúralo en pvp.html → Constructor de Equipos</div>
         <div class="setup-team-preview" id="atk-preview"><span class="stp-empty">Sin equipo configurado</span></div>
       </div>
       <div class="setup-panel">
-        <div class="setup-panel-title" style="color:#3b82f6">Equipo Defensor</div>
-        <div class="setup-panel-sub" id="def-source-lbl">Usando tu propio equipo de defensa como práctica</div>
-        <div class="setup-team-preview" id="def-preview"><span class="stp-empty">Sin equipo enemigo</span></div>
+        <div class="setup-panel-title" style="color:#3b82f6">Equipo Rival</div>
+        <div class="setup-panel-sub" id="def-source-lbl">Selecciona un rival arriba</div>
+        <div class="setup-team-preview" id="def-preview"><span class="stp-empty">Sin rival seleccionado</span></div>
       </div>
     </div>
 
     <button class="start-btn" id="start-btn" onclick="startBattle()" disabled>Iniciar Batalla ⚔</button>
-    <div style="margin-top:.6rem;text-align:center;color:var(--muted);font-size:.78rem;" id="setup-msg">Cargando equipos...</div>
+    <div style="margin-top:.6rem;text-align:center;color:var(--muted);font-size:.78rem;" id="setup-msg">Cargando...</div>
   </div>
 
   <!-- BATTLE SCREEN -->
@@ -250,7 +271,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 ══════════════════════════════════════ */
 let pvpData      = null;
 let myAtkTeam    = [];  // from Firestore/localStorage
-let enemyDefTeam = [];  // from Firestore/localStorage (own def for practice)
+let enemyDefTeam = [];  // defense team of matched opponent
 let enemyId      = null;
 let enemyName    = 'CPU';
 
@@ -288,6 +309,8 @@ function showTab(t) {
 /* ══════════════════════════════════════
    INIT
 ══════════════════════════════════════ */
+const SELF_USER = JSON.parse(localStorage.getItem('user'));
+
 async function init() {
   // Load pvp_chars.json
   try { const r = await fetch('pvp_chars.json'); pvpData = await r.json(); } catch { pvpData = {characters:[],affinities:{}}; }
@@ -299,29 +322,125 @@ async function init() {
   document.getElementById('cq-hdr-val').textContent  = cq.toLocaleString();
   document.getElementById('conquest-hdr').style.display = 'flex';
 
-  // Get attack team — from ud.atkTeam or localStorage
+  // Get attack team
   const storedAtk = ud.atkTeam || JSON.parse(localStorage.getItem('reanime_atkteam')||'null');
-  const storedDef = ud.defTeam || JSON.parse(localStorage.getItem('reanime_defteam')||'null');
+  myAtkTeam = (storedAtk||[]).filter(Boolean);
 
-  myAtkTeam    = (storedAtk||[]).filter(Boolean);
-  enemyDefTeam = (storedDef||[]).filter(Boolean);
-
-  // Check URL for enemy id
+  // Check URL for direct enemy link
   const urlId = new URLSearchParams(location.search).get('enemy');
   if (urlId) {
-    enemyId = urlId;
-    try {
-      const url = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/users/${urlId}?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
-      const r = await fetch(url);
-      const doc = await r.json();
-      const parsed = firestoreDocToObj(doc);
-      if (parsed.defTeam) enemyDefTeam = parsed.defTeam.filter(Boolean);
-      enemyName = parsed.displayName || parsed.discordUsername || 'Oponente';
-      document.getElementById('def-source-lbl').textContent = `Equipo de defensa de ${enemyName}`;
-    } catch {}
+    await loadEnemy(urlId);
   }
 
   renderSetup();
+}
+
+/* ── MATCHMAKING ── */
+async function searchOpponent() {
+  const btn = document.getElementById('search-btn');
+  const msg = document.getElementById('search-msg');
+  btn.disabled = true;
+  btn.textContent = '🔍 Buscando...';
+  msg.textContent = 'Consultando jugadores...';
+
+  try {
+    const ud = await window.ReAnimeDB.loadUserData();
+    const myCq = ud.conquest || 0;
+
+    // Query Firestore REST for users with defTeam set
+    // We fetch up to 50 users and filter client-side by conquest proximity
+    const url = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/users?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU&pageSize=50`;
+    const r = await fetch(url);
+    const j = await r.json();
+    const docs = j.documents || [];
+
+    const rivals = [];
+    for (const doc of docs) {
+      try {
+        const data = firestoreDocToObj(doc);
+        // Skip self
+        if (data.discordId === SELF_USER?.id) continue;
+        // Must have a defense team
+        const def = (data.defTeam || []).filter(Boolean);
+        if (def.length === 0) continue;
+
+        const theirCq = data.conquest || 0;
+        const diff = Math.abs(theirCq - myCq);
+        rivals.push({
+          id: data.discordId || doc.name.split('/').pop(),
+          name: data.displayName || data.discordUsername || 'Jugador',
+          avatar: data.discordAvatar ? `https://cdn.discordapp.com/avatars/${data.discordId}/${data.discordAvatar}.png` : '',
+          conquest: theirCq,
+          defTeam: def,
+          diff,
+        });
+      } catch {}
+    }
+
+    // Sort by conquest proximity, take top 5
+    rivals.sort((a,b) => a.diff - b.diff);
+    const top = rivals.slice(0, 5);
+
+    if (top.length === 0) {
+      msg.textContent = 'No se encontraron rivales con equipo defensivo. Intenta más tarde.';
+    } else {
+      msg.textContent = `${top.length} rival(es) encontrado(s) — selecciona uno para batallar.`;
+      renderRivals(top);
+    }
+  } catch(e) {
+    msg.textContent = 'Error al buscar rivales. Verifica tu conexión.';
+    console.warn('matchmaking:', e);
+  }
+  btn.disabled = false;
+  btn.textContent = '🔍 Buscar Rival';
+}
+
+function renderRivals(rivals) {
+  const list = document.getElementById('rival-list');
+  const cards = document.getElementById('rival-cards');
+  list.style.display = 'block';
+  cards.innerHTML = '';
+
+  rivals.forEach(rv => {
+    const card = document.createElement('div');
+    card.className = 'rival-card';
+    card.innerHTML = `
+      ${rv.avatar ? `<img class="rival-avatar" src="${rv.avatar}" onerror="this.style.display='none'"/>` : `<div class="rival-avatar" style="background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:1.2rem">👤</div>`}
+      <div>
+        <div class="rival-name">${rv.name}</div>
+        <div class="rival-sub">Equipo de ${rv.defTeam.filter(Boolean).length} personajes</div>
+      </div>
+      <div class="rival-pts">⚔ ${rv.conquest.toLocaleString()}</div>`;
+    card.onclick = () => selectRival(rv, card);
+    cards.appendChild(card);
+  });
+}
+
+function selectRival(rv, cardEl) {
+  // Deselect all
+  document.querySelectorAll('.rival-card').forEach(c => c.classList.remove('selected'));
+  cardEl.classList.add('selected');
+
+  enemyId      = rv.id;
+  enemyName    = rv.name;
+  enemyDefTeam = rv.defTeam;
+
+  document.getElementById('def-source-lbl').textContent = `Defensa de ${rv.name} — ⚔ ${rv.conquest} pts`;
+  renderTeamPreview('def-preview', enemyDefTeam);
+  renderSetup();
+}
+
+async function loadEnemy(uid) {
+  try {
+    const url = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/users/${uid}?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
+    const r = await fetch(url);
+    const doc = await r.json();
+    const data = firestoreDocToObj(doc);
+    if (data.defTeam) enemyDefTeam = data.defTeam.filter(Boolean);
+    enemyId   = uid;
+    enemyName = data.displayName || data.discordUsername || 'Oponente';
+    document.getElementById('def-source-lbl').textContent = `Defensa de ${enemyName}`;
+  } catch {}
 }
 
 function firestoreDocToObj(doc) {
@@ -349,13 +468,15 @@ function parseFireVal(v) {
    SETUP RENDER
 ══════════════════════════════════════ */
 function renderSetup() {
-  const ready = myAtkTeam.length > 0 && enemyDefTeam.length > 0;
+  const ready = myAtkTeam.length > 0 && enemyDefTeam.length > 0 && !!enemyId;
   document.getElementById('start-btn').disabled = !ready;
   document.getElementById('setup-msg').textContent = ready
     ? 'Todo listo. Los turnos se ordenan por velocidad (SPD).'
     : myAtkTeam.length === 0
-      ? '⚠ No tienes equipo de ataque. Configúralo en PVP.'
-      : '⚠ No hay equipo enemigo. Vuelve a pvp.html y guarda tu equipo de defensa para practicar.';
+      ? '⚠ No tienes equipo de ataque. Configúralo en pvp.html.'
+      : !enemyDefTeam.length
+      ? 'Usa "Buscar Rival" para encontrar un oponente.'
+      : '⚠ El rival no tiene equipo defensivo.';
 
   renderTeamPreview('atk-preview', myAtkTeam);
   renderTeamPreview('def-preview', enemyDefTeam);

@@ -32,7 +32,7 @@
     .page-tab:hover{color:var(--text);}
     .page-tab.active{color:var(--pink);border-bottom-color:var(--pink);}
 
-    #tab-collection{display:block;} #tab-pvp{display:none;}
+    #tab-collection{display:none !important;} #tab-pvp{display:block;}
 
     .section-title{font-family:var(--font-h);font-size:2rem;letter-spacing:3px;margin-bottom:.4rem;}
     .section-title em{color:var(--pink);font-style:normal;}
@@ -167,8 +167,8 @@
 
   <div class="page">
     <div class="page-tabs">
-      <button class="page-tab active" onclick="switchTab('collection')">Coleccion</button>
-      <button class="page-tab" onclick="switchTab('pvp')">Constructor PVP</button>
+      
+      <button class="page-tab active" onclick="switchTab('pvp')">Constructor de Equipos</button>
     </div>
 
     <!-- COLLECTION -->
@@ -190,7 +190,7 @@
     <!-- PVP BUILDER -->
     <div id="tab-pvp">
       <div class="section-title">Constructor <em>PVP</em></div>
-      <div class="section-sub">Solo personajes de tu coleccion habilitados. Click en un chip para añadirlo.</div>
+      <div class="section-sub">Solo personajes de tu coleccion disponibles para PVP. Click en un chip para añadirlo al equipo.</div>
       <div class="pvp-layout">
         <div class="team-panel">
           <div class="team-panel-title">Equipo <em style="color:var(--pink)">Ataque</em></div>
@@ -270,8 +270,8 @@
 
   function switchTab(t){
     document.querySelectorAll('.page-tab').forEach((b,i)=>b.classList.toggle('active',i===(t==='collection'?0:1)));
-    document.getElementById('tab-collection').style.display=t==='collection'?'block':'none';
-    document.getElementById('tab-pvp').style.display=t==='pvp'?'block':'none';
+    // collection tab removed
+    document.getElementById('tab-pvp').style.display='block';
   }
 
   function setFilter(el,v){ document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); collFilter=v; renderCollection(); }
@@ -314,7 +314,7 @@
     document.getElementById('cm-series').textContent=(pvp?.series||coll.anime)+(pvp?` · ${pvp.role}`:'');
     const st=document.getElementById('cm-status');
     if(pvp){st.className='cm-status ok';st.textContent='⚔ Habilitado para PVP';}
-    else{st.className='cm-status locked';st.textContent='🔒 No habilitado aún';}
+    else{st.className='cm-status locked';st.textContent='🔒 Este personaje no está disponible para PVP aún.';}
     document.getElementById('cm-stats').innerHTML=pvp?.stats?Object.entries(pvp.stats).map(([k,v])=>`<div class="cm-stat"><div class="cm-stat-lbl">${SL[k]||k}</div><div class="cm-stat-val" style="color:${col}">${v}${k==='cr'||k==='cd'?'%':''}</div></div>`).join(''):`<div style="color:var(--muted);font-size:.8rem;grid-column:1/-1">Sin stats PVP.</div>`;
     document.getElementById('cm-skills').innerHTML=pvp?.skills?.length?`<div class="cm-skills-hd">Habilidades</div>`+pvp.skills.map(s=>`<div class="cm-skill"><div class="cm-skill-name">${s.name}</div><div class="cm-skill-desc">${s.desc}</div><div class="cm-skill-meta">${s.type==='pasiva'?'Pasiva':`Activa · CD: ${s.cooldown===0?'Básico':s.cooldown+' turnos'}`}</div></div>`).join(''):'';
     ['cm-atk','cm-def'].forEach(id=>{document.getElementById(id).disabled=!pvp;document.getElementById(id).style.opacity=pvp?'1':'.3';});
@@ -348,7 +348,7 @@
         el.innerHTML=`<div class="slot-char"><div class="slot-bg" style="background:${RG[ch.stars]||RG[1]}"></div>${ch.image?`<img class="slot-img" src="${ch.image}" onerror="this.style.display='none'"/>`:''}<div class="slot-overlay"></div><div class="slot-affinity">${aff?.icon||''}</div><div class="slot-info"><div class="slot-name" style="color:${col}">${ch.name}</div><div class="slot-role">${ch.role||''}</div></div><button class="slot-remove" onclick="removeSlot('${type}',${i})">✕</button></div>`;
       } else {
         el.innerHTML=`<div class="slot-empty-icon">+</div><div class="slot-empty-label">Slot ${i+1}</div>`;
-        el.onclick=()=>{ _pickTeam=type; switchTab('pvp'); showToast('Selecciona un personaje de la lista.'); };
+        el.onclick=()=>{ _pickTeam=type; showToast('Selecciona un personaje de la lista.'); };
       }
       c.appendChild(el);
     });

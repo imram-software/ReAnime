@@ -592,6 +592,35 @@
     .btn-set-featured:hover { background:#a78bfa22; }
     .btn-set-featured.active { background:#a78bfa; color:#fff; border-color:#a78bfa; }
 
+    /* ── COLLECTION TAB ── */
+    #coll-tab { display:none; margin-top:1rem; }
+    .coll-grid-g { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:1rem; }
+    .coll-card-g {
+      position:relative; border-radius:var(--radius); overflow:hidden; aspect-ratio:2/3;
+      background:var(--surface); border:2px solid var(--border);
+      cursor:pointer; transition:transform .3s,border-color .3s; display:flex; flex-direction:column;
+    }
+    .coll-card-g:hover { transform:translateY(-4px) scale(1.03); border-color:var(--pink); }
+    .coll-card-g.r5{border-color:#fbbf2455;} .coll-card-g.r4{border-color:#c084fc55;} .coll-card-g.r3{border-color:#38bdf855;}
+    .coll-card-g.pvp-ok { box-shadow:0 0 10px var(--pink-glow); }
+    .coll-face { flex:1; position:relative; min-height:0; overflow:hidden; }
+    .coll-face img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:top; z-index:2; }
+    .coll-face-bg { position:absolute; inset:0; z-index:1; }
+    .coll-face-sym { position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center; font-size:3rem; opacity:.12; pointer-events:none; }
+    .coll-dupes { position:absolute; top:5px; left:5px; background:rgba(0,0,0,.75); color:var(--rose); font-size:.62rem; border-radius:4px; padding:.1rem .3rem; z-index:4; }
+    .coll-pvp-icon { position:absolute; top:5px; right:5px; font-size:.7rem; background:var(--pink); color:#fff; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; z-index:4; }
+    .coll-info { padding:.45rem .55rem .4rem; background:var(--bg); border-top:1px solid rgba(255,255,255,.05); flex-shrink:0; }
+    .coll-name { font-family:var(--font-h); font-size:.82rem; letter-spacing:1px; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .r5 .coll-name{color:var(--r5);} .r4 .coll-name{color:var(--r4);} .r3 .coll-name{color:var(--r3);} .r2 .coll-name{color:var(--r2);} .r1 .coll-name{color:var(--muted);}
+    .coll-meta { font-size:.58rem; color:var(--muted); margin-top:.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .coll-filter-row { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; align-items:center; }
+    .coll-search-g { background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:.4rem .8rem; font-size:.82rem; font-family:var(--font-b); outline:none; min-width:180px; }
+    .coll-search-g:focus { border-color:var(--pink); }
+    .page-tab-g { font-family:var(--font-h); font-size:1.1rem; letter-spacing:2px; padding:.5rem 1.5rem; cursor:pointer; color:var(--muted); border-bottom:3px solid transparent; transition:all .2s; background:none; border-top:none; border-left:none; border-right:none; }
+    .page-tab-g:hover { color:var(--text); }
+    .page-tab-g.active { color:var(--pink); border-bottom-color:var(--pink); }
+    .page-tabs-g { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:1.5rem; }
+
     /* ── HISTORY ── */
     .history-title {
       font-family:var(--font-h); font-size:1.3rem; letter-spacing:2px;
@@ -643,6 +672,12 @@
   <div id="toast"></div>
 
   <div class="page">
+    <div class="page-tabs-g">
+      <button class="page-tab-g active" onclick="switchGachaTab('gacha')">Gacha</button>
+      <button class="page-tab-g" onclick="switchGachaTab('collection')">Coleccion</button>
+    </div>
+
+    <div id="gacha-tab">
     <div class="gacha-title">GACHA</div>
     <div class="gacha-sub">アニメ · Invocaciones · Re:Anime</div>
 
@@ -686,6 +721,24 @@
     <div id="reveal-charanime"></div>
     <div id="reveal-counter"></div>
     <button id="reveal-skip" onclick="revealSkip()">Saltar todo</button>
+  </div>
+
+  </div><!-- /gacha-tab -->
+
+  <!-- COLLECTION TAB -->
+  <div id="coll-tab">
+    <div class="gacha-title" style="font-size:clamp(2rem,5vw,3.5rem);margin-bottom:.3rem;">Mi <em style="color:var(--rose)">Coleccion</em></div>
+    <div class="gacha-sub" id="coll-sub-g">Cargando...</div>
+    <div class="coll-filter-row">
+      <input class="coll-search-g" id="coll-search-g" placeholder="Buscar..." oninput="renderCollG()"/>
+      <button class="filter-chip active" onclick="setCollFilter(this,'all')">Todos</button>
+      <button class="filter-chip" onclick="setCollFilter(this,'pvp')">⚔ PVP</button>
+      <button class="filter-chip" onclick="setCollFilter(this,'5')">★★★★★</button>
+      <button class="filter-chip" onclick="setCollFilter(this,'4')">★★★★</button>
+    </div>
+    <div class="coll-grid-g" id="coll-grid-g">
+      <div style="color:var(--muted);font-size:.85rem;padding:2rem;">Cargando coleccion...</div>
+    </div>
   </div>
 
   <!-- FEATURED IN PROFILE -->
@@ -1418,6 +1471,96 @@
     if (el && e.detail?.holy !== undefined)
       el.textContent = (e.detail.holy || 0).toLocaleString();
   });
+
+  /* ══════════════════════════════════════
+     GACHA TABS
+  ══════════════════════════════════════ */
+  function switchGachaTab(t) {
+    document.querySelectorAll('.page-tab-g').forEach((b,i)=>b.classList.toggle('active',i===(t==='gacha'?0:1)));
+    document.getElementById('gacha-tab').style.display  = t==='gacha'      ? 'block' : 'none';
+    document.getElementById('coll-tab').style.display   = t==='collection' ? 'block' : 'none';
+    if (t === 'collection') loadCollectionG();
+  }
+
+  /* ══════════════════════════════════════
+     COLLECTION
+  ══════════════════════════════════════ */
+  let _collData=[], _collDedupe=[], _collFilter='all', _pvpDataG=null, _collLoaded=false;
+
+  async function loadCollectionG() {
+    if (_collLoaded && _collData.length) { renderCollG(); return; }
+    if (!window.ReAnimeDB) return;
+    _collData = await window.ReAnimeDB.getCollection();
+    // Load pvp data for indicators
+    if (!_pvpDataG) {
+      try { const r=await fetch('pvp_chars.json'); _pvpDataG=await r.json(); } catch { _pvpDataG={characters:[]}; }
+    }
+    buildCollDedupe();
+    _collLoaded = true;
+    renderCollG();
+  }
+
+  function buildCollDedupe() {
+    const m = new Map();
+    for (const c of _collData) {
+      const k = c.name.toLowerCase().trim();
+      if (m.has(k)) m.get(k).count++;
+      else m.set(k, { ...c, count:1 });
+    }
+    _collDedupe = Array.from(m.values()).sort((a,b)=>b.stars-a.stars||a.name.localeCompare(b.name));
+  }
+
+  function findPvpG(name) {
+    return _pvpDataG?.characters.find(c=>c.name.toLowerCase().trim()===name.toLowerCase().trim())||null;
+  }
+
+  function setCollFilter(el, v) {
+    document.querySelectorAll('.coll-filter-row .filter-chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active'); _collFilter=v; renderCollG();
+  }
+
+  function renderCollG() {
+    const grid  = document.getElementById('coll-grid-g');
+    const query = document.getElementById('coll-search-g')?.value.toLowerCase()||'';
+    const pvpCount = _collDedupe.filter(c=>!!findPvpG(c.name)).length;
+    const sub = document.getElementById('coll-sub-g');
+    if (sub) sub.textContent = `${_collDedupe.length} personajes únicos · ${pvpCount} disponibles para PVP`;
+
+    let list = _collDedupe.filter(c => {
+      if (query && !c.name.toLowerCase().includes(query) && !c.anime.toLowerCase().includes(query)) return false;
+      const p = findPvpG(c.name);
+      if (_collFilter==='pvp' && !p) return false;
+      if (_collFilter==='5' && c.stars!==5) return false;
+      if (_collFilter==='4' && c.stars!==4) return false;
+      return true;
+    });
+
+    if (!list.length) {
+      grid.innerHTML = _collData.length===0
+        ? '<div style="color:var(--muted);font-size:.85rem;grid-column:1/-1;padding:2rem;text-align:center;">Tu coleccion está vacía. Gira el Gacha para obtener personajes.</div>'
+        : '<div style="color:var(--muted);font-size:.85rem;grid-column:1/-1;padding:2rem;text-align:center;">Sin resultados.</div>';
+      return;
+    }
+
+    const RGRADS={5:'linear-gradient(160deg,#1a0a00,#3d1900 50%)',4:'linear-gradient(160deg,#0d001a,#1e003d 50%)',3:'linear-gradient(160deg,#001220,#002444 50%)',2:'linear-gradient(160deg,#001a0a,#003018 60%)',1:'linear-gradient(160deg,#0d0d0d,#181818)'};
+    const RSYMS={5:'★',4:'◆',3:'▲',2:'●',1:'─'};
+    const RCOLS={5:'#fbbf24',4:'#c084fc',3:'#38bdf8',2:'#86efac',1:'#94a3b8'};
+
+    grid.innerHTML='';
+    list.forEach(ch => {
+      const p = findPvpG(ch.name);
+      const col = RCOLS[ch.stars]||'#94a3b8';
+      const el = document.createElement('div');
+      el.className = `coll-card-g r${ch.stars}${p?' pvp-ok':''}`;
+      el.innerHTML=`<div class="coll-face"><div class="coll-face-bg" style="background:${RGRADS[ch.stars]||RGRADS[1]}"></div><div class="coll-face-sym">${RSYMS[ch.stars]||'─'}</div>${ch.image?`<img src="${ch.image}" loading="lazy" onerror="this.style.display='none'"/>`:''}${ch.count>1?`<div class="coll-dupes">×${ch.count}</div>`:''}${p?'<div class="coll-pvp-icon">⚔</div>':''}</div><div class="coll-info"><div class="card-stars-row">${starsHTML(ch.stars,'stars-r'+ch.stars)}</div><div class="coll-name">${ch.name}</div><div class="coll-meta">${ch.anime}</div></div>`;
+      el.onclick = () => {
+        // Open the existing openModal if available, else show toast
+        const collForModal = { ...ch };
+        openModal(collForModal, collForModal);
+      };
+      grid.appendChild(el);
+    });
+  }
 
   /* ══════════════════════════════════════
      INIT
