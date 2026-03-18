@@ -693,6 +693,7 @@
     <div class="logo">Re<span>:</span>Anime</div>
     <div class="header-right">
       <button id="theme-toggle-btn" onclick="toggleTheme()">☀ Tema</button>
+      <a href="pvp.html" id="pvp-header-btn" style="background:none;border:1px solid #4ecdc4;color:#4ecdc4;padding:0.4rem 0.9rem;border-radius:6px;font-size:0.82rem;text-decoration:none;font-weight:700;transition:all 0.2s;display:none;" onmouseover="this.style.background='#4ecdc422'" onmouseout="this.style.background='none'">⚔ PvP</a>
       <a href="gacha.html" id="gacha-header-btn" style="
         background:none; border:1px solid #a78bfa; color:#a78bfa;
         padding:0.4rem 0.9rem; border-radius:6px; font-size:0.82rem;
@@ -716,6 +717,7 @@
     <div style="display:flex;gap:1rem;position:relative;z-index:1;flex-wrap:wrap;justify-content:center;">
       <button class="btn-enter" id="enter-btn">Entrar &nbsp;→</button>
       <a href="gacha.html" class="btn-enter" style="text-decoration:none;background:transparent;border-color:var(--rose);color:var(--rose);">Gacha &nbsp;✦</a>
+      <a href="pvp.html" class="btn-enter" style="text-decoration:none;background:transparent;border-color:#a78bfa;color:#a78bfa;">PVP &nbsp;⚔</a>
     </div>
     <div class="scroll-hint">
       <span>scroll</span>
@@ -878,6 +880,8 @@
       loadApp();
       const gb = document.getElementById('gacha-header-btn');
       if (gb) gb.style.display = 'inline-flex';
+      const pb = document.getElementById('pvp-header-btn');
+      if (pb) pb.style.display = 'inline-flex';
     }, 500);
   });
 
@@ -1223,6 +1227,8 @@
     document.getElementById('app').style.display = 'block';
     const gb = document.getElementById('gacha-header-btn');
     if (gb) gb.style.display = 'inline-flex';
+    const pb = document.getElementById('pvp-header-btn');
+    if (pb) pb.style.display = 'inline-flex';
     loadApp();
   }
   </script>

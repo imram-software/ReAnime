@@ -1,0 +1,170 @@
+{
+  "_readme": "Agrega personajes aqui para habilitarlos en PVP. El campo 'name' debe coincidir con el nombre en la coleccion del jugador. Los jugadores que ya tengan ese personaje en su coleccion podran usarlo.",
+  "affinities": {
+    "fuego": {
+      "color": "#ef4444",
+      "icon": "🔥",
+      "strong_vs": "tierra",
+      "weak_vs": "agua"
+    },
+    "agua": {
+      "color": "#3b82f6",
+      "icon": "💧",
+      "strong_vs": "fuego",
+      "weak_vs": "rayo"
+    },
+    "tierra": {
+      "color": "#84cc16",
+      "icon": "🌿",
+      "strong_vs": "rayo",
+      "weak_vs": "fuego"
+    },
+    "rayo": {
+      "color": "#eab308",
+      "icon": "⚡",
+      "strong_vs": "agua",
+      "weak_vs": "tierra"
+    },
+    "luz": {
+      "color": "#f5f5f5",
+      "icon": "✦",
+      "strong_vs": "oscuridad",
+      "weak_vs": "oscuridad"
+    },
+    "oscuridad": {
+      "color": "#a78bfa",
+      "icon": "🌑",
+      "strong_vs": "luz",
+      "weak_vs": "luz"
+    }
+  },
+  "roles": {
+    "guerrero": {
+      "icon": "⚔",
+      "desc": "Alto daño fisico, stats balanceadas"
+    },
+    "mago": {
+      "icon": "🔮",
+      "desc": "Alto daño magico, baja defensa"
+    },
+    "tanque": {
+      "icon": "🛡",
+      "desc": "Alta vida y defensa"
+    },
+    "sanador": {
+      "icon": "💚",
+      "desc": "Restaura HP del equipo"
+    },
+    "soporte": {
+      "icon": "⭐",
+      "desc": "Buffs y debuffs"
+    }
+  },
+  "characters": [
+    {
+      "name": "Subaru Natsuki",
+      "series": "Re:Zero",
+      "affinity": "oscuridad",
+      "role": "soporte",
+      "rarity": 3,
+      "image": "",
+      "stats": {
+        "hp": 4200,
+        "atk": 820,
+        "def": 960,
+        "spd": 98,
+        "cr": 12,
+        "cd": 140
+      },
+      "skills": [
+        {
+          "name": "Vuelta a la vida",
+          "desc": "Revive con 30% HP al ser derrotado una vez por batalla.",
+          "type": "pasiva"
+        },
+        {
+          "name": "Llamada de auxilio",
+          "desc": "Aumenta la velocidad de todos los aliados en 15% por 2 turnos.",
+          "type": "activa",
+          "cooldown": 3
+        },
+        {
+          "name": "Resistencia",
+          "desc": "Ataca y tiene 50% de chance de reducir el ATK enemigo.",
+          "type": "activa",
+          "cooldown": 0
+        }
+      ]
+    },
+    {
+      "name": "Rem",
+      "series": "Re:Zero",
+      "affinity": "agua",
+      "role": "guerrero",
+      "rarity": 5,
+      "image": "",
+      "stats": {
+        "hp": 5100,
+        "atk": 1620,
+        "def": 980,
+        "spd": 108,
+        "cr": 20,
+        "cd": 160
+      },
+      "skills": [
+        {
+          "name": "Oni Awakening",
+          "desc": "Ignora 25% DEF del objetivo al atacar.",
+          "type": "pasiva"
+        },
+        {
+          "name": "Maza de Hierro",
+          "desc": "Ataque fuerte con 40% de chance de aturdir 1 turno.",
+          "type": "activa",
+          "cooldown": 3
+        },
+        {
+          "name": "Lluvia de Golpes",
+          "desc": "Golpea al objetivo 3 veces seguidas.",
+          "type": "activa",
+          "cooldown": 0
+        }
+      ]
+    },
+    {
+      "name": "Ram",
+      "series": "Re:Zero",
+      "affinity": "rayo",
+      "role": "mago",
+      "rarity": 4,
+      "image": "",
+      "stats": {
+        "hp": 3800,
+        "atk": 1480,
+        "def": 720,
+        "spd": 112,
+        "cr": 18,
+        "cd": 175
+      },
+      "skills": [
+        {
+          "name": "Clarividencia",
+          "desc": "Tiene 30% de chance de atacar dos veces.",
+          "type": "pasiva"
+        },
+        {
+          "name": "Viento Cortante",
+          "desc": "Daño magico a todo el equipo enemigo.",
+          "type": "activa",
+          "cooldown": 4
+        },
+        {
+          "name": "Dardo Magico",
+          "desc": "Ataque basico con elemento rayo.",
+          "type": "activa",
+          "cooldown": 0
+        }
+      ]
+    }
+  ]
+}
