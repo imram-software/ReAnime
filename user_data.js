@@ -38,7 +38,9 @@ const DEFAULT_DATA = {
   featured: null,   // personaje destacado en perfil
   displayName: "",   // nombre personalizable
   likes: 0,          // total de likes recibidos (publico)
-  likesGiven: {}     // { userId: "YYYY-MM-DD" } — rastreo de likes dados hoy
+  likesGiven: {},    // { userId: "YYYY-MM-DD" } — rastreo de likes dados hoy
+  pvpAttack: [],     // equipo de ataque [{ charId, charName }]
+  pvpDefense: []     // equipo de defensa [{ charId, charName }]
 };
 
 /* ─────────────────────────────────────────────────────────────
@@ -333,6 +335,28 @@ async function hasLikedToday(targetUserId) {
   return given[targetUserId] === today;
 }
 
+async function setPvpTeam(type, team) {
+  // type: 'attack' | 'defense'
+  // team: array de hasta 5 objetos { id, name, anime, image, stars }
+  await _readyPromise;
+  const field = type === 'attack' ? 'pvpAttack' : 'pvpDefense';
+  _localData[field] = team;
+  window.dispatchEvent(new CustomEvent("reanimdb:update", { detail: _localData }));
+  if (!discordUser) { localStorage.setItem("user_data", JSON.stringify(_localData)); return; }
+  try {
+    await ensureDoc();
+    await updateDoc(userRef(), { [field]: team });
+  } catch(e) { console.warn("[Re:Anime] setPvpTeam:", e); }
+}
+
+async function getPvpTeams() {
+  await _readyPromise;
+  return {
+    attack:  _localData.pvpAttack  || [],
+    defense: _localData.pvpDefense || [],
+  };
+}
+
 async function setDisplayName(name) {
   await _readyPromise;
   const clean = (name || '').trim().slice(0, 32);
@@ -343,6 +367,38 @@ async function setDisplayName(name) {
     await ensureDoc();
     await updateDoc(userRef(), { displayName: clean });
   } catch(e) { console.warn("[Re:Anime] setDisplayName:", e); }
+}
+
+
+async function addConquestPoints(amount) {
+  await _readyPromise;
+  const newVal = Math.max(0, (_localData.conquest || 0) + amount);
+  _localData.conquest = newVal;
+  window.dispatchEvent(new CustomEvent("reanimdb:update", { detail: _localData }));
+  if (!discordUser) { localStorage.setItem("user_data", JSON.stringify(_localData)); return newVal; }
+  try { await ensureDoc(); await updateDoc(userRef(), { conquest: newVal }); } catch(e) {}
+  return newVal;
+}
+async function getConquest() { await _readyPromise; return _localData.conquest || 0; }
+
+async function addBattleLog(entry) {
+  await _readyPromise;
+  const log = (_localData.battleLog || []);
+  log.unshift({ ...entry, date: Date.now() });
+  _localData.battleLog = log.slice(0, 50);
+  window.dispatchEvent(new CustomEvent("reanimdb:update", { detail: _localData }));
+  if (!discordUser) { localStorage.setItem("user_data", JSON.stringify(_localData)); return; }
+  try { await ensureDoc(); await updateDoc(userRef(), { battleLog: _localData.battleLog }); } catch(e) {}
+}
+async function getBattleLog() { await _readyPromise; return _localData.battleLog || []; }
+
+async function recordDefenseWin(targetUserId) {
+  try {
+    const commitUrl = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents:commit?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
+    await fetch(commitUrl, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ writes:[{ transform:{ document:`projects/reanime-1a781/databases/(default)/documents/users/${targetUserId}`, fieldTransforms:[{ fieldPath:'conquest', increment:{integerValue:10} }] }}] })
+    });
+  } catch(e) { console.warn("[Re:Anime] recordDefenseWin:", e); }
 }
 
 window.ReAnimeDB = {
@@ -362,5 +418,12 @@ window.ReAnimeDB = {
   getFeaturedChar,
   setDisplayName,
   likeProfile,
-  hasLikedToday
+  hasLikedToday,
+  setPvpTeam,
+  getPvpTeams,
+  addConquestPoints,
+  getConquest,
+  addBattleLog,
+  getBattleLog,
+  recordDefenseWin
 };

@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Re:Anime · Batalla</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+:root{--bg:#080808;--bg2:#111;--bg3:#1a1a1a;--surface:#161616;--border:#222;--pink:#ff2d78;--pink-dim:#ff2d7822;--rose:#ff6fa8;--text:#e8e8e8;--muted:#555;--font-h:'Bebas Neue',cursive;--font-b:'DM Sans',sans-serif;--radius:10px;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");background-size:200px;opacity:0.4;}
+
+/* ── HEADER ── */
+header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(8,8,8,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.logo{font-family:var(--font-h);font-size:2rem;letter-spacing:3px;color:var(--pink);text-decoration:none;}
+.logo span{color:var(--text);}
+.hdr-right{display:flex;align-items:center;gap:1rem;}
+.back-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.4rem .9rem;font-size:.82rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;}
+.back-btn:hover{border-color:var(--pink);color:var(--pink);}
+
+/* ── LAYOUT ── */
+.page{max-width:1100px;margin:0 auto;padding:72px 1.5rem 3rem;position:relative;z-index:1;}
+
+/* ── BATTLE SCREEN ── */
+#battle-screen{display:none;}
+
+/* Field: enemy top, ally bottom */
+.field{display:flex;flex-direction:column;gap:1rem;margin-bottom:1rem;}
+.team-row{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;}
+
+/* Fighter card */
+.fighter{width:110px;border-radius:var(--radius);background:var(--surface);border:2px solid var(--border);overflow:hidden;cursor:default;transition:transform .2s,border-color .2s;position:relative;user-select:none;}
+.fighter.player{cursor:pointer;}
+.fighter.player:hover:not(.dead){transform:translateY(-4px);border-color:var(--pink);}
+.fighter.selected{border-color:var(--pink);box-shadow:0 0 12px var(--pink-dim);}
+.fighter.dead{opacity:.35;filter:grayscale(1);}
+.fighter.targeting{border-color:#ef4444;box-shadow:0 0 12px rgba(239,68,68,.4);}
+.fighter.acting{animation:actPulse .4s ease;}
+@keyframes actPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);}}
+
+.f-img{height:90px;position:relative;overflow:hidden;}
+.f-img img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.f-img-bg{position:absolute;inset:0;}
+.f-img-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 50%);}
+.f-aff{position:absolute;top:4px;right:4px;font-size:.8rem;z-index:2;}
+
+.f-body{padding:.4rem .45rem .4rem;}
+.f-name{font-family:var(--font-h);font-size:.72rem;letter-spacing:1px;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.f-role{font-size:.55rem;color:var(--muted);}
+
+/* HP bar */
+.hp-bar-wrap{margin-top:.3rem;background:rgba(255,255,255,.06);border-radius:4px;height:5px;overflow:hidden;}
+.hp-bar{height:100%;border-radius:4px;transition:width .4s ease;background:#22c55e;}
+.hp-bar.mid{background:#eab308;}
+.hp-bar.low{background:#ef4444;}
+.hp-text{font-size:.55rem;color:var(--muted);margin-top:.15rem;text-align:right;}
+
+/* Turn order */
+.turn-row{display:flex;align-items:center;gap:.3rem;margin-bottom:.8rem;overflow-x:auto;padding:.3rem 0;}
+.turn-token{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);overflow:hidden;flex-shrink:0;transition:transform .3s;}
+.turn-token.current{border-color:var(--pink);box-shadow:0 0 8px var(--pink-dim);transform:scale(1.2);}
+.turn-token.enemy{opacity:.7;}
+.turn-token img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.turn-token .tt-sym{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:.7rem;background:var(--bg3);}
+.turn-label{font-size:.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;flex-shrink:0;margin-right:.3rem;}
+
+/* Battle log */
+.battle-log{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);height:120px;overflow-y:auto;padding:.6rem .8rem;font-size:.75rem;line-height:1.6;margin-bottom:.8rem;}
+.log-entry{padding:.1rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.log-entry:last-child{border:none;}
+.log-dmg{color:#f87171;}
+.log-heal{color:#4ade80;}
+.log-crit{color:#fbbf24;}
+.log-sys{color:var(--muted);}
+.log-miss{color:var(--muted);font-style:italic;}
+
+/* Action panel */
+#action-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.8rem;}
+.action-title{font-family:var(--font-h);font-size:.9rem;letter-spacing:2px;color:var(--muted);margin-bottom:.6rem;}
+.skill-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;}
+.skill-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:.45rem .4rem;font-size:.72rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;text-align:left;}
+.skill-btn:hover:not(:disabled){border-color:var(--pink);color:var(--pink);}
+.skill-btn:disabled{opacity:.35;cursor:default;}
+.skill-btn .sk-name{font-weight:700;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.skill-btn .sk-cd{font-size:.6rem;color:var(--muted);margin-top:.1rem;}
+.skill-btn .sk-type{font-size:.6rem;color:var(--rose);}
+#target-hint{font-size:.75rem;color:var(--rose);margin-top:.5rem;text-align:center;min-height:1.2em;}
+
+/* ── SETUP SCREEN ── */
+#setup-screen{padding:2rem 0;}
+.setup-title{font-family:var(--font-h);font-size:clamp(2rem,5vw,3.5rem);letter-spacing:4px;margin-bottom:.3rem;}
+.setup-title em{color:var(--pink);font-style:normal;}
+.setup-sub{color:var(--muted);font-size:.85rem;margin-bottom:2rem;}
+
+.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+@media(max-width:700px){.setup-grid{grid-template-columns:1fr;}}
+
+.setup-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;}
+.setup-panel-title{font-family:var(--font-h);font-size:1.3rem;letter-spacing:2px;margin-bottom:.3rem;}
+.setup-panel-sub{font-size:.75rem;color:var(--muted);margin-bottom:1rem;}
+.setup-team-preview{display:flex;gap:.5rem;flex-wrap:wrap;min-height:60px;align-items:center;}
+.stp-char{display:flex;align-items:center;gap:.35rem;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.3rem .5rem;font-size:.75rem;}
+.stp-char img{width:24px;height:24px;border-radius:4px;object-fit:cover;object-position:top;}
+.stp-empty{color:var(--muted);font-size:.8rem;font-style:italic;}
+
+.start-btn{width:100%;background:var(--pink);border:none;color:#fff;border-radius:6px;padding:.7rem;font-family:var(--font-h);font-size:1.3rem;letter-spacing:3px;cursor:pointer;box-shadow:0 0 20px var(--pink-dim);transition:opacity .2s,transform .2s;}
+.start-btn:hover{opacity:.85;transform:translateY(-2px);}
+.start-btn:disabled{opacity:.3;cursor:default;transform:none;}
+
+/* ── WIN/LOSE SCREEN ── */
+#result-screen{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);flex-direction:column;align-items:center;justify-content:center;gap:1rem;}
+.result-title{font-family:var(--font-h);font-size:clamp(4rem,10vw,8rem);letter-spacing:8px;text-align:center;}
+.result-title.win{color:#fbbf24;text-shadow:0 0 40px rgba(251,191,36,.5),0 0 80px rgba(251,191,36,.2);}
+.result-title.lose{color:#ef4444;text-shadow:0 0 40px rgba(239,68,68,.4);}
+.result-pts{font-family:var(--font-h);font-size:2rem;letter-spacing:3px;}
+.result-pts.win{color:#4ade80;}
+.result-pts.lose{color:#f87171;}
+.result-sub{color:var(--muted);font-size:.9rem;}
+.result-btns{display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;justify-content:center;}
+.result-btn{background:none;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:.55rem 1.4rem;font-size:.9rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;}
+.result-btn:hover{border-color:var(--pink);color:var(--pink);}
+.result-btn.primary{background:var(--pink);border-color:var(--pink);color:#fff;}
+.result-btn.primary:hover{opacity:.85;}
+
+/* Particles */
+.particle{position:absolute;border-radius:50%;pointer-events:none;animation:pfloat linear forwards;}
+@keyframes pfloat{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0);}}
+
+/* ── BATTLE LOG TAB ── */
+#log-screen{display:none;}
+.log-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:.75rem;display:flex;align-items:center;gap:1rem;}
+.log-result{font-family:var(--font-h);font-size:1.5rem;letter-spacing:2px;flex-shrink:0;width:60px;}
+.log-result.win{color:#4ade80;} .log-result.lose{color:#f87171;}
+.log-info{flex:1;}
+.log-enemy{font-weight:700;font-size:.9rem;}
+.log-date{font-size:.72rem;color:var(--muted);margin-top:.15rem;}
+.log-type{font-size:.68rem;color:var(--rose);}
+.log-pts{font-family:var(--font-h);font-size:1.1rem;flex-shrink:0;}
+.log-pts.win{color:#4ade80;} .log-pts.lose{color:#f87171;}
+
+/* Conquest badge */
+.conquest-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.8rem 1.2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;}
+.cq-icon{font-size:1.8rem;}
+.cq-val{font-family:var(--font-h);font-size:2.5rem;letter-spacing:2px;color:#fbbf24;}
+.cq-label{font-size:.75rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+
+/* Tabs */
+.btabs{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.btab{font-family:var(--font-h);font-size:1.1rem;letter-spacing:2px;padding:.6rem 2rem;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;}
+.btab:hover{color:var(--text);}
+.btab.active{color:var(--pink);border-bottom-color:var(--pink);}
+
+/* Damage floaty */
+.dmg-float{position:absolute;z-index:10;font-family:var(--font-h);font-size:1.2rem;letter-spacing:2px;pointer-events:none;animation:dmgRise .9s ease forwards;}
+@keyframes dmgRise{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-50px) scale(.8);}}
+  </style>
+</head>
+<body>
+<script type="module" src="user_data.js"></script>
+
+<header>
+  <a class="logo" href="index.html">Re<span>:</span>Anime</a>
+  <div class="hdr-right">
+    <div id="conquest-hdr" style="font-family:var(--font-h);font-size:1rem;letter-spacing:2px;color:#fbbf24;display:none;">⚔ <span id="cq-hdr-val">0</span></div>
+    <button class="back-btn" onclick="history.length>1?history.back():location.href='pvp.html'">← PVP</button>
+  </div>
+</header>
+
+<div class="page">
+  <!-- TABS -->
+  <div class="btabs">
+    <button class="btab active" onclick="showTab('battle')">Batalla</button>
+    <button class="btab" onclick="showTab('log')">Registro</button>
+  </div>
+
+  <!-- SETUP SCREEN -->
+  <div id="setup-screen">
+    <div class="setup-title">Sistema <em>PVP</em></div>
+    <div class="setup-sub">Tu equipo de ataque vs el equipo defensivo de otro jugador. Los turnos se ordenan por velocidad.</div>
+
+    <div class="conquest-bar">
+      <div class="cq-icon">⚔</div>
+      <div><div class="cq-val" id="cq-display">0</div><div class="cq-label">Puntos de Conquista</div></div>
+    </div>
+
+    <div class="setup-grid">
+      <div class="setup-panel">
+        <div class="setup-panel-title" style="color:var(--pink)">Tu Equipo de Ataque</div>
+        <div class="setup-panel-sub">Guardado en pvp.html</div>
+        <div class="setup-team-preview" id="atk-preview"><span class="stp-empty">Sin equipo configurado</span></div>
+      </div>
+      <div class="setup-panel">
+        <div class="setup-panel-title" style="color:#3b82f6">Equipo Defensor</div>
+        <div class="setup-panel-sub" id="def-source-lbl">Usando tu propio equipo de defensa como práctica</div>
+        <div class="setup-team-preview" id="def-preview"><span class="stp-empty">Sin equipo enemigo</span></div>
+      </div>
+    </div>
+
+    <button class="start-btn" id="start-btn" onclick="startBattle()" disabled>Iniciar Batalla ⚔</button>
+    <div style="margin-top:.6rem;text-align:center;color:var(--muted);font-size:.78rem;" id="setup-msg">Cargando equipos...</div>
+  </div>
+
+  <!-- BATTLE SCREEN -->
+  <div id="battle-screen">
+    <!-- Turn order -->
+    <div style="display:flex;align-items:center;margin-bottom:.5rem;">
+      <div class="turn-label">Turno</div>
+      <div class="turn-row" id="turn-row"></div>
+    </div>
+
+    <!-- Field -->
+    <div class="field">
+      <div class="team-row" id="enemy-row"></div>
+      <div class="team-row" id="ally-row"></div>
+    </div>
+
+    <!-- Battle log -->
+    <div class="battle-log" id="battle-log"></div>
+
+    <!-- Action panel -->
+    <div id="action-panel">
+      <div class="action-title" id="action-title">Esperando...</div>
+      <div class="skill-btns" id="skill-btns"></div>
+      <div id="target-hint"></div>
+    </div>
+  </div>
+
+  <!-- LOG SCREEN -->
+  <div id="log-screen">
+    <div class="section-title" style="font-family:var(--font-h);font-size:2rem;letter-spacing:3px;margin-bottom:1.5rem;">Registro de <em style="color:var(--pink)">Batallas</em></div>
+    <div id="log-list"><div style="color:var(--muted);font-size:.85rem;">Cargando...</div></div>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="result-screen">
+  <div class="result-title" id="result-title">VICTORIA</div>
+  <div class="result-pts" id="result-pts">+10 Conquista</div>
+  <div class="result-sub" id="result-sub"></div>
+  <div class="result-btns">
+    <button class="result-btn" onclick="location.href='pvp.html'">← PVP</button>
+    <button class="result-btn primary" onclick="resetBattle()">Otra Batalla</button>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   DATA & STATE
+══════════════════════════════════════ */
+let pvpData      = null;
+let myAtkTeam    = [];  // from Firestore/localStorage
+let enemyDefTeam = [];  // from Firestore/localStorage (own def for practice)
+let enemyId      = null;
+let enemyName    = 'CPU';
+
+// Battle state
+let fighters    = [];  // all active fighters with full battle stats
+let turnQueue   = [];  // ordered by current SPD/ATK tracker
+let currentTurn = 0;
+let selectedFighter = null;  // which ally we're acting with
+let selectedSkill   = null;
+let phase = 'setup'; // setup | ally_pick | target_pick | enemy_turn | done
+
+const AFFINITIES = {
+  fuego:{ strong_vs:'tierra', weak_vs:'agua' },
+  agua: { strong_vs:'fuego',  weak_vs:'rayo' },
+  tierra:{strong_vs:'rayo',  weak_vs:'fuego'},
+  rayo: { strong_vs:'agua',  weak_vs:'tierra'},
+  luz:  { strong_vs:'oscuridad', weak_vs:'oscuridad'},
+  oscuridad:{strong_vs:'luz', weak_vs:'luz'}
+};
+const AFF_ICONS = { fuego:'🔥', agua:'💧', tierra:'🌿', rayo:'⚡', luz:'✦', oscuridad:'🌑' };
+const RC = { 5:'#fbbf24', 4:'#c084fc', 3:'#38bdf8', 2:'#86efac', 1:'#94a3b8' };
+const RG = { 5:'linear-gradient(160deg,#1a0a00,#3d1900 50%)',4:'linear-gradient(160deg,#0d001a,#1e003d 50%)',3:'linear-gradient(160deg,#001220,#002444 50%)',2:'linear-gradient(160deg,#001a0a,#003018 60%)',1:'linear-gradient(160deg,#0d0d0d,#181818)'};
+
+/* ══════════════════════════════════════
+   TABS
+══════════════════════════════════════ */
+function showTab(t) {
+  document.querySelectorAll('.btab').forEach((b,i)=>b.classList.toggle('active',i===(t==='battle'?0:1)));
+  document.getElementById('setup-screen').style.display  = t==='battle' ? (phase==='battle'?'none':'block') : 'none';
+  document.getElementById('battle-screen').style.display = t==='battle' && phase==='battle' ? 'block' : 'none';
+  document.getElementById('log-screen').style.display    = t==='log' ? 'block' : 'none';
+  if(t==='log') renderBattleLog();
+}
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+async function init() {
+  // Load pvp_chars.json
+  try { const r = await fetch('pvp_chars.json'); pvpData = await r.json(); } catch { pvpData = {characters:[],affinities:{}}; }
+
+  // Load user data
+  const ud = await window.ReAnimeDB.loadUserData();
+  const cq = ud.conquest || 0;
+  document.getElementById('cq-display').textContent = cq.toLocaleString();
+  document.getElementById('cq-hdr-val').textContent  = cq.toLocaleString();
+  document.getElementById('conquest-hdr').style.display = 'flex';
+
+  // Get attack team — from ud.atkTeam or localStorage
+  const storedAtk = ud.atkTeam || JSON.parse(localStorage.getItem('reanime_atkteam')||'null');
+  const storedDef = ud.defTeam || JSON.parse(localStorage.getItem('reanime_defteam')||'null');
+
+  myAtkTeam    = (storedAtk||[]).filter(Boolean);
+  enemyDefTeam = (storedDef||[]).filter(Boolean);
+
+  // Check URL for enemy id
+  const urlId = new URLSearchParams(location.search).get('enemy');
+  if (urlId) {
+    enemyId = urlId;
+    try {
+      const url = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/users/${urlId}?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
+      const r = await fetch(url);
+      const doc = await r.json();
+      const parsed = firestoreDocToObj(doc);
+      if (parsed.defTeam) enemyDefTeam = parsed.defTeam.filter(Boolean);
+      enemyName = parsed.displayName || parsed.discordUsername || 'Oponente';
+      document.getElementById('def-source-lbl').textContent = `Equipo de defensa de ${enemyName}`;
+    } catch {}
+  }
+
+  renderSetup();
+}
+
+function firestoreDocToObj(doc) {
+  if (!doc.fields) return {};
+  const out = {};
+  for (const [k, v] of Object.entries(doc.fields)) {
+    if (v.arrayValue)  out[k] = (v.arrayValue.values||[]).map(parseFireVal);
+    else if(v.mapValue) out[k] = firestoreDocToObj({fields:v.mapValue.fields||{}});
+    else out[k] = parseFireVal(v);
+  }
+  return out;
+}
+function parseFireVal(v) {
+  if(v.stringValue!==undefined) return v.stringValue;
+  if(v.integerValue!==undefined) return parseInt(v.integerValue);
+  if(v.doubleValue!==undefined) return parseFloat(v.doubleValue);
+  if(v.booleanValue!==undefined) return v.booleanValue;
+  if(v.nullValue!==undefined) return null;
+  if(v.mapValue) return firestoreDocToObj({fields:v.mapValue.fields||{}});
+  if(v.arrayValue) return (v.arrayValue.values||[]).map(parseFireVal);
+  return null;
+}
+
+/* ══════════════════════════════════════
+   SETUP RENDER
+══════════════════════════════════════ */
+function renderSetup() {
+  const ready = myAtkTeam.length > 0 && enemyDefTeam.length > 0;
+  document.getElementById('start-btn').disabled = !ready;
+  document.getElementById('setup-msg').textContent = ready
+    ? 'Todo listo. Los turnos se ordenan por velocidad (SPD).'
+    : myAtkTeam.length === 0
+      ? '⚠ No tienes equipo de ataque. Configúralo en PVP.'
+      : '⚠ No hay equipo enemigo. Vuelve a pvp.html y guarda tu equipo de defensa para practicar.';
+
+  renderTeamPreview('atk-preview', myAtkTeam);
+  renderTeamPreview('def-preview', enemyDefTeam);
+}
+
+function renderTeamPreview(id, team) {
+  const el = document.getElementById(id);
+  if (!team.length) { el.innerHTML = '<span class="stp-empty">Sin personajes</span>'; return; }
+  el.innerHTML = team.map(c => `
+    <div class="stp-char">
+      ${c.image ? `<img src="${c.image}" onerror="this.style.display='none'"/>` : ''}
+      <span>${c.name}</span>
+      <span style="font-size:.6rem;color:var(--muted)">${AFF_ICONS[c.affinity]||''}</span>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   BATTLE ENGINE
+══════════════════════════════════════ */
+function findPvpStats(name) {
+  return pvpData.characters.find(c=>c.name.toLowerCase()===name.toLowerCase()) || null;
+}
+
+function buildFighter(charData, isEnemy, idx) {
+  const pvp = findPvpStats(charData.name);
+  const baseStats = pvp?.stats || { hp:3000, atk:800, def:600, spd:90, cr:10, cd:150 };
+  return {
+    id: (isEnemy?'e':'a') + idx,
+    name: charData.name,
+    anime: charData.anime,
+    image: charData.image || '',
+    stars: charData.stars || 3,
+    affinity: charData.affinity || '',
+    role: charData.role || '',
+    skills: pvp?.skills || [{ name:'Ataque Básico', desc:'Ataque físico.', type:'activa', cooldown:0 }],
+    isEnemy,
+    // Battle stats
+    maxHp: baseStats.hp,
+    hp:    baseStats.hp,
+    atk:   baseStats.atk,
+    def:   baseStats.def,
+    spd:   baseStats.spd,
+    cr:    baseStats.cr,
+    cd:    baseStats.cd,
+    // Turn tracker (ATB-like)
+    atbBar: Math.random() * 30, // small random start offset
+    cooldowns: {},
+    buffs: [],   // [{stat, mult, turns}]
+    debuffs: [], // [{stat, mult, turns}]
+    stunned: false,
+  };
+}
+
+function calcTurnOrder(ftrs) {
+  // Each fighter advances atbBar by spd per tick; when it hits 100 they act
+  // Here we pre-compute order for display
+  return [...ftrs].filter(f=>f.hp>0).sort((a,b)=>(b.spd - a.spd) || Math.random()-0.5);
+}
+
+function startBattle() {
+  if (myAtkTeam.length===0 || enemyDefTeam.length===0) return;
+  phase = 'battle';
+
+  fighters = [
+    ...myAtkTeam.map((c,i) => buildFighter(c, false, i)),
+    ...enemyDefTeam.map((c,i) => buildFighter(c, true, i)),
+  ];
+  turnQueue = [...fighters].sort((a,b)=>b.spd - a.spd);
+  currentTurn = 0;
+
+  document.getElementById('setup-screen').style.display  = 'none';
+  document.getElementById('battle-screen').style.display = 'block';
+
+  renderBattleField();
+  renderTurnOrder();
+  logMsg('⚔ Batalla comenzando — orden por velocidad.', 'sys');
+  logMsg(`${turnQueue.map(f=>f.name).join(', ')}`, 'sys');
+  nextTurn();
+}
+
+function nextTurn() {
+  // Skip dead fighters
+  while (currentTurn < turnQueue.length && turnQueue[currentTurn].hp <= 0) {
+    currentTurn++;
+  }
+  // Check win/lose
+  const aliveAllies  = fighters.filter(f => !f.isEnemy && f.hp > 0);
+  const aliveEnemies = fighters.filter(f =>  f.isEnemy && f.hp > 0);
+  if (!aliveAllies.length)  { endBattle(false); return; }
+  if (!aliveEnemies.length) { endBattle(true);  return; }
+
+  // Rebuild queue if exhausted (new round)
+  if (currentTurn >= turnQueue.length) {
+    currentTurn = 0;
+    // Rebuild with alive fighters sorted by spd
+    turnQueue = fighters.filter(f=>f.hp>0).sort((a,b)=>b.spd - a.spd);
+    logMsg('── Nueva ronda ──', 'sys');
+    // Reduce buff/debuff durations and cooldowns
+    fighters.forEach(f => {
+      f.buffs   = f.buffs.filter(b  => { b.turns--;  return b.turns > 0; });
+      f.debuffs = f.debuffs.filter(d => { d.turns--; return d.turns > 0; });
+      f.stunned = false;
+      // reduce cooldowns
+      Object.keys(f.cooldowns).forEach(k => { if(f.cooldowns[k]>0) f.cooldowns[k]--; });
+    });
+  }
+
+  // Skip dead (again after queue rebuild)
+  while (currentTurn < turnQueue.length && turnQueue[currentTurn].hp <= 0) currentTurn++;
+  if (currentTurn >= turnQueue.length) { nextTurn(); return; }
+
+  renderTurnOrder();
+  const actor = turnQueue[currentTurn];
+
+  if (actor.isEnemy) {
+    phase = 'enemy_turn';
+    updateActionPanel(`${actor.name} está pensando...`);
+    setTimeout(() => enemyAI(actor), 900);
+  } else {
+    phase = 'ally_pick';
+    selectFighter(actor);
+  }
+}
+
+/* ── ALLY ACTION ── */
+function selectFighter(f) {
+  selectedFighter = f;
+  selectedSkill   = null;
+  phase = 'ally_pick';
+
+  document.querySelectorAll('.fighter').forEach(el => el.classList.remove('selected'));
+  document.getElementById('f-' + f.id)?.classList.add('selected');
+
+  renderSkills(f);
+  document.getElementById('target-hint').textContent = 'Selecciona una habilidad.';
+}
+
+function renderSkills(f) {
+  const container = document.getElementById('skill-btns');
+  container.innerHTML = '';
+  updateActionPanel(`Turno de ${f.name} — elige habilidad:`);
+
+  f.skills.forEach((sk, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'skill-btn';
+    const cd = f.cooldowns[i] || 0;
+    btn.disabled = cd > 0 || phase !== 'ally_pick';
+    btn.innerHTML = `<span class="sk-name">${sk.name}</span><span class="sk-cd">${cd > 0 ? `CD: ${cd}` : (sk.cooldown===0?'Básico':'Disponible')}</span><span class="sk-type">${sk.type==='pasiva'?'Pasiva':''}</span>`;
+    if (sk.type !== 'pasiva') {
+      btn.onclick = () => chooseSkill(i, sk);
+    } else {
+      btn.disabled = true;
+    }
+    container.appendChild(btn);
+  });
+}
+
+function chooseSkill(idx, skill) {
+  selectedSkill = { idx, skill };
+  phase = 'target_pick';
+  document.getElementById('target-hint').textContent = '→ Haz click en un enemigo para atacar.';
+  // Highlight enemies
+  fighters.filter(f=>f.isEnemy&&f.hp>0).forEach(f=>{
+    document.getElementById('f-'+f.id)?.classList.add('targeting');
+  });
+}
+
+function onFighterClick(id) {
+  const f = fighters.find(x=>x.id===id);
+  if (!f) return;
+
+  if (phase === 'ally_pick' && !f.isEnemy && f.hp > 0) {
+    selectFighter(f);
+    return;
+  }
+  if (phase === 'target_pick' && f.isEnemy && f.hp > 0) {
+    // Remove targeting highlight
+    fighters.forEach(x => document.getElementById('f-'+x.id)?.classList.remove('targeting'));
+    executeAction(selectedFighter, selectedSkill, f);
+  }
+}
+
+/* ── COMBAT MATH ── */
+function getAffMult(atk, def) {
+  const aff = AFFINITIES[atk];
+  if (!aff) return 1;
+  if (aff.strong_vs === def) return 1.5;
+  if (aff.weak_vs   === def) return 0.75;
+  return 1;
+}
+
+function calcDamage(attacker, target, skillMult = 1) {
+  const isCrit = Math.random() * 100 < attacker.cr;
+  const critMult = isCrit ? (attacker.cd / 100) : 1;
+  const affMult = getAffMult(attacker.affinity, target.affinity);
+  // Damage = ATK * skillMult * affMult * crit / (DEF mitigation)
+  const defMit = target.def / (target.def + 1000); // 0→1 scale
+  const raw = attacker.atk * skillMult * affMult * critMult * (1 - defMit);
+  return { dmg: Math.round(raw), isCrit, affMult };
+}
+
+function applyDamage(target, dmg) {
+  target.hp = Math.max(0, target.hp - dmg);
+  updateFighterHP(target);
+  if (target.hp <= 0) {
+    document.getElementById('f-'+target.id)?.classList.add('dead');
+    logMsg(`💀 ${target.name} fue derrotado.`, 'sys');
+  }
+}
+
+function executeAction(actor, skillChoice, target) {
+  const skill = skillChoice.skill;
+  const sk_idx = skillChoice.idx;
+
+  // Set cooldown
+  if (skill.cooldown > 0) actor.cooldowns[sk_idx] = skill.cooldown;
+
+  // Check if skill hits all enemies
+  if (skill.name.includes('todo') || skill.desc.toLowerCase().includes('todo el equipo enemigo') || skill.desc.toLowerCase().includes('todos')) {
+    // AoE
+    const targets = fighters.filter(f => f.isEnemy !== actor.isEnemy && f.hp > 0);
+    const r = calcDamage(actor, target, 0.65); // AoE reduced
+    targets.forEach(t => {
+      applyDamage(t, r.dmg);
+      showDmgFloat('f-'+t.id, r.dmg, r.isCrit);
+    });
+    logMsg(`${actor.name} usa ${skill.name} en todo el equipo. ${r.dmg} de daño cada uno.${r.affMult>1?' Super efectivo!':r.affMult<1?' No muy efectivo.':''}`, r.isCrit?'crit':'dmg');
+  } else {
+    // Single target
+    const r = calcDamage(actor, target, 1.2);
+    applyDamage(target, r.dmg);
+    showDmgFloat('f-'+target.id, r.dmg, r.isCrit);
+    const affTxt = r.affMult > 1 ? ' ✦ Super efectivo!' : r.affMult < 1 ? ' ▼ No muy efectivo.' : '';
+    logMsg(`${actor.name} usa ${skill.name} en ${target.name}: ${r.dmg}${r.isCrit?' CRÍTICO!':''}${affTxt}`, r.isCrit?'crit':'dmg');
+  }
+
+  // Special passive: Rem's Oni Awakening — already in calcDamage (def ignore)
+  // Special: multi-hit (3 veces)
+  if (skill.desc.includes('3 veces')) {
+    for (let i=0;i<2;i++) {
+      if (target.hp > 0) {
+        const r2 = calcDamage(actor, target, 0.4);
+        applyDamage(target, r2.dmg);
+        showDmgFloat('f-'+target.id, r2.dmg, r2.isCrit);
+      }
+    }
+  }
+
+  document.getElementById('f-'+actor.id)?.classList.add('acting');
+  setTimeout(()=>document.getElementById('f-'+actor.id)?.classList.remove('acting'), 400);
+
+  currentTurn++;
+  setTimeout(() => nextTurn(), 600);
+}
+
+/* ── ENEMY AI ── */
+function enemyAI(actor) {
+  if (actor.hp <= 0 || actor.stunned) {
+    logMsg(`${actor.name} está aturdido y pierde el turno.`, 'sys');
+    currentTurn++;
+    setTimeout(nextTurn, 400);
+    return;
+  }
+
+  const aliveAllies = fighters.filter(f => !f.isEnemy && f.hp > 0);
+  if (!aliveAllies.length) { endBattle(false); return; }
+
+  // Pick skill: prefer cooldown-0 skills with highest damage, else basic
+  const availSkills = actor.skills.map((sk,i)=>({sk,i}))
+    .filter(({sk,i}) => sk.type !== 'pasiva' && !(actor.cooldowns[i]>0));
+
+  const skillChoice = availSkills.find(s=>s.sk.cooldown>0) || availSkills[0];
+  if (!skillChoice) { currentTurn++; setTimeout(nextTurn,400); return; }
+
+  // Target: lowest HP ally
+  const target = aliveAllies.reduce((a,b) => a.hp < b.hp ? a : b);
+
+  const skill = skillChoice.sk;
+  if (skill.cooldown > 0) actor.cooldowns[skillChoice.i] = skill.cooldown;
+
+  const r = calcDamage(actor, target, 1.1);
+  applyDamage(target, r.dmg);
+  showDmgFloat('f-'+target.id, r.dmg, r.isCrit);
+  const affTxt = r.affMult > 1 ? ' Super efectivo!' : r.affMult < 1 ? ' No muy efectivo.' : '';
+  logMsg(`${actor.name} usa ${skill.name} en ${target.name}: ${r.dmg}${r.isCrit?' CRÍTICO!':''}${affTxt}`, r.isCrit?'crit':'dmg');
+
+  document.getElementById('f-'+actor.id)?.classList.add('acting');
+  setTimeout(()=>document.getElementById('f-'+actor.id)?.classList.remove('acting'), 400);
+
+  currentTurn++;
+  setTimeout(() => nextTurn(), 700);
+}
+
+/* ── END BATTLE ── */
+async function endBattle(playerWon) {
+  phase = 'done';
+  document.getElementById('battle-screen').style.display = 'none';
+
+  const rs = document.getElementById('result-screen');
+  rs.style.display = 'flex';
+
+  const rtitle = document.getElementById('result-title');
+  const rpts   = document.getElementById('result-pts');
+  const rsub   = document.getElementById('result-sub');
+
+  if (playerWon) {
+    rtitle.textContent = 'VICTORIA';
+    rtitle.className   = 'result-title win';
+    rpts.textContent   = '+10 Conquista';
+    rpts.className     = 'result-pts win';
+    rsub.textContent   = `Derrotaste el equipo defensivo de ${enemyName}.`;
+    spawnParticles('#fbbf24', 40);
+    if (window.ReAnimeDB) {
+      await window.ReAnimeDB.addConquestPoints(10);
+      await window.ReAnimeDB.addBattleLog({ type:'attack', result:'win', enemyId, enemyName, pts:10 });
+      if (enemyId) await window.ReAnimeDB.recordDefenseWin(enemyId); // +10 to defender too? No — -5/+10 means attacker +10, defender +10 if they win (defense wins = enemy wins)
+      // Actually: if enemy wins (defense holds), enemy gets +10. We lost = -5.
+    }
+  } else {
+    rtitle.textContent = 'DERROTA';
+    rtitle.className   = 'result-title lose';
+    rpts.textContent   = '-5 Conquista';
+    rpts.className     = 'result-pts lose';
+    rsub.textContent   = `Tu equipo fue derrotado por la defensa de ${enemyName}.`;
+    if (window.ReAnimeDB) {
+      await window.ReAnimeDB.addConquestPoints(-5);
+      await window.ReAnimeDB.addBattleLog({ type:'attack', result:'lose', enemyId, enemyName, pts:-5 });
+      // Enemy defense won → give them +10
+      if (enemyId) await window.ReAnimeDB.recordDefenseWin(enemyId);
+    }
+  }
+  // Refresh conquest display
+  if (window.ReAnimeDB) {
+    const cq = await window.ReAnimeDB.getConquest();
+    document.getElementById('cq-display').textContent = cq.toLocaleString();
+    document.getElementById('cq-hdr-val').textContent  = cq.toLocaleString();
+  }
+}
+
+function resetBattle() {
+  document.getElementById('result-screen').style.display = 'none';
+  phase = 'setup';
+  fighters = []; turnQueue = []; currentTurn = 0;
+  selectedFighter = null; selectedSkill = null;
+  document.getElementById('battle-log').innerHTML = '';
+  document.getElementById('setup-screen').style.display = 'block';
+  document.getElementById('battle-screen').style.display = 'none';
+}
+
+/* ══════════════════════════════════════
+   RENDER HELPERS
+══════════════════════════════════════ */
+function renderBattleField() {
+  const enemyRow = document.getElementById('enemy-row');
+  const allyRow  = document.getElementById('ally-row');
+  enemyRow.innerHTML = '';
+  allyRow.innerHTML  = '';
+
+  fighters.forEach(f => {
+    const el = document.createElement('div');
+    el.className = `fighter${f.isEnemy?'':' player'}`;
+    el.id = 'f-' + f.id;
+    if (!f.isEnemy) el.onclick = () => onFighterClick(f.id);
+    const col = RC[f.stars] || '#94a3b8';
+    const hpPct = Math.round(f.hp / f.maxHp * 100);
+    el.innerHTML = `
+      <div class="f-img">
+        <div class="f-img-bg" style="background:${RG[f.stars]||RG[1]}"></div>
+        ${f.image?`<img src="${f.image}" onerror="this.style.display='none'"/>`:''} 
+        <div class="f-img-overlay"></div>
+        <div class="f-aff">${AFF_ICONS[f.affinity]||''}</div>
+      </div>
+      <div class="f-body">
+        <div class="f-name" style="color:${col}">${f.name}</div>
+        <div class="f-role">${f.role}</div>
+        <div class="hp-bar-wrap"><div class="hp-bar ${hpPct<40?'low':hpPct<70?'mid':''}" id="hpbar-${f.id}" style="width:${hpPct}%"></div></div>
+        <div class="hp-text" id="hptxt-${f.id}">${f.hp}/${f.maxHp}</div>
+      </div>`;
+    (f.isEnemy ? enemyRow : allyRow).appendChild(el);
+  });
+}
+
+function updateFighterHP(f) {
+  const bar  = document.getElementById('hpbar-'+f.id);
+  const txt  = document.getElementById('hptxt-'+f.id);
+  const pct  = Math.max(0, Math.round(f.hp / f.maxHp * 100));
+  if (bar) { bar.style.width = pct+'%'; bar.className = `hp-bar ${pct<40?'low':pct<70?'mid':''}`; }
+  if (txt) txt.textContent = `${f.hp}/${f.maxHp}`;
+}
+
+function renderTurnOrder() {
+  const row = document.getElementById('turn-row');
+  row.innerHTML = '';
+  const alive = fighters.filter(f=>f.hp>0).sort((a,b)=>b.spd-a.spd);
+  alive.forEach((f,i) => {
+    const tk = document.createElement('div');
+    tk.className = `turn-token${f.isEnemy?' enemy':''}${currentTurn < turnQueue.length && turnQueue[currentTurn]?.id===f.id?' current':''}`;
+    if (f.image) {
+      const img = document.createElement('img');
+      img.src = f.image;
+      img.onerror = () => { img.style.display='none'; };
+      tk.appendChild(img);
+    } else {
+      const sym = document.createElement('div');
+      sym.className = 'tt-sym';
+      sym.textContent = AFF_ICONS[f.affinity] || '?';
+      tk.appendChild(sym);
+    }
+    row.appendChild(tk);
+  });
+}
+
+function updateActionPanel(txt) {
+  document.getElementById('action-title').textContent = txt;
+}
+
+function logMsg(txt, type='') {
+  const log = document.getElementById('battle-log');
+  const div = document.createElement('div');
+  div.className = `log-entry ${type==='dmg'?'log-dmg':type==='crit'?'log-crit':type==='heal'?'log-heal':'log-sys'}`;
+  div.textContent = txt;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function showDmgFloat(elId, dmg, isCrit) {
+  const parent = document.getElementById(elId);
+  if (!parent) return;
+  const fl = document.createElement('div');
+  fl.className = 'dmg-float';
+  fl.textContent = (isCrit ? '💥' : '') + dmg;
+  fl.style.cssText = `color:${isCrit?'#fbbf24':'#f87171'};top:30%;left:${20+Math.random()*60}%;`;
+  parent.style.position = 'relative';
+  parent.appendChild(fl);
+  setTimeout(() => fl.remove(), 1000);
+}
+
+function spawnParticles(color, count) {
+  const rs = document.getElementById('result-screen');
+  for (let i=0;i<count;i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 4+Math.random()*8;
+    p.style.cssText = `width:${size}px;height:${size}px;background:${color};left:${Math.random()*100}%;top:${Math.random()*100}%;--dx:${(Math.random()-0.5)*200}px;--dy:${-100-Math.random()*200}px;animation-duration:${1+Math.random()*1.5}s;animation-delay:${Math.random()*0.5}s;`;
+    rs.appendChild(p);
+    setTimeout(() => p.remove(), 3000);
+  }
+}
+
+/* ══════════════════════════════════════
+   BATTLE LOG TAB
+══════════════════════════════════════ */
+async function renderBattleLog() {
+  const list = document.getElementById('log-list');
+  let log = [];
+  if (window.ReAnimeDB) log = await window.ReAnimeDB.getBattleLog();
+  if (!log.length) { list.innerHTML = '<div style="color:var(--muted);font-size:.85rem;padding:1rem;">Sin batallas registradas.</div>'; return; }
+  list.innerHTML = log.map(entry => {
+    const d = new Date(entry.date);
+    const dateStr = d.toLocaleDateString('es',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const typeLabel = entry.type==='attack' ? '⚔ Ataque' : '🛡 Defensa';
+    const won = entry.result === 'win';
+    const ptsSign = won ? `+${entry.pts||10}` : `${entry.pts||-5}`;
+    return `<div class="log-card">
+      <div class="log-result ${entry.result}">${won?'WIN':'LOSS'}</div>
+      <div class="log-info">
+        <div class="log-enemy">vs ${entry.enemyName||'Desconocido'}</div>
+        <div class="log-date">${dateStr}</div>
+        <div class="log-type">${typeLabel}</div>
+      </div>
+      <div class="log-pts ${entry.result}">${ptsSign}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════
+   BOOT
+══════════════════════════════════════ */
+if (window.ReAnimeDB) init();
+else window.addEventListener('reanimdb:ready', init, { once:true });
+</script>
+</body>
+</html>

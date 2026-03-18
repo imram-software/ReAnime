@@ -198,6 +198,7 @@
           <div class="team-slots" id="atk-slots"></div>
           <div class="team-stats" id="atk-stats"></div>
           <button class="save-btn" onclick="saveTeam('atk')">Guardar Ataque ⚔</button>
+        <a href="battle.html" style="display:block;margin-top:.6rem;background:none;border:1px solid var(--pink);color:var(--pink);border-radius:6px;padding:.5rem;text-align:center;font-family:var(--font-h);font-size:1rem;letter-spacing:2px;text-decoration:none;transition:all .2s;" onmouseover="this.style.background='var(--pink-dim)'" onmouseout="this.style.background='none'">Ir a Batalla →</a>
         </div>
         <div class="team-panel">
           <div class="team-panel-title">Equipo <em style="color:#3b82f6">Defensa</em></div>
@@ -228,10 +229,11 @@
         <div class="cm-status" id="cm-status"></div>
         <div class="cm-stats" id="cm-stats"></div>
         <div id="cm-skills"></div>
-        <div class="cm-actions">
+        <div class="cm-actions" style="flex-wrap:wrap;">
           <button class="cm-btn" onclick="closeModal()">Cerrar</button>
           <button class="cm-btn primary" id="cm-atk" onclick="addModal('atk')">+ Ataque</button>
           <button class="cm-btn primary" id="cm-def" onclick="addModal('def')" style="background:#2563eb;border-color:#2563eb;">+ Defensa</button>
+          <button class="cm-btn" id="cm-feat" onclick="setFeaturedFromModal()" style="border-color:#a78bfa;color:#a78bfa;grid-column:1/-1;margin-top:.2rem;">✦ Destacar en Perfil</button>
         </div>
       </div>
     </div>
@@ -410,6 +412,17 @@
   }
 
   function showToast(msg,ms=2500){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),ms); }
+
+  function setFeaturedFromModal(){
+    if(!_modal?.coll) return;
+    const c=_modal.coll, p=_modal.pvp;
+    const data={id:c.id||c.name,name:c.name,anime:p?.series||c.anime,image:c.image||'',stars:c.stars,description:''};
+    localStorage.setItem('gacha_featured',JSON.stringify(data));
+    if(window.ReAnimeDB) window.ReAnimeDB.setFeatured(data).catch(()=>{});
+    const btn=document.getElementById('cm-feat');
+    if(btn){btn.textContent='✦ Destacado!';btn.style.background='#a78bfa';btn.style.color='#fff';}
+    showToast('✦ '+c.name+' destacado en tu perfil');
+  }
 
   window.addEventListener('reanimdb:update',async()=>{ if(!window.ReAnimeDB)return; myCol=await window.ReAnimeDB.getCollection(); buildDedupe(); buildPvpAvail(); renderCollection(); renderChips(); });
 

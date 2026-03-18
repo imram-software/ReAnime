@@ -531,6 +531,7 @@
           renderSection('watchlist', all, userData.watchlist || []);
           renderSection('watched',   all, userData.completed || []);
           if (isOwnProfile) renderHolyBadge(userData.holy || 0);
+          renderConquest(userData.conquest || 0);
         });
       }
 
@@ -604,6 +605,11 @@
       function renderHolyBadge(holy) {
         const el = document.getElementById('holy-profile-badge');
         if (el) el.textContent = holy.toLocaleString() + ' ✦ Holy';
+      }
+
+      function renderConquest(pts) {
+        const el = document.getElementById('conquest-badge');
+        if (el) el.textContent = (pts||0).toLocaleString() + ' ⚔ Conquista';
       }
 
       function updateLikesDisplay(count) {
@@ -684,6 +690,7 @@
             ${isSelf ? `<input class="display-name-input" id="display-name-input" maxlength="32" placeholder="Tu nombre..." /><button class="save-name-btn" id="save-name-btn">Guardar</button>` : ''}
             <small id="profile-username" style="color:var(--muted);font-size:0.75rem;display:block;margin-top:0.15rem;"></small>
             <small id="holy-profile-badge" style="color:#a78bfa;font-size:0.78rem;display:block;margin-top:0.1rem;"></small>
+            <small id="conquest-badge" style="color:#fbbf24;font-size:0.78rem;display:block;margin-top:0.1rem;"></small>
           </div>
           <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:0.5rem;">
             <div style="display:flex;align-items:baseline;gap:0.4rem;">
