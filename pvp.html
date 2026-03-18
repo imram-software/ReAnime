@@ -190,7 +190,7 @@
     <!-- PVP BUILDER -->
     <div id="tab-pvp">
       <div class="section-title">Constructor <em>PVP</em></div>
-      <div class="section-sub">Solo personajes de tu coleccion habilitados en pvp_chars.json. Click en un chip para añadirlo.</div>
+      <div class="section-sub">Solo personajes de tu coleccion habilitados. Click en un chip para añadirlo.</div>
       <div class="pvp-layout">
         <div class="team-panel">
           <div class="team-panel-title">Equipo <em style="color:var(--pink)">Ataque</em></div>
@@ -312,7 +312,7 @@
     document.getElementById('cm-series').textContent=(pvp?.series||coll.anime)+(pvp?` · ${pvp.role}`:'');
     const st=document.getElementById('cm-status');
     if(pvp){st.className='cm-status ok';st.textContent='⚔ Habilitado para PVP';}
-    else{st.className='cm-status locked';st.textContent='🔒 No habilitado aún en pvp_chars.json';}
+    else{st.className='cm-status locked';st.textContent='🔒 No habilitado aún';}
     document.getElementById('cm-stats').innerHTML=pvp?.stats?Object.entries(pvp.stats).map(([k,v])=>`<div class="cm-stat"><div class="cm-stat-lbl">${SL[k]||k}</div><div class="cm-stat-val" style="color:${col}">${v}${k==='cr'||k==='cd'?'%':''}</div></div>`).join(''):`<div style="color:var(--muted);font-size:.8rem;grid-column:1/-1">Sin stats PVP.</div>`;
     document.getElementById('cm-skills').innerHTML=pvp?.skills?.length?`<div class="cm-skills-hd">Habilidades</div>`+pvp.skills.map(s=>`<div class="cm-skill"><div class="cm-skill-name">${s.name}</div><div class="cm-skill-desc">${s.desc}</div><div class="cm-skill-meta">${s.type==='pasiva'?'Pasiva':`Activa · CD: ${s.cooldown===0?'Básico':s.cooldown+' turnos'}`}</div></div>`).join(''):'';
     ['cm-atk','cm-def'].forEach(id=>{document.getElementById(id).disabled=!pvp;document.getElementById(id).style.opacity=pvp?'1':'.3';});
