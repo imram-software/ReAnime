@@ -35,7 +35,8 @@ const DEFAULT_DATA = {
   watching: [], completed: [], favorites: [], watchlist: [], episodesSeen: {},
   holy: 0,          // moneda del gacha
   collection: [],   // personajes obtenidos [{id,name,anime,image,stars,obtainedAt}]
-  featured: null    // personaje destacado en perfil
+  featured: null,   // personaje destacado en perfil
+  displayName: ""    // nombre personalizable
 };
 
 /* ─────────────────────────────────────────────────────────────
@@ -53,7 +54,11 @@ const _readyPromise = new Promise(res => { _readyResolve = res; });
 function userRef() { return doc(db, "users", discordUser.id); }
 
 async function ensureDoc() {
-  await setDoc(userRef(), { discordId: discordUser.id }, { merge: true });
+  // Guardar tambien username y avatar para que otros perfiles puedan mostrarlos
+  const profileData = { discordId: discordUser.id };
+  if (discordUser.username) profileData.discordUsername = discordUser.username;
+  if (discordUser.avatar)   profileData.discordAvatar   = discordUser.avatar;
+  await setDoc(userRef(), profileData, { merge: true });
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -79,7 +84,7 @@ function startListener() {
         _localData = { ...DEFAULT_DATA, ...snap.data() };
       } else {
         /* Primera vez: crear documento */
-        _localData = { discordId: discordUser.id, ...DEFAULT_DATA };
+        _localData = { discordId: discordUser.id, discordUsername: discordUser.username || "", discordAvatar: discordUser.avatar || "", ...DEFAULT_DATA };
         setDoc(userRef(), _localData).catch(e => console.warn("[Re:Anime] setDoc:", e));
       }
 
@@ -269,6 +274,18 @@ async function getFeaturedChar() {
   return _localData.featured || null;
 }
 
+async function setDisplayName(name) {
+  await _readyPromise;
+  const clean = (name || '').trim().slice(0, 32);
+  _localData.displayName = clean;
+  window.dispatchEvent(new CustomEvent("reanimdb:update", { detail: _localData }));
+  if (!discordUser) { localStorage.setItem("user_data", JSON.stringify(_localData)); return; }
+  try {
+    await ensureDoc();
+    await updateDoc(userRef(), { displayName: clean });
+  } catch(e) { console.warn("[Re:Anime] setDisplayName:", e); }
+}
+
 window.ReAnimeDB = {
   loadUserData,
   addToList,
@@ -283,5 +300,6 @@ window.ReAnimeDB = {
   addToCollection,
   getCollection,
   setFeatured,
-  getFeaturedChar
+  getFeaturedChar,
+  setDisplayName
 };

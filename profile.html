@@ -316,13 +316,83 @@
             <p style="color:var(--muted);margin-top:4rem;text-align:center;">Perfil no encontrado.</p>`;
           return;
         }
+
+        /* ── Actualizar avatar y nombres desde datos de Firestore ── */
+        const avatarEl = document.getElementById('profile-avatar');
+        if (avatarEl && userData.discordAvatar && userData.discordId) {
+          avatarEl.src = `https://cdn.discordapp.com/avatars/${userData.discordId}/${userData.discordAvatar}.png`;
+        }
+
+        const nameEl = document.getElementById('display-name-text');
+        if (nameEl) {
+          const display = userData.displayName || userData.discordUsername || `Usuario ${(userData.discordId||'????').slice(-4)}`;
+          nameEl.textContent = display;
+        }
+
+        const unameEl = document.getElementById('profile-username');
+        if (unameEl && userData.discordUsername) {
+          unameEl.textContent = '@' + userData.discordUsername;
+        }
+
+        /* ── Inicializar editor de nombre (solo para uno mismo) ── */
+        const isSelf = selfUser && selfUser.id === (userData.discordId || targetId);
+        if (isSelf) initNameEditor(userData.displayName || '');
+
+        /* ── Share button ── */
+        const shareBtn = document.getElementById('share-btn');
+        if (shareBtn) {
+          shareBtn.onclick = () => {
+            const url = location.origin + location.pathname + '?id=' + targetId;
+            navigator.clipboard.writeText(url)
+              .then(() => { shareBtn.textContent = '✓ Copiado!'; setTimeout(() => shareBtn.textContent = 'Compartir perfil', 2000); })
+              .catch(() => {});
+          };
+        }
+
         renderFeaturedProfile(userData.featured || null);
         animesP.then(all => {
           renderSection('favorites', all, userData.favorites || []);
           renderSection('watchlist', all, userData.watchlist || []);
           renderSection('watched',   all, userData.completed || []);
-          /* Mostrar Holy y coleccion solo si es perfil propio */
           if (isOwnProfile) renderHolyBadge(userData.holy || 0);
+        });
+      }
+
+      function initNameEditor(currentName) {
+        const nameText  = document.getElementById('display-name-text');
+        const nameInput = document.getElementById('display-name-input');
+        const editBtn   = document.getElementById('edit-name-btn');
+        const saveBtn   = document.getElementById('save-name-btn');
+        if (!editBtn || !nameInput || !saveBtn) return;
+
+        editBtn.onclick = () => {
+          nameInput.value = nameText.textContent.trim();
+          nameText.style.display   = 'none';
+          editBtn.style.display    = 'none';
+          nameInput.style.display  = 'block';
+          saveBtn.style.display    = 'inline-block';
+          nameInput.focus();
+        };
+
+        const doSave = async () => {
+          const val = nameInput.value.trim().slice(0, 32);
+          if (val) nameText.textContent = val;
+          nameText.style.display  = '';
+          editBtn.style.display   = '';
+          nameInput.style.display = 'none';
+          saveBtn.style.display   = 'none';
+          if (window.ReAnimeDB) await window.ReAnimeDB.setDisplayName(val);
+        };
+
+        saveBtn.onclick = doSave;
+        nameInput.addEventListener('keydown', e => {
+          if (e.key === 'Enter') doSave();
+          if (e.key === 'Escape') {
+            nameText.style.display  = '';
+            editBtn.style.display   = '';
+            nameInput.style.display = 'none';
+            saveBtn.style.display   = 'none';
+          }
         });
       }
 
@@ -376,25 +446,33 @@
     }
 
     function buildProfileShell(targetId) {
-      /* Intentar construir avatar desde el ID si es el propio usuario */
-      const isSelf  = selfUser && selfUser.id === targetId;
-      const avatar  = isSelf
-        ? `https://cdn.discordapp.com/avatars/${selfUser.id}/${selfUser.avatar}.png`
-        : `https://cdn.discordapp.com/embed/avatars/0.png`; // placeholder para ajenos
-      const uname   = isSelf ? selfUser.username : `Usuario ${targetId.slice(-4)}`;
+      const isSelf   = selfUser && selfUser.id === targetId;
       const shareUrl = location.origin + location.pathname + '?id=' + targetId;
+
+      // Avatar y nombre se actualizaran cuando lleguen los datos de Firestore
+      const placeholderAvatar = isSelf && selfUser.avatar
+        ? `https://cdn.discordapp.com/avatars/${selfUser.id}/${selfUser.avatar}.png`
+        : 'https://cdn.discordapp.com/embed/avatars/0.png';
+      const placeholderName = isSelf ? (selfUser.username || '...') : '...';
 
       document.getElementById('profile-content').innerHTML = `
         <button class="back-btn" onclick="history.length>1?history.back():location.href='index.html'">← Volver</button>
         <div class="user-card">
-          <img src="${avatar}" alt="Avatar" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'" />
+          <img id="profile-avatar" src="${placeholderAvatar}" alt="Avatar" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'" />
           <div class="user-card-info">
-            <strong>${uname}</strong>
-            <small id="holy-profile-badge" style="color:#a78bfa;font-size:0.78rem;display:block;margin-top:0.2rem;"></small>
-            ${!isSelf ? `<small style="color:var(--muted)">Perfil publico</small>` : ''}
+            <div class="display-name-wrap">
+              <span class="display-name-text" id="display-name-text">
+                ${placeholderName}
+              </span>
+              ${isSelf ? `<button class="edit-name-btn" id="edit-name-btn" title="Editar nombre">✏</button>` : ''}
+            </div>
+            <input class="display-name-input" id="display-name-input" maxlength="32" placeholder="Tu nombre..." />
+            ${isSelf ? `<button class="save-name-btn" id="save-name-btn">Guardar</button>` : ''}
+            <small id="profile-username" style="color:var(--muted);font-size:0.75rem;display:block;margin-top:0.15rem;"></small>
+            <small id="holy-profile-badge" style="color:#a78bfa;font-size:0.78rem;display:block;margin-top:0.1rem;"></small>
           </div>
           ${isSelf ? `<button class="logout-btn" onclick="logout()">Cerrar sesion</button>` : ''}
-          <button class="logout-btn" style="margin-left:${isSelf?'0':'auto'}" onclick="navigator.clipboard.writeText('${shareUrl}').then(()=>this.textContent='Copiado!').catch(()=>{});this.textContent='Copiando...'">Compartir perfil</button>
+          <button class="logout-btn" style="margin-left:${isSelf?'0':'auto'}" id="share-btn">Compartir perfil</button>
         </div>
         <div id="featured-profile-section"></div>
         <div class="section-wrap">
@@ -451,4 +529,29 @@
     }
   </script>
 </body>
-</html>
+</html>      /* ── DISPLAY NAME editor ── */
+      .display-name-wrap {
+        display:flex; align-items:center; gap:0.5rem;
+      }
+      .display-name-text {
+        font-size:1.1rem; font-weight:700;
+      }
+      .display-name-input {
+        background:var(--bg3); border:1px solid var(--pink);
+        color:var(--text); border-radius:6px;
+        padding:0.3rem 0.6rem; font-size:1rem;
+        font-family:var(--font-body); outline:none;
+        max-width:200px; display:none;
+      }
+      .edit-name-btn {
+        background:none; border:none; cursor:pointer;
+        color:var(--muted); font-size:0.85rem; padding:0.1rem 0.3rem;
+        transition:color 0.2s; line-height:1;
+      }
+      .edit-name-btn:hover { color:var(--pink); }
+      .save-name-btn {
+        background:var(--pink); border:none; color:#fff;
+        border-radius:5px; padding:0.3rem 0.7rem;
+        font-size:0.78rem; cursor:pointer; display:none;
+        font-family:var(--font-body);
+      }
