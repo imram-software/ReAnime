@@ -20,10 +20,82 @@
           "id": 2,
           "name": "Ram",
           "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
-          "rarity": 4,
+          "rarity": 5,
           "image": "https://imgs.search.brave.com/l2CgYzii6sEbazo6WxJ4mz9f2JE3UTTeNEA_UmXoNMg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zMy56/ZXJvY2hhbi5uZXQv/MjQwLzI1LzI3LzQ0/NjM4NzUuYXZpZg",
           "description": "Ram es un personaje de Re:Zero - Starting Life in Another World. Hermana gemela mayor de Rem, trabaja como sirvienta en la mansión de Roswaal. Es orgullosa y sarcástica, pero también leal a su hermana y a Roswaal. A pesar de su actitud fría, se preocupa profundamente por Rem y se muestra protectora hacia ella.",
           "type": "femenino"
+        },
+        {
+          "id": 3,
+          "name": "Emilia",
+          "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
+          "rarity": 5,
+          "image": "https://imgs.search.brave.com/SHXepJOJJhXxZ_-VQWzlyVWvpfuJ3HzkOD2t6vjCPwY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2RlLzA5/LzcwL2RlMDk3MDYx/MGQ2Y2M5ZjIzNGVk/ODI5YzY4NzEzZmQ4/LmpwZw",
+          "description": "Emilia es un personaje de Re:Zero - Starting Life in Another World. Es una joven medio elfa con cabello plateado y ojos morados. Es amable, compasiva y tiene un fuerte sentido de la justicia. A pesar de su apariencia frágil, Emilia es una maga poderosa y valiente que lucha por proteger a sus seres queridos y por encontrar su lugar en el mundo.",
+          "type": "femenino"
+        },
+        {
+          "id": 4,
+          "name": "Subaru Natsuki",
+          "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
+          "rarity": 5,
+          "image": "https://imgs.search.brave.com/jdVMWDuOOJ8hhlyIhAy3lW7MRdxCG3qxRBqkZXuULZc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS50ZW5vci5jb20v/d0J6WFgxYmx5M3NB/QUFBTS9zdWJhcnUt/bmF0c3VraS1zdWJh/cnUuZ2lm.gif",
+          "description": "Subaru Natsuki es el protagonista de Re:Zero - Starting Life in Another World. Es un joven que es transportado a un mundo de fantasía y descubre que tiene la habilidad de regresar en el tiempo cada vez que muere. A lo largo de la serie, Subaru enfrenta numerosos desafíos y peligros mientras intenta proteger a sus amigos y encontrar una manera de regresar a su mundo original.",
+          "type": "masculino"
+        },
+        {
+          "id": 5,
+          "name": "Beatrice",
+          "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
+          "rarity": 5,
+          "image": "https://imgs.search.brave.com/yapaYWKx6gwE-_BBdwOwbUpaQZ1hIim2Gi7mZLZqlYk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2U1LzYw/LzRjL2U1NjA0YzU2/YzllOThmOTIxMGYx/NmY3NmQ5MDRlMGIx/LmpwZw",
+          "description": "Beatrice es un personaje de Re:Zero - Starting Life in Another World. Es una joven con cabello rubio y ojos azules, que lleva un vestido rosa y un lazo en la cabeza. Es la guardiana de la biblioteca de la mansión de Roswaal y tiene una personalidad fría y distante. A pesar de su apariencia frágil, Beatrice es una maga poderosa y tiene un conocimiento profundo sobre el mundo en el que se encuentra.",
+          "type": "femenino"
+        },
+        {
+          "id": 6,
+          "name": "Roswaal L Mathers",
+          "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
+          "rarity": 4,
+          "image": "https://static.wikia.nocookie.net/villains/images/d/d6/Infinity_Roswaal_card_2.png/revision/latest?cb=20201017103355",
+          "description": "Roswaal L Mathers es un personaje de Re:Zero - Starting Life in Another World. Es el señor de la mansión donde trabajan Rem y Ram como sirvientas. Roswaal es un mago poderoso y excéntrico, conocido por su apariencia llamativa y su personalidad enigmática. A lo largo de la serie, se revela que tiene sus propios objetivos y motivaciones, lo que lo convierte en un personaje intrigante y complejo.",
+          "type": "masculino"
+        },
+        {
+          "id": 7,
+          "name": "Puck",
+          "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
+          "rarity": 4,
+          "image": "https://i.pinimg.com/1200x/1f/e9/a6/1fe9a6f64a4cea01947cc71609221b19.jpg",
+          "description": "Puck es un personaje de Re:Zero - Starting Life in Another World. Es un espíritu de hielo que se manifiesta como un gato pequeño y adorable. Puck es el compañero de Emilia y tiene una personalidad juguetona y protectora. A pesar de su apariencia tierna, Puck es un ser poderoso que puede manipular el hielo y tiene una conexión especial con Emilia.",
+          "type": "masculino"
+        },
+        {
+          "id": 8,
+          "name": "Satella",
+          "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
+          "rarity": 4,
+          "image": "https://imgs.search.brave.com/3WwbQh52ygQ7yHE1d27GpgPJzepZcIk2dg6ezsilTN8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzRlL2Qy/LzdjLzRlZDI3Y2Qz/ODlmNDBmNzI1NjRl/MTc2NDA4MTUzMDVl/LmpwZw",
+          "description": "Satella es un personaje de Re:Zero - Starting Life in Another World. Es la archimaga de la bruja de la envidia y es conocida por su apariencia misteriosa y su conexión con Subaru. A lo largo de la serie, se revela que Satella tiene una relación compleja con Subaru y desempeña un papel importante en la trama, aunque su verdadera naturaleza y motivaciones siguen siendo un misterio.",
+          "type": "femenino"
+        },
+        {
+          "id": 9,
+          "name": "Echidna",
+          "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
+          "rarity": 4,
+          "image": "https://static.zerochan.net/Echidna.%28Re%3AZero%29.1024.3249703.webp",
+          "description": "Echidna es un personaje de Re:Zero - Starting Life in Another World. Es la archimaga de la bruja de la codicia y es conocida por su apariencia elegante y su personalidad intrigante. Echidna tiene un conocimiento profundo sobre el mundo en el que se encuentra y desempeña un papel importante en la trama, aunque sus verdaderas intenciones y motivaciones siguen siendo un misterio.",
+          "type": "femenino"
+        },
+        {
+          "id": 10,
+          "name": "Regulus Corneas",
+          "anime": "Re:Zero Kara Hajimeru Isekai Seikatsu",
+          "rarity": 4,
+          "image": "https://i.pinimg.com/1200x/28/9b/31/289b312d2a6390401673246f28b2c0d3.jpg",
+          "description": "Regulus Corneas es un personaje de Re:Zero - Starting Life in Another World. Es el archimago de la bruja de la pereza y es conocido por su apariencia imponente y su personalidad arrogante. Regulus es un ser poderoso que tiene la capacidad de manipular el tiempo y desempeña un papel importante en la trama, aunque sus verdaderas intenciones y motivaciones siguen siendo un misterio.",
+          "type": "masculino"
         }
       ]
     }
