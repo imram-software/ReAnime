@@ -36,7 +36,9 @@ const DEFAULT_DATA = {
   holy: 0,          // moneda del gacha
   collection: [],   // personajes obtenidos [{id,name,anime,image,stars,obtainedAt}]
   featured: null,   // personaje destacado en perfil
-  displayName: ""    // nombre personalizable
+  displayName: "",   // nombre personalizable
+  likes: 0,          // total de likes recibidos (publico)
+  likesGiven: {}     // { userId: "YYYY-MM-DD" } — rastreo de likes dados hoy
 };
 
 /* ─────────────────────────────────────────────────────────────
@@ -274,6 +276,63 @@ async function getFeaturedChar() {
   return _localData.featured || null;
 }
 
+/* ─────────────────────────────────────────────────────────────
+   LIKES
+   likesGiven se guarda en el documento del usuario que da el like.
+   likes (contador) se guarda en el documento del perfil que lo recibe.
+───────────────────────────────────────────────────────────── */
+
+/* Dar like al perfil de otro usuario.
+   Retorna: 'ok' | 'already_today' | 'not_logged_in' */
+async function likeProfile(targetUserId) {
+  await _readyPromise;
+  if (!discordUser) return 'not_logged_in';
+  if (discordUser.id === targetUserId) return 'self';
+
+  const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+  const given = _localData.likesGiven || {};
+
+  if (given[targetUserId] === today) return 'already_today';
+
+  // 1. Marcar en nuestro propio doc que dimos like hoy
+  given[targetUserId] = today;
+  _localData.likesGiven = given;
+
+  try {
+    await ensureDoc();
+    await updateDoc(userRef(), { [`likesGiven.${targetUserId}`]: today });
+  } catch(e) { console.warn('[Re:Anime] likeProfile (own doc):', e); }
+
+  // 2. Incrementar el contador en el doc del destinatario
+  //    Usamos la REST commit API con fieldTransforms (no necesita auth para reglas publicas)
+  try {
+    const commitUrl = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents:commit?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
+    await fetch(commitUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        writes: [{
+          transform: {
+            document: `projects/reanime-1a781/databases/(default)/documents/users/${targetUserId}`,
+            fieldTransforms: [{ fieldPath: 'likes', increment: { integerValue: 1 } }]
+          }
+        }]
+      })
+    });
+  } catch(e) { console.warn('[Re:Anime] likeProfile (target increment):', e); }
+
+  return 'ok';
+}
+
+/* Verificar si ya dimos like hoy a este perfil */
+async function hasLikedToday(targetUserId) {
+  await _readyPromise;
+  if (!discordUser) return false;
+  const today = new Date().toISOString().slice(0, 10);
+  const given = _localData.likesGiven || {};
+  return given[targetUserId] === today;
+}
+
 async function setDisplayName(name) {
   await _readyPromise;
   const clean = (name || '').trim().slice(0, 32);
@@ -301,5 +360,7 @@ window.ReAnimeDB = {
   getCollection,
   setFeatured,
   getFeaturedChar,
-  setDisplayName
+  setDisplayName,
+  likeProfile,
+  hasLikedToday
 };

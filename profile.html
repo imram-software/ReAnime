@@ -173,6 +173,28 @@
       padding: 1.5rem 0; font-style: italic;
     }
 
+    /* ── LIKES ── */
+    .like-btn-wrap {
+      display:flex; align-items:center; gap:0.7rem;
+      margin-top:0.7rem;
+    }
+    .like-btn {
+      display:inline-flex; align-items:center; gap:0.4rem;
+      background:none; border:1px solid var(--border);
+      color:var(--muted); border-radius:20px;
+      padding:0.35rem 1rem; font-size:0.82rem;
+      cursor:pointer; font-family:var(--font-body);
+      transition:all 0.25s;
+    }
+    .like-btn:hover:not([disabled]) { border-color:var(--pink); color:var(--pink); }
+    .like-btn.liked { border-color:var(--pink); color:var(--pink); background:var(--pink-dim); }
+    .like-btn[disabled] { opacity:0.45; cursor:default; }
+    .likes-count {
+      font-family:var(--font-head); font-size:1.3rem;
+      letter-spacing:1px; color:var(--text);
+    }
+    .likes-label { font-size:0.7rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+
     /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--border); padding: 2rem;
@@ -379,6 +401,8 @@
         }
 
         renderFeaturedProfile(userData.featured || null);
+        updateLikesDisplay(userData.likes || 0);
+        initLikeBtn();
         animesP.then(all => {
           renderSection('favorites', all, userData.favorites || []);
           renderSection('watchlist', all, userData.watchlist || []);
@@ -457,6 +481,79 @@
         if (el) el.textContent = holy.toLocaleString() + ' ✦ Holy';
       }
 
+      function updateLikesDisplay(count) {
+        const el = document.getElementById('likes-count');
+        if (el) el.textContent = (count || 0).toLocaleString();
+      }
+
+      async function initLikeBtn() {
+        const btn = document.getElementById('like-btn');
+        if (!btn) return;
+        const selfUser2 = JSON.parse(localStorage.getItem('user'));
+        if (!selfUser2) {
+          btn.title = 'Inicia sesion para dar like';
+          btn.setAttribute('disabled', true);
+          return;
+        }
+        // Check if already liked today
+        if (window.ReAnimeDB) {
+          const alreadyToday = await window.ReAnimeDB.hasLikedToday(targetId);
+          if (alreadyToday) {
+            btn.textContent = '♥ Liked';
+            btn.classList.add('liked');
+            btn.setAttribute('disabled', true);
+            btn.title = 'Ya diste like hoy, vuelve mañana';
+          }
+        } else {
+          // Check localStorage fallback
+          const today = new Date().toISOString().slice(0,10);
+          const key = 'liked_' + targetId;
+          if (localStorage.getItem(key) === today) {
+            btn.textContent = '♥ Liked';
+            btn.classList.add('liked');
+            btn.setAttribute('disabled', true);
+          }
+        }
+      }
+
+      async function handleLike() {
+        const btn = document.getElementById('like-btn');
+        if (!btn || btn.disabled) return;
+        btn.setAttribute('disabled', true);
+        btn.textContent = '...';
+
+        let result;
+        if (window.ReAnimeDB) {
+          result = await window.ReAnimeDB.likeProfile(targetId);
+        } else {
+          // Fallback sin Firebase
+          const today = new Date().toISOString().slice(0,10);
+          const key = 'liked_' + targetId;
+          result = localStorage.getItem(key) === today ? 'already_today' : 'ok';
+          if (result === 'ok') localStorage.setItem(key, today);
+        }
+
+        if (result === 'ok') {
+          btn.textContent = '♥ Liked';
+          btn.classList.add('liked');
+          btn.title = 'Vuelve mañana para dar like de nuevo';
+          // Actualizar contador localmente
+          const countEl = document.getElementById('likes-count');
+          if (countEl) {
+            const cur = parseInt(countEl.textContent.replace(/,/g,'')) || 0;
+            countEl.textContent = (cur + 1).toLocaleString();
+          }
+        } else if (result === 'already_today') {
+          btn.textContent = '♥ Liked';
+          btn.classList.add('liked');
+          btn.title = 'Ya diste like hoy';
+        } else if (result === 'not_logged_in') {
+          btn.textContent = '♡ Like';
+          btn.removeAttribute('disabled');
+          alert('Inicia sesion con Discord para dar like.');
+        }
+      }
+
       /* ── Iniciar carga ── */
       buildProfileShell(targetId);
 
@@ -498,6 +595,13 @@
             ${isSelf ? `<input class="display-name-input" id="display-name-input" maxlength="32" placeholder="Tu nombre..." /><button class="save-name-btn" id="save-name-btn">Guardar</button>` : ''}
             <small id="profile-username" style="color:var(--muted);font-size:0.75rem;display:block;margin-top:0.15rem;"></small>
             <small id="holy-profile-badge" style="color:#a78bfa;font-size:0.78rem;display:block;margin-top:0.1rem;"></small>
+          </div>
+          <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:0.5rem;">
+            <div style="display:flex;align-items:baseline;gap:0.4rem;">
+              <span class="likes-count" id="likes-count">—</span>
+              <span class="likes-label">likes</span>
+            </div>
+            ${!isSelf ? `<div class="like-btn-wrap"><button class="like-btn" id="like-btn" onclick="handleLike()">♡ Like</button></div>` : ''}
           </div>
           ${isSelf ? `<button class="logout-btn" onclick="logout()">Cerrar sesion</button>` : ''}
           <button class="logout-btn" style="margin-left:${isSelf?'0':'auto'}" id="share-btn">Compartir perfil</button>
