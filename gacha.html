@@ -928,7 +928,7 @@
     /* paginas 1-20 al azar para variedad */
     const page = Math.ceil(Math.random() * 20);
     try {
-      const r = await fetch(`https://api.jikan.moe/v4/top/characters?page=${page}&limit=25/full`);
+      const r = await fetch(`https://api.jikan.moe/v4/top/characters?page=${page}&limit=25`);
       if (!r.ok) throw new Error('Jikan ' + r.status);
       const j = await r.json();
       const nuevos = (j.data || []).map(jikanToChar);
