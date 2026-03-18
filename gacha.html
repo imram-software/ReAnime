@@ -622,11 +622,11 @@
         <div class="pull-btns">
           <button class="pull-btn" id="btn-x1" onclick="doPull(1)">
             <span>×1 INVOCAR</span>
-            <span class="btn-label">500 Holy</span>
+            <span class="btn-label">GIRO INFINITO (TEST)</span>
           </button>
           <button class="pull-btn x10" id="btn-x10" onclick="doPull(10)">
             <span>×10 INVOCAR</span>
-            <span class="btn-label">5000 Holy</span>
+            <span class="btn-label">GIRO INFINITO (TEST)</span>
           </button>
         </div>
       </div>
@@ -885,6 +885,94 @@
   /* ══════════════════════════════════════
      PULL LOGIC
   ══════════════════════════════════════ */
+  function setBtnsDisabled(v) {
+    document.getElementById('btn-x1').classList.toggle('disabled', v);
+    document.getElementById('btn-x10').classList.toggle('disabled', v);
+  }
+
+  /* Simbolos decorativos por rareza */
+  const R_SYMBOL_GACHA = { 5:'★', 4:'◆', 3:'▲', 2:'●', 1:'─' };
+
+  function buildCardEl(ch, clickIdx, chars) {
+    const rClass = 'r' + ch.stars;
+    const el = document.createElement('div');
+    el.className = 'char-card ' + rClass;
+
+    const face = document.createElement('div');
+    face.className = 'card-face';
+
+    const grad = document.createElement('div');
+    grad.className = 'card-face-gradient';
+    face.appendChild(grad);
+
+    const sym = document.createElement('div');
+    sym.className = 'card-symbol';
+    sym.textContent = R_SYMBOL_GACHA[ch.stars] || '─';
+    face.appendChild(sym);
+
+    if (ch.image) {
+      const img = document.createElement('img');
+      img.className = 'card-face-img';
+      img.alt = ch.name;
+      img.loading = 'lazy';
+      img.src = ch.image;
+      img.onerror = () => img.classList.add('broken');
+      face.appendChild(img);
+    }
+    el.appendChild(face);
+
+    const info = document.createElement('div');
+    info.className = 'card-info';
+    info.innerHTML =
+      '<div class="card-stars-row">' + starsHTML(ch.stars, 'stars-' + rClass) + '</div>' +
+      '<div class="card-char-name">' + ch.name + '</div>' +
+      '<div class="card-anime-row">' + ch.anime + '</div>';
+    el.appendChild(info);
+
+    el.addEventListener('click', () => openModal(chars[clickIdx]));
+    return el;
+  }
+
+  function spawnParticles(container, color, count) {
+    for (let i=0; i<count; i++) {
+      const pt = document.createElement('div');
+      pt.className = 'fx-pt';
+      const angle = (Math.PI*2/count)*i + (Math.random()-0.5)*0.8;
+      const dist  = 70 + Math.random()*130;
+      pt.style.cssText = [
+        'background:'+color,'left:50%','top:50%',
+        '--dx:'+Math.cos(angle)*dist+'px',
+        '--dy:'+Math.sin(angle)*dist+'px',
+        'animation-delay:'+Math.random()*0.2+'s',
+        'animation-duration:'+(0.55+Math.random()*0.5)+'s',
+        'width:'+(3+Math.random()*7)+'px',
+        'height:'+(3+Math.random()*7)+'px',
+        'box-shadow:0 0 5px '+color,
+        'margin-left:-3px','margin-top:-3px',
+      ].join(';');
+      container.appendChild(pt);
+    }
+  }
+
+  function spawnBeams(container, color, count) {
+    for (let i=0; i<count; i++) {
+      const b = document.createElement('div');
+      b.className = 'fx-beam';
+      const angle = (360/count)*i + (Math.random()-0.5)*8;
+      b.style.cssText = [
+        'background:linear-gradient(to top,'+color+'cc,transparent)',
+        'left:50%','bottom:50%','margin-left:-1.5px',
+        'transform:rotate('+angle+'deg) scaleY(0)',
+        'transform-origin:bottom center',
+        'height:'+(70+Math.random()*70)+'px',
+        'width:'+(1.5+Math.random()*3)+'px',
+        'animation-delay:'+Math.random()*0.12+'s',
+        'box-shadow:0 0 8px '+color,
+      ].join(';');
+      container.appendChild(b);
+    }
+  }
+
   async function doPull(n) {
     if (pulling) return;
 
@@ -944,6 +1032,100 @@
     setBtnsDisabled(false);
   }
 
+
+  /* ══════════════════════════════════════
+     REVEAL SYSTEM — fullscreen 1x1
+  ══════════════════════════════════════ */
+  const R_CFG = {
+    5: { anim:'anim5',  dur:1100, nameColor:'#fbbf24', bgAnim:'bgFlash5', rays:true,  shake:false },
+    4: { anim:'anim4',  dur:800,  nameColor:'#c084fc', bgAnim:'bgFlash4', rays:false, shake:true  },
+    3: { anim:'anim3',  dur:600,  nameColor:'#38bdf8', bgAnim:'bgFlash3', rays:false, shake:false },
+    2: { anim:'anim1',  dur:450,  nameColor:'#86efac', bgAnim:null,       rays:false, shake:false },
+    1: { anim:'anim1',  dur:350,  nameColor:'#94a3b8', bgAnim:null,       rays:false, shake:false },
+  };
+
+  let revealChars   = [];
+  let revealSkipped = false;
+  let revealResolve = null;
+
+  const overlay     = document.getElementById('reveal-overlay');
+  const revCardWrap = document.getElementById('reveal-card-wrap');
+  const revName     = document.getElementById('reveal-charname');
+  const revAnime    = document.getElementById('reveal-charanime');
+  const revCounter  = document.getElementById('reveal-counter');
+  const revEffects  = document.getElementById('reveal-effects');
+
+  function revealSkip() { revealSkipped = true; finishReveal(); }
+
+  function finishReveal() {
+    overlay.classList.remove('open');
+    revEffects.innerHTML = ''; // clear effects
+    overlay.style.animation = 'none';
+    if (revealResolve) { revealResolve(); revealResolve = null; }
+  }
+
+  async function revealOne(ch, idx, total) {
+    if (revealSkipped) return;
+    const cfg = R_CFG[ch.stars] || R_CFG[1];
+    revEffects.innerHTML = '';
+
+    if (cfg.bgAnim) overlay.style.animation = cfg.bgAnim + ' 0.9s ease forwards';
+    else { overlay.style.animation = 'none'; overlay.style.background = 'rgba(0,0,0,0.95)'; }
+
+    if (ch.stars === 5) {
+      const rays = document.createElement('div'); rays.className = 'fx-rays';
+      revEffects.appendChild(rays);
+      spawnBeams(revEffects, '#fbbf24', 16);
+      spawnParticles(revEffects, '#fbbf24', 20);
+      spawnParticles(revEffects, '#fffbeb', 10);
+    } else if (ch.stars === 4) {
+      spawnBeams(revEffects, '#c084fc', 10);
+      spawnParticles(revEffects, '#c084fc', 16);
+      spawnParticles(revEffects, '#ede9fe', 6);
+    } else if (ch.stars === 3) {
+      spawnBeams(revEffects, '#38bdf8', 6);
+      spawnParticles(revEffects, '#38bdf8', 10);
+    } else if (ch.stars === 2) {
+      spawnParticles(revEffects, '#86efac', 7);
+    }
+
+    revCardWrap.innerHTML = '';
+    const cardEl = buildCardEl(ch, idx, revealChars);
+    cardEl.style.animation = cfg.anim + ' ' + cfg.dur + 'ms cubic-bezier(.34,1.56,.64,1) both';
+    if (ch.stars === 5) cardEl.classList.add('holo-card');
+    else if (ch.stars === 4) cardEl.classList.add('glow4-card');
+    else if (ch.stars === 3) cardEl.classList.add('glow3-card');
+
+    if (cfg.shake) {
+      const shaker = document.createElement('div');
+      shaker.style.animation = 'shake4 0.55s ease ' + Math.floor(cfg.dur*0.4) + 'ms both';
+      shaker.appendChild(cardEl);
+      revCardWrap.appendChild(shaker);
+    } else {
+      revCardWrap.appendChild(cardEl);
+    }
+
+    revName.textContent = ch.name;
+    revName.style.color = cfg.nameColor;
+    revName.style.animation = 'anim1 0.4s ease ' + Math.floor(cfg.dur*0.55) + 'ms both';
+    revAnime.textContent = ch.anime;
+    revAnime.style.animation = 'anim1 0.4s ease ' + Math.floor(cfg.dur*0.7) + 'ms both';
+    revCounter.textContent = (idx+1) + ' / ' + total;
+
+    const viewTime = ch.stars === 5 ? 1600 : ch.stars === 4 ? 1200 : ch.stars === 3 ? 900 : 600;
+    await delay(cfg.dur + viewTime);
+  }
+
+  async function runReveal(chars) {
+    revealChars   = chars;
+    revealSkipped = false;
+    overlay.classList.add('open');
+    for (let i=0; i<chars.length; i++) {
+      if (revealSkipped) break;
+      await revealOne(chars[i], i, chars.length);
+    }
+    return new Promise(res => { revealResolve = res; finishReveal(); });
+  }
 
   async function showResults(chars, n) {
     const area = document.getElementById('result-area');
