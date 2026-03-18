@@ -884,9 +884,10 @@
 
   /* Convierte un objeto data de Jikan a nuestro formato */
   function jikanToChar(d) {
-    const anime = d.anime?.[0]?.anime?.title
-               || d.manga?.[0]?.manga?.title
-               || 'Anime/Manga';
+    const anime =
+  (Array.isArray(d.anime) && d.anime.length > 0 && d.anime[0]?.anime?.title) ||
+  (Array.isArray(d.manga) && d.manga.length > 0 && d.manga[0]?.manga?.title) ||
+  'Desconocido';
     /* Limpiar descripcion: quitar stats de ficha, quedarse con el primer parrafo de texto real */
     const raw = (d.about || '').replace(/\n/g,' ').trim();
     const desc = cleanDesc(raw);
