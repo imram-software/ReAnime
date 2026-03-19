@@ -359,21 +359,24 @@ async function searchOpponent() {
     let playerIds = [];
 
     if (regRes.status === 404) {
-      /* El documento no existe aun — significa que nadie guardó defensa todavía */
-      /* Intentar crearlo vacío para la próxima vez */
-      try {
-        const createUrl = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/pvp?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
-        await fetch(createUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fields: { registryInit: { booleanValue: true } } })
-        });
-      } catch {}
-      msg.textContent = 'Aún no hay jugadores registrados. Guarda tu equipo defensivo en pvp.html para aparecer en el matchmaking.';
-      btn.disabled = false;
-      btn.textContent = '🔍 Buscar Rival';
-      return;
-    }
+      /* El registro no existe todavía — crearlo registrando al jugador actual */
+      if (SELF_USER?.id && window.ReAnimeDB?.registerPvpPlayer) {
+        await window.ReAnimeDB.registerPvpPlayer();
+        /* Reintentar */
+        const retry = await fetch(registryUrl);
+        if (retry.ok) {
+          const retryDoc = await retry.json();
+          const retryData = firestoreDocToObj(retryDoc);
+          playerIds = (retryData.players || []).filter(id => id !== SELF_USER.id);
+        }
+      }
+      if (!playerIds.length) {
+        msg.textContent = 'Eres el primer jugador registrado. Cuando otros guarden su equipo defensivo podrás batallar contra ellos.';
+        btn.disabled = false;
+        btn.textContent = '🔍 Buscar Rival';
+        return;
+      }
+    } else
 
     if (!regRes.ok) {
       msg.textContent = `Error al acceder al registro (${regRes.status}). Verifica las reglas de Firestore.`;

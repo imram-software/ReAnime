@@ -370,6 +370,29 @@ async function setDisplayName(name) {
 }
 
 
+async function registerPvpPlayer() {
+  if (!discordUser) return;
+  try {
+    /* Atomically add this player's ID to the registry array */
+    const commitUrl = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents:commit?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
+    await fetch(commitUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        writes: [{
+          transform: {
+            document: 'projects/reanime-1a781/databases/(default)/documents/pvp/registry',
+            fieldTransforms: [{
+              fieldPath: 'players',
+              appendMissingElements: { values: [{ stringValue: discordUser.id }] }
+            }]
+          }
+        }]
+      })
+    });
+  } catch(e) { console.warn("[Re:Anime] registerPvpPlayer:", e); }
+}
+
 async function addConquestPoints(amount) {
   await _readyPromise;
   const newVal = Math.max(0, (_localData.conquest || 0) + amount);
@@ -421,6 +444,7 @@ window.ReAnimeDB = {
   hasLikedToday,
   setPvpTeam,
   getPvpTeams,
+  registerPvpPlayer,
   addConquestPoints,
   getConquest,
   addBattleLog,
