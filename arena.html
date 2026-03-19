@@ -630,12 +630,17 @@ function renderBattle(state) {
   // Action panel
   if (isMyTurn && !actionLock) {
     const actor = fighters.find(f => f.id === curFId);
-    if (actor) renderActionPanel(actor);
+    if (actor) {
+      selectedFighter = actor; // always keep in sync
+      if (!selectedSkill) renderActionPanel(actor); // don't reset if mid-targeting
+    }
   } else if (!isMyTurn) {
     document.getElementById('action-title').textContent = 'Esperando al rival...';
     document.getElementById('skill-btns').innerHTML = '<div class="waiting-overlay"><span class="waiting-dot"></span><span class="waiting-dot"></span><span class="waiting-dot"></span></div>';
     document.getElementById('target-hint').textContent = '';
-    selectedFighter = null; selectedSkill = null;
+    selectedFighter = null;
+    selectedSkill   = null;
+    actionLock      = false;
   }
 }
 
@@ -648,6 +653,9 @@ function renderFighters(fighters, mySide, themSide, curFId, isMyTurn) {
 
 function buildRow(rowId, fts, isAlly, curFId, isMyTurn) {
   const row = document.getElementById(rowId);
+  // Remove any stale elements not in current fighters list
+  const currentIds = new Set(fts.map(f => 'f-'+f.id));
+  Array.from(row.children).forEach(ch => { if (!currentIds.has(ch.id)) ch.remove(); });
   fts.forEach(f => {
     let el = document.getElementById('f-'+f.id);
     const isNew = !el;
@@ -695,28 +703,33 @@ function buildRow(rowId, fts, isAlly, curFId, isMyTurn) {
 function onFighterClick(fid) {
   if (actionLock) return;
   const f = localFighters.find(x => x.id === fid);
-  if (!f || f.hp <= 0) return;
-  const mySide = myRole === 'player1' ? 'p1' : 'p2';
-  const curFId = JSON.parse(battleState?.turnOrder||'[]')[battleState?.turnIndex||0];
+  if (!f) return;
+  const mySide   = myRole === 'player1' ? 'p1' : 'p2';
+  const themSide = myRole === 'player1' ? 'p2' : 'p1';
+  const curFId   = JSON.parse(battleState?.turnOrder||'[]')[battleState?.turnIndex||0];
   const isMyTurn = curFId?.startsWith(mySide);
   if (!isMyTurn) return;
 
-  if (f.side === mySide && f.id === curFId) {
-    // Select fighter (already selected — show skills)
-    selectedFighter = f;
-    selectedSkill = null;
-    renderActionPanel(f);
-    return;
-  }
-  if (f.side !== mySide && selectedSkill) {
-    // Attack this enemy
+  // Click on enemy to attack
+  if (f.side === themSide && f.hp > 0) {
+    if (!selectedSkill) {
+      document.getElementById('target-hint').textContent = '→ Primero selecciona una habilidad.';
+      return;
+    }
+    if (!selectedFighter) {
+      // Auto-assign current actor
+      selectedFighter = localFighters.find(x => x.id === curFId);
+    }
+    if (!selectedFighter) return;
     document.querySelectorAll('.fighter').forEach(e => e.classList.remove('targeting'));
     submitAction(selectedFighter, selectedSkill, f);
     return;
   }
-  if (f.side !== mySide && !selectedSkill) {
-    document.getElementById('target-hint').textContent = '→ Primero selecciona una habilidad.';
-  }
+
+  // Click on dead enemy — ignore
+  if (f.side === themSide && f.hp <= 0) return;
+
+  // Click on own fighter — no action needed (auto-selected)
 }
 
 function renderActionPanel(actor) {
@@ -727,7 +740,7 @@ function renderActionPanel(actor) {
     if (sk.type === 'pasiva') return;
     const btn = document.createElement('button');
     btn.className = 'skill-btn';
-    const cd = actor.cooldowns?.[i] || 0;
+    const cd = actor.cooldowns?.[String(i)] || actor.cooldowns?.[i] || 0;
     btn.disabled = cd > 0 || actionLock;
     btn.innerHTML = `<span class="sk-name">${sk.name}</span><span class="sk-cd">${cd>0?`CD: ${cd}`:(sk.cooldown===0?'Básico':'Lista')}</span>`;
     btn.onclick = () => {
@@ -772,7 +785,7 @@ async function submitAction(actor, skillChoice, target) {
   // Set cooldown
   if (!actorF.cooldowns) actorF.cooldowns = {};
   const sk = skillChoice.skill;
-  if (sk.cooldown > 0) actorF.cooldowns[skillChoice.idx] = sk.cooldown;
+  if (sk.cooldown > 0) actorF.cooldowns[String(skillChoice.idx)] = sk.cooldown;
 
   // Calc damage
   const { dmg, isCrit, affMult } = calcDamage(actorF, targetF, 1.1);
