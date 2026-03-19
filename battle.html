@@ -356,17 +356,27 @@ async function searchOpponent() {
     const registryUrl = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/pvp/registry?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
     const regRes = await fetch(registryUrl);
     
+    let playerIds = [];
+
+    if (regRes.status === 404) {
+      /* El documento no existe aun — significa que nadie guardó defensa todavía */
+      /* Intentar crearlo vacío para la próxima vez */
+      try {
+        const createUrl = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/pvp?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
+        await fetch(createUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fields: { registryInit: { booleanValue: true } } })
+        });
+      } catch {}
+      msg.textContent = 'Aún no hay jugadores registrados. Guarda tu equipo defensivo en pvp.html para aparecer en el matchmaking.';
+      btn.disabled = false;
+      btn.textContent = '🔍 Buscar Rival';
+      return;
+    }
+
     if (!regRes.ok) {
-      msg.textContent = 'Para usar matchmaking necesitas actualizar las reglas de Firestore. Ver consola.';
-      console.info('[Re:Anime] Actualiza las reglas de Firestore en Firebase Console:\n' +
-        'rules_version = \'2\';\n' +
-        'service cloud.firestore {\n' +
-        '  match /databases/{database}/documents {\n' +
-        '    match /{document=**} {\n' +
-        '      allow read, write: if true;\n' +
-        '    }\n' +
-        '  }\n' +
-        '}');
+      msg.textContent = `Error al acceder al registro (${regRes.status}). Verifica las reglas de Firestore.`;
       btn.disabled = false;
       btn.textContent = '🔍 Buscar Rival';
       return;
@@ -374,10 +384,21 @@ async function searchOpponent() {
     
     const regDoc = await regRes.json();
     const regData = firestoreDocToObj(regDoc);
-    const playerIds = regData.players || [];
+    playerIds = regData.players || [];
+
+    /* Incluir al propio usuario si tiene defensa (para que otros lo encuentren)
+       y registrar al jugador actual en el registry si aún no está */
+    if (SELF_USER?.id) {
+      const selfUd = await window.ReAnimeDB.loadUserData();
+      const selfDef = (selfUd.defTeam || []).filter(Boolean);
+      if (selfDef.length > 0 && !playerIds.includes(SELF_USER.id)) {
+        await window.ReAnimeDB.registerPvpPlayer?.();
+        playerIds.push(SELF_USER.id);
+      }
+    }
 
     if (!playerIds.length) {
-      msg.textContent = 'Ningún jugador ha registrado equipo defensivo aún.';
+      msg.textContent = 'Ningún jugador tiene equipo defensivo configurado aún.';
       btn.disabled = false;
       btn.textContent = '🔍 Buscar Rival';
       return;
