@@ -32,6 +32,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 /* Fighter card */
 .fighter{width:110px;border-radius:var(--radius);background:var(--surface);border:2px solid var(--border);overflow:hidden;cursor:default;transition:transform .2s,border-color .2s;position:relative;user-select:none;}
 .fighter.player{cursor:pointer;}
+.fighter.targeting{cursor:crosshair !important;}
 .fighter.player:hover:not(.dead){transform:translateY(-4px);border-color:var(--pink);}
 .fighter.selected{border-color:var(--pink);box-shadow:0 0 12px var(--pink-dim);}
 .fighter.dead{opacity:.35;filter:grayscale(1);}
@@ -40,7 +41,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 @keyframes actPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);}}
 
 .f-img{height:90px;position:relative;overflow:hidden;}
-.f-img img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.f-img img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;}
 .f-img-bg{position:absolute;inset:0;}
 .f-img-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 50%);}
 .f-aff{position:absolute;top:4px;right:4px;font-size:.8rem;z-index:2;}
@@ -351,39 +352,57 @@ async function searchOpponent() {
     const ud = await window.ReAnimeDB.loadUserData();
     const myCq = ud.conquest || 0;
 
-    /* Usar el SDK de Firestore (ya cargado via user_data.js) para getDocs */
-    const { getFirestore, collection, getDocs } =
-      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const { initializeApp, getApps } =
-      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    /* Leer el registro PVP — documento unico que lista jugadores activos */
+    const registryUrl = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/pvp/registry?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
+    const regRes = await fetch(registryUrl);
+    
+    if (!regRes.ok) {
+      msg.textContent = 'Para usar matchmaking necesitas actualizar las reglas de Firestore. Ver consola.';
+      console.info('[Re:Anime] Actualiza las reglas de Firestore en Firebase Console:\n' +
+        'rules_version = \'2\';\n' +
+        'service cloud.firestore {\n' +
+        '  match /databases/{database}/documents {\n' +
+        '    match /{document=**} {\n' +
+        '      allow read, write: if true;\n' +
+        '    }\n' +
+        '  }\n' +
+        '}');
+      btn.disabled = false;
+      btn.textContent = '🔍 Buscar Rival';
+      return;
+    }
+    
+    const regDoc = await regRes.json();
+    const regData = firestoreDocToObj(regDoc);
+    const playerIds = regData.players || [];
 
-    /* Reusar app si ya esta inicializada */
-    const firebaseConfig = {
-      apiKey: 'AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU',
-      projectId: 'reanime-1a781',
-      appId: '1:129737601446:web:721e6601c2f5ba0bb35f67'
-    };
-    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    if (!playerIds.length) {
+      msg.textContent = 'Ningún jugador ha registrado equipo defensivo aún.';
+      btn.disabled = false;
+      btn.textContent = '🔍 Buscar Rival';
+      return;
+    }
 
-    const snapshot = await getDocs(collection(db, 'users'));
+    /* Fetch cada jugador individualmente (permitido por allow read: if true) */
     const rivals = [];
-
-    snapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      if (data.discordId === SELF_USER?.id) return; // skip self
-      const def = (data.defTeam || []).filter(Boolean);
-      if (!def.length) return; // skip no defense
-      const theirCq = data.conquest || 0;
-      rivals.push({
-        id:       data.discordId || docSnap.id,
-        name:     data.displayName || data.discordUsername || 'Jugador',
-        avatar:   data.discordAvatar ? `https://cdn.discordapp.com/avatars/${data.discordId}/${data.discordAvatar}.png` : '',
-        conquest: theirCq,
-        defTeam:  def,
-        diff:     Math.abs(theirCq - myCq),
-      });
-    });
+    await Promise.all(playerIds.map(async pid => {
+      if (pid === SELF_USER?.id) return;
+      try {
+        const r = await fetch(`https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/users/${pid}?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`);
+        if (!r.ok) return;
+        const data = firestoreDocToObj(await r.json());
+        const def = (data.defTeam || []).filter(Boolean);
+        if (!def.length) return;
+        rivals.push({
+          id:       data.discordId || pid,
+          name:     data.displayName || data.discordUsername || 'Jugador',
+          avatar:   data.discordAvatar ? `https://cdn.discordapp.com/avatars/${data.discordId}/${data.discordAvatar}.png` : '',
+          conquest: data.conquest || 0,
+          defTeam:  def,
+          diff:     Math.abs((data.conquest||0) - myCq),
+        });
+      } catch {}
+    }));
 
     rivals.sort((a,b) => a.diff - b.diff);
     const top = rivals.slice(0, 5);
@@ -662,9 +681,15 @@ function onFighterClick(id) {
     return;
   }
   if (phase === 'target_pick' && f.isEnemy && f.hp > 0) {
-    // Remove targeting highlight
     fighters.forEach(x => document.getElementById('f-'+x.id)?.classList.remove('targeting'));
     executeAction(selectedFighter, selectedSkill, f);
+    return;
+  }
+  if (phase === 'target_pick' && !f.isEnemy) {
+    document.getElementById('target-hint').textContent = '→ Selecciona un ENEMIGO (arriba) para atacar.';
+  }
+  if (phase === 'ally_pick' && f.isEnemy) {
+    document.getElementById('target-hint').textContent = '→ Primero selecciona una habilidad.';
   }
 }
 
@@ -848,15 +873,15 @@ function renderBattleField() {
     const el = document.createElement('div');
     el.className = `fighter${f.isEnemy?'':' player'}`;
     el.id = 'f-' + f.id;
-    if (!f.isEnemy) el.onclick = () => onFighterClick(f.id);
+    el.onclick = () => onFighterClick(f.id);
     const col = RC[f.stars] || '#94a3b8';
     const hpPct = Math.round(f.hp / f.maxHp * 100);
     el.innerHTML = `
       <div class="f-img">
-        <div class="f-img-bg" style="background:${RG[f.stars]||RG[1]}"></div>
-        ${f.image?`<img src="${f.image}" onerror="this.style.display='none'"/>`:''} 
-        <div class="f-img-overlay"></div>
-        <div class="f-aff">${AFF_ICONS[f.affinity]||''}</div>
+        <div class="f-img-bg" style="background:${RG[f.stars]||RG[1]};position:absolute;inset:0;z-index:0;"></div>
+        ${f.image?`<img src="${f.image}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;z-index:1;" onerror="this.style.display='none'"/>`:``}
+        <div class="f-img-overlay" style="position:absolute;inset:0;z-index:2;"></div>
+        <div class="f-aff" style="position:absolute;top:4px;right:4px;z-index:3;">${AFF_ICONS[f.affinity]||''}</div>
       </div>
       <div class="f-body">
         <div class="f-name" style="color:${col}">${f.name}</div>
