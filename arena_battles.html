@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Re:Anime · Arena Mundial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+:root{--bg:#080808;--bg2:#111;--bg3:#1a1a1a;--surface:#161616;--border:#222;--pink:#ff2d78;--pink-dim:#ff2d7822;--pink-glow:#ff2d7855;--rose:#ff6fa8;--text:#e8e8e8;--muted:#555;--gold:#fbbf24;--font-h:'Bebas Neue',cursive;--font-b:'DM Sans',sans-serif;--radius:10px;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--pink);border-radius:2px;}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");background-size:200px;opacity:.4;}
+
+header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(8,8,8,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.logo{font-family:var(--font-h);font-size:2rem;letter-spacing:3px;color:var(--pink);text-decoration:none;}
+.logo span{color:var(--text);}
+.hdr-r{display:flex;align-items:center;gap:1rem;}
+.back-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.4rem .9rem;font-size:.82rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;}
+.back-btn:hover{border-color:var(--pink);color:var(--pink);}
+.cq-badge{font-family:var(--font-h);font-size:1rem;letter-spacing:2px;color:var(--gold);}
+
+.page{max-width:1100px;margin:0 auto;padding:72px 1.5rem 3rem;position:relative;z-index:1;}
+
+/* ── LOBBY ── */
+#lobby{text-align:center;padding:3rem 0;}
+.arena-title{font-family:var(--font-h);font-size:clamp(3rem,8vw,6rem);letter-spacing:6px;background:linear-gradient(135deg,var(--gold) 0%,var(--pink) 60%,#c084fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.3rem;}
+.arena-sub{color:var(--muted);font-size:.85rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:2.5rem;}
+
+.req-badge{display:inline-flex;align-items:center;gap:.5rem;border:1px solid var(--gold);border-radius:20px;padding:.35rem 1rem;font-size:.8rem;color:var(--gold);margin-bottom:2rem;}
+.req-ok{border-color:#4ade80;color:#4ade80;}
+.req-locked{border-color:#ef4444;color:#ef4444;}
+
+.find-btn{background:linear-gradient(135deg,var(--gold),#ef8b2c);border:none;color:#000;border-radius:var(--radius);padding:.9rem 2.5rem;font-family:var(--font-h);font-size:1.5rem;letter-spacing:3px;cursor:pointer;box-shadow:0 0 30px rgba(251,191,36,.35);transition:all .25s;}
+.find-btn:hover{transform:translateY(-3px);box-shadow:0 0 40px rgba(251,191,36,.5);}
+.find-btn:disabled{opacity:.35;cursor:default;transform:none;}
+
+.queue-status{margin-top:1.5rem;color:var(--muted);font-size:.85rem;display:flex;align-items:center;justify-content:center;gap:.6rem;min-height:2rem;}
+.queue-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:qdot 1.2s ease-in-out infinite;}
+@keyframes qdot{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+
+.cancel-btn{margin-top:.8rem;background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.4rem 1.2rem;font-size:.8rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;display:none;}
+.cancel-btn:hover{border-color:var(--pink);color:var(--pink);}
+
+.locked-box{background:var(--surface);border:1px solid #ef444433;border-radius:var(--radius);padding:2rem;max-width:400px;margin:0 auto;}
+.locked-box h3{font-family:var(--font-h);font-size:1.5rem;letter-spacing:2px;color:#ef4444;margin-bottom:.5rem;}
+.locked-box p{color:var(--muted);font-size:.85rem;line-height:1.6;}
+
+/* ── BATTLE SCREEN ── */
+#battle-screen{display:none;}
+
+.vs-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;padding:.6rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);}
+.vs-player{font-family:var(--font-h);font-size:1rem;letter-spacing:2px;display:flex;align-items:center;gap:.5rem;}
+.vs-player img{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);}
+.vs-label{font-size:.7rem;color:var(--muted);letter-spacing:1px;}
+.vs-mid{font-family:var(--font-h);font-size:1.5rem;color:var(--pink);letter-spacing:4px;}
+.vs-ping{font-size:.65rem;color:#4ade80;letter-spacing:1px;}
+
+.turn-indicator{text-align:center;padding:.4rem;margin-bottom:.6rem;border-radius:6px;font-family:var(--font-h);font-size:1rem;letter-spacing:2px;transition:all .3s;}
+.turn-indicator.mine{background:rgba(255,45,120,.12);color:var(--pink);border:1px solid var(--pink-dim);}
+.turn-indicator.theirs{background:rgba(251,191,36,.08);color:var(--gold);border:1px solid rgba(251,191,36,.2);}
+
+.field{display:flex;flex-direction:column;gap:.6rem;margin-bottom:.6rem;}
+.team-row{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;}
+
+.fighter{width:105px;border-radius:var(--radius);background:var(--surface);border:2px solid var(--border);overflow:hidden;cursor:default;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative;user-select:none;}
+.fighter.mine{cursor:pointer;}
+.fighter.mine:hover:not(.dead){transform:translateY(-4px);border-color:var(--pink);}
+.fighter.selected{border-color:var(--pink);box-shadow:0 0 14px var(--pink-glow);}
+.fighter.dead{opacity:.3;filter:grayscale(1);}
+.fighter.targeting{border-color:#ef4444;box-shadow:0 0 12px rgba(239,68,68,.4);cursor:crosshair;}
+.fighter.acting{animation:actPulse .4s ease;}
+@keyframes actPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+.f-img{height:85px;position:relative;overflow:hidden;}
+.f-img-bg{position:absolute;inset:0;z-index:0;}
+.f-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;z-index:1;display:block;}
+.f-img-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 55%);z-index:2;}
+.f-aff{position:absolute;top:3px;right:4px;font-size:.75rem;z-index:3;}
+
+.f-body{padding:.35rem .4rem .35rem;}
+.f-name{font-family:var(--font-h);font-size:.68rem;letter-spacing:1px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hp-bar-wrap{margin-top:.25rem;background:rgba(255,255,255,.06);border-radius:4px;height:4px;overflow:hidden;}
+.hp-bar{height:100%;border-radius:4px;transition:width .4s ease;background:#22c55e;}
+.hp-bar.mid{background:#eab308;} .hp-bar.low{background:#ef4444;}
+.hp-text{font-size:.5rem;color:var(--muted);margin-top:.1rem;text-align:right;}
+
+.battle-log{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);height:100px;overflow-y:auto;padding:.5rem .7rem;font-size:.72rem;line-height:1.6;margin-bottom:.6rem;}
+.log-dmg{color:#f87171;} .log-heal{color:#4ade80;} .log-crit{color:var(--gold);} .log-sys{color:var(--muted);} .log-enemy{color:var(--rose);}
+
+#action-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.7rem;}
+.action-title{font-family:var(--font-h);font-size:.85rem;letter-spacing:2px;color:var(--muted);margin-bottom:.5rem;}
+.skill-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem;}
+.skill-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:.4rem .35rem;font-size:.68rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;text-align:left;}
+.skill-btn:hover:not(:disabled){border-color:var(--pink);color:var(--pink);}
+.skill-btn:disabled{opacity:.35;cursor:default;}
+.sk-name{font-weight:700;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sk-cd{font-size:.58rem;color:var(--muted);margin-top:.1rem;}
+#target-hint{font-size:.72rem;color:var(--rose);margin-top:.4rem;text-align:center;min-height:1.1em;}
+
+.waiting-overlay{text-align:center;padding:1.5rem;color:var(--muted);font-size:.85rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+.waiting-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);display:inline-block;animation:qdot 1s ease-in-out infinite;}
+.waiting-dot:nth-child(2){animation-delay:.2s;} .waiting-dot:nth-child(3){animation-delay:.4s;}
+
+/* ── RESULT ── */
+#result-screen{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.94);backdrop-filter:blur(16px);flex-direction:column;align-items:center;justify-content:center;gap:1rem;}
+.result-title{font-family:var(--font-h);font-size:clamp(4rem,10vw,8rem);letter-spacing:8px;text-align:center;animation:resIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes resIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+.result-title.win{color:var(--gold);text-shadow:0 0 40px rgba(251,191,36,.5);}
+.result-title.draw{color:#a78bfa;}
+.result-title.lose{color:#ef4444;}
+.result-pts{font-family:var(--font-h);font-size:2rem;letter-spacing:3px;}
+.result-pts.win{color:#4ade80;} .result-pts.lose{color:#f87171;} .result-pts.draw{color:#a78bfa;}
+.result-vs{color:var(--muted);font-size:.9rem;}
+.result-btns{display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;justify-content:center;}
+.result-btn{background:none;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:.55rem 1.4rem;font-size:.9rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;}
+.result-btn:hover{border-color:var(--pink);color:var(--pink);}
+.result-btn.primary{background:var(--pink);border-color:var(--pink);color:#fff;}
+
+.particle{position:absolute;border-radius:50%;pointer-events:none;animation:pfloat linear forwards;}
+@keyframes pfloat{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0);}}
+.dmg-float{position:absolute;z-index:10;font-family:var(--font-h);font-size:1.1rem;letter-spacing:2px;pointer-events:none;animation:dmgRise .9s ease forwards;}
+@keyframes dmgRise{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-45px) scale(.8);}}
+  </style>
+</head>
+<body>
+<script type="module" src="user_data.js"></script>
+
+<header>
+  <a class="logo" href="index.html">Re<span>:</span>Anime</a>
+  <div class="hdr-r">
+    <div class="cq-badge" id="cq-hdr">⚔ <span id="cq-val">0</span></div>
+    <button class="back-btn" onclick="leavePage()">← Salir</button>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- LOBBY -->
+  <div id="lobby">
+    <div class="arena-title">ARENA<br>MUNDIAL</div>
+    <div class="arena-sub">アリーナ · PVP en Tiempo Real · Re:Anime</div>
+
+    <div id="req-badge" class="req-badge">⚔ Requiere 50 puntos de Conquista</div>
+
+    <div id="locked-box" class="locked-box" style="display:none;">
+      <h3>Bloqueado</h3>
+      <p>Necesitas al menos <strong style="color:var(--gold)">50 puntos de Conquista</strong> para acceder a la Arena Mundial.<br><br>
+      Gana batallas en el PVP normal para acumular puntos.</p>
+      <a href="battle.html" style="display:inline-block;margin-top:1rem;color:var(--pink);font-size:.85rem;text-decoration:none;border-bottom:1px solid var(--pink-dim);">→ Ir a Batalla PVP</a>
+    </div>
+
+    <div id="lobby-main" style="display:none;">
+      <button class="find-btn" id="find-btn" onclick="findMatch()">BUSCAR PARTIDA</button>
+      <div class="queue-status" id="queue-status"></div>
+      <button class="cancel-btn" id="cancel-btn" onclick="cancelQueue()">Cancelar búsqueda</button>
+    </div>
+  </div>
+
+  <!-- BATTLE SCREEN -->
+  <div id="battle-screen">
+    <div class="vs-bar">
+      <div class="vs-player" id="vs-me">
+        <img id="vs-me-img" src="" onerror="this.style.display='none'"/>
+        <div><div id="vs-me-name">Tú</div><div class="vs-label" id="vs-me-cq"></div></div>
+      </div>
+      <div>
+        <div class="vs-mid">VS</div>
+        <div class="vs-ping" id="vs-ping">● EN VIVO</div>
+      </div>
+      <div class="vs-player" id="vs-them" style="flex-direction:row-reverse;text-align:right;">
+        <img id="vs-them-img" src="" onerror="this.style.display='none'"/>
+        <div><div id="vs-them-name">Rival</div><div class="vs-label" id="vs-them-cq"></div></div>
+      </div>
+    </div>
+
+    <div class="turn-indicator" id="turn-indicator">Esperando...</div>
+
+    <div class="field">
+      <div class="team-row" id="enemy-row"></div>
+      <div class="team-row" id="ally-row"></div>
+    </div>
+
+    <div class="battle-log" id="battle-log"></div>
+
+    <div id="action-panel">
+      <div class="action-title" id="action-title">Cargando batalla...</div>
+      <div class="skill-btns" id="skill-btns"></div>
+      <div id="target-hint"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result-screen">
+  <div class="result-title" id="result-title">VICTORIA</div>
+  <div class="result-pts" id="result-pts">+15 Conquista</div>
+  <div class="result-vs" id="result-vs"></div>
+  <div class="result-btns">
+    <button class="result-btn" onclick="leavePage()">← Lobby</button>
+    <button class="result-btn primary" onclick="location.reload()">Otra Partida</button>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   FIREBASE SETUP — reusar instancia de user_data.js
+══════════════════════════════════════ */
+const FB_KEY     = 'AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU';
+const FB_PROJECT = 'reanime-1a781';
+const REST       = `https://firestore.googleapis.com/v1/projects/${FB_PROJECT}/databases/(default)/documents`;
+
+const SELF = JSON.parse(localStorage.getItem('user'));
+
+/* ── Firestore REST helpers ── */
+async function fsGet(path) {
+  const r = await fetch(`${REST}/${path}?key=${FB_KEY}`);
+  if (!r.ok) return null;
+  return firestoreDocToObj(await r.json());
+}
+
+async function fsPatch(path, fields) {
+  const body = { fields: toFirestore(fields) };
+  const fieldMask = Object.keys(fields).map(k => `updateMask.fieldPaths=${k}`).join('&');
+  const r = await fetch(`${REST}/${path}?key=${FB_KEY}&${fieldMask}`, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  return r.ok;
+}
+
+async function fsSet(path, fields) {
+  const r = await fetch(`${REST}/${path}?key=${FB_KEY}`, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields: toFirestore(fields) })
+  });
+  return r.ok;
+}
+
+async function fsDelete(path) {
+  await fetch(`${REST}/${path}?key=${FB_KEY}`, { method: 'DELETE' });
+}
+
+function toFirestore(obj) {
+  const f = {};
+  for (const [k,v] of Object.entries(obj)) {
+    if (v === null || v === undefined) f[k] = { nullValue: null };
+    else if (typeof v === 'boolean')   f[k] = { booleanValue: v };
+    else if (typeof v === 'number' && Number.isInteger(v)) f[k] = { integerValue: v };
+    else if (typeof v === 'number')    f[k] = { doubleValue: v };
+    else if (typeof v === 'string')    f[k] = { stringValue: v };
+    else if (Array.isArray(v))         f[k] = { arrayValue: { values: v.map(i => toFirestoreVal(i)) } };
+    else if (typeof v === 'object')    f[k] = { mapValue: { fields: toFirestore(v) } };
+  }
+  return f;
+}
+
+function toFirestoreVal(v) {
+  if (v === null || v === undefined) return { nullValue: null };
+  if (typeof v === 'boolean')  return { booleanValue: v };
+  if (typeof v === 'number' && Number.isInteger(v)) return { integerValue: v };
+  if (typeof v === 'number')   return { doubleValue: v };
+  if (typeof v === 'string')   return { stringValue: v };
+  if (Array.isArray(v))        return { arrayValue: { values: v.map(toFirestoreVal) } };
+  if (typeof v === 'object')   return { mapValue: { fields: toFirestore(v) } };
+  return { stringValue: String(v) };
+}
+
+function firestoreDocToObj(doc) {
+  if (!doc?.fields) return {};
+  const out = {};
+  for (const [k,v] of Object.entries(doc.fields)) {
+    out[k] = parseFireVal(v);
+  }
+  return out;
+}
+function parseFireVal(v) {
+  if (!v) return null;
+  if (v.stringValue  !== undefined) return v.stringValue;
+  if (v.integerValue !== undefined) return parseInt(v.integerValue);
+  if (v.doubleValue  !== undefined) return parseFloat(v.doubleValue);
+  if (v.booleanValue !== undefined) return v.booleanValue;
+  if (v.nullValue    !== undefined) return null;
+  if (v.mapValue)    return firestoreDocToObj({ fields: v.mapValue.fields || {} });
+  if (v.arrayValue)  return (v.arrayValue.values || []).map(parseFireVal);
+  return null;
+}
+
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+const AFF_ICONS = { fuego:'🔥', agua:'💧', tierra:'🌿', rayo:'⚡', luz:'✦', oscuridad:'🌑' };
+const AFFINITIES = { fuego:{strong_vs:'tierra',weak_vs:'agua'}, agua:{strong_vs:'fuego',weak_vs:'rayo'}, tierra:{strong_vs:'rayo',weak_vs:'fuego'}, rayo:{strong_vs:'agua',weak_vs:'tierra'}, luz:{strong_vs:'oscuridad',weak_vs:'oscuridad'}, oscuridad:{strong_vs:'luz',weak_vs:'luz'} };
+const RC = {5:'#fbbf24',4:'#c084fc',3:'#38bdf8',2:'#86efac',1:'#94a3b8'};
+const RG = {5:'linear-gradient(160deg,#1a0a00,#3d1900 50%)',4:'linear-gradient(160deg,#0d001a,#1e003d 50%)',3:'linear-gradient(160deg,#001220,#002444 50%)',2:'linear-gradient(160deg,#001a0a,#003018 60%)',1:'linear-gradient(160deg,#0d0d0d,#181818)'};
+
+let myConquest  = 0;
+let pvpData     = null;
+let battleId    = null;
+let battleState = null;
+let myRole      = null; // 'player1' | 'player2'
+let pollInterval= null;
+let phase       = 'lobby'; // lobby | queue | battle | done
+let selectedFighter = null;
+let selectedSkill   = null;
+let localFighters   = []; // local copy for HP display
+let lastLogCount    = 0;
+let queueDoc        = null;
+let actionLock      = false;
+
+const QUEUE_TIMEOUT = 45000; // 45s timeout searching
+const POLL_MS       = 1500;  // poll every 1.5s
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+async function init() {
+  if (!SELF) {
+    document.getElementById('lobby-main').style.display = 'none';
+    document.getElementById('locked-box').innerHTML = '<h3>Sesión requerida</h3><p>Inicia sesión con Discord para acceder a la Arena Mundial.</p>';
+    document.getElementById('locked-box').style.display = 'block';
+    return;
+  }
+
+  // Load conquest
+  if (window.ReAnimeDB) {
+    myConquest = await window.ReAnimeDB.getConquest();
+  } else {
+    await new Promise(r => window.addEventListener('reanimdb:ready', r, { once:true }));
+    myConquest = await window.ReAnimeDB.getConquest();
+  }
+
+  document.getElementById('cq-val').textContent = myConquest.toLocaleString();
+
+  // Load pvp chars
+  try { const r = await fetch('pvp_chars.json'); pvpData = await r.json(); } catch { pvpData = {characters:[]}; }
+
+  const reqBadge = document.getElementById('req-badge');
+  if (myConquest >= 50) {
+    reqBadge.className = 'req-badge req-ok';
+    reqBadge.textContent = `⚔ ${myConquest} Conquista — Acceso habilitado`;
+    document.getElementById('lobby-main').style.display = 'block';
+
+    // Check if mid-battle already
+    const existing = localStorage.getItem('arena_battle_id');
+    if (existing) { await rejoinBattle(existing); }
+  } else {
+    reqBadge.className = 'req-badge req-locked';
+    reqBadge.textContent = `⚔ ${myConquest}/50 Conquista — Acceso bloqueado`;
+    document.getElementById('locked-box').style.display = 'block';
+  }
+}
+
+/* ══════════════════════════════════════
+   MATCHMAKING
+══════════════════════════════════════ */
+async function findMatch() {
+  if (phase !== 'lobby') return;
+  const ud = await window.ReAnimeDB.loadUserData();
+  const team = (ud.atkTeam || []).filter(Boolean);
+  if (!team.length) {
+    setQueueStatus('No tienes equipo de ataque. Configúralo en pvp.html.');
+    return;
+  }
+
+  phase = 'queue';
+  document.getElementById('find-btn').disabled = true;
+  document.getElementById('cancel-btn').style.display = 'inline-block';
+  setQueueStatus('Buscando rival...', true);
+
+  // Write self to queue
+  const playerDoc = {
+    id:      SELF.id,
+    name:    ud.displayName || ud.discordUsername || SELF.username,
+    avatar:  ud.discordAvatar ? `https://cdn.discordapp.com/avatars/${SELF.id}/${ud.discordAvatar}.png` : '',
+    conquest:myConquest,
+    team:    team.map(c => ({ name:c.name, anime:c.anime, image:c.image||'', stars:c.stars, affinity:c.affinity||'', role:c.role||'' })),
+    ts:      Date.now()
+  };
+  queueDoc = playerDoc;
+  await fsSet(`arena_queue/${SELF.id}`, playerDoc);
+
+  // Poll for match
+  const startTs = Date.now();
+  pollInterval = setInterval(async () => {
+    if (phase !== 'queue') { clearInterval(pollInterval); return; }
+    if (Date.now() - startTs > QUEUE_TIMEOUT) {
+      clearInterval(pollInterval);
+      await cancelQueue();
+      setQueueStatus('Tiempo de espera agotado. Intenta de nuevo.');
+      return;
+    }
+    await checkForMatch(team);
+  }, POLL_MS);
+}
+
+async function checkForMatch(myTeam) {
+  // Check if someone made a battle for us
+  const myBattle = await fsGet(`arena_battles_pending/${SELF.id}`);
+  if (myBattle && myBattle.battleId) {
+    clearInterval(pollInterval);
+    await fsDelete(`arena_battles_pending/${SELF.id}`);
+    await joinBattle(myBattle.battleId, 'player2');
+    return;
+  }
+
+  // Look for another player in queue (not self)
+  // Fetch queue list via REST
+  const r = await fetch(`${REST}/arena_queue?key=${FB_KEY}&pageSize=20`);
+  if (!r.ok) return;
+  const j = await r.json();
+  const docs = j.documents || [];
+
+  for (const doc of docs) {
+    const data = firestoreDocToObj(doc);
+    if (data.id === SELF.id) continue;
+    if (!data.team || !data.team.length) continue;
+    // Found a rival — create the battle
+    clearInterval(pollInterval);
+    const bid = `${SELF.id}_${data.id}_${Date.now()}`;
+    await createBattle(bid, queueDoc, data, myTeam);
+    // Notify the other player
+    await fsSet(`arena_battles_pending/${data.id}`, { battleId: bid });
+    await fsDelete(`arena_queue/${SELF.id}`);
+    await joinBattle(bid, 'player1');
+    return;
+  }
+  setQueueStatus(`Buscando rival... ${Math.floor((Date.now() - (window._queueStart||Date.now()))/1000)}s`, true);
+}
+
+async function cancelQueue() {
+  phase = 'lobby';
+  clearInterval(pollInterval);
+  await fsDelete(`arena_queue/${SELF.id}`);
+  document.getElementById('find-btn').disabled = false;
+  document.getElementById('cancel-btn').style.display = 'none';
+  setQueueStatus('');
+}
+
+function setQueueStatus(msg, loading=false) {
+  window._queueStart = window._queueStart || Date.now();
+  const el = document.getElementById('queue-status');
+  el.innerHTML = loading
+    ? `<span class="queue-dot"></span> ${msg}`
+    : msg;
+}
+
+/* ══════════════════════════════════════
+   BATTLE CREATION
+══════════════════════════════════════ */
+async function createBattle(bid, p1Data, p2Data, p1Team) {
+  const p2Team = p2Data.team;
+  // Build initial fighters state
+  const p1Fighters = p1Team.map((c,i) => buildFighterData(c, 'p1', i));
+  const p2Fighters = p2Team.map((c,i) => buildFighterData(c, 'p2', i));
+  const allFighters = [...p1Fighters, ...p2Fighters];
+  // Turn order by SPD
+  const turnOrder = [...allFighters].sort((a,b) => b.spd - a.spd).map(f => f.id);
+
+  const battle = {
+    id: bid,
+    player1: p1Data.id,
+    player1Name: p1Data.name,
+    player1Avatar: p1Data.avatar || '',
+    player1Conquest: p1Data.conquest || 0,
+    player2: p2Data.id,
+    player2Name: p2Data.name,
+    player2Avatar: p2Data.avatar || '',
+    player2Conquest: p2Data.conquest || 0,
+    fighters: JSON.stringify(allFighters),
+    turnOrder: JSON.stringify(turnOrder),
+    turnIndex: 0,
+    log: JSON.stringify([{ msg:'⚔ Batalla iniciada.', type:'sys', ts: Date.now() }]),
+    status: 'active',
+    winner: '',
+    round: 1,
+    lastAction: Date.now()
+  };
+  await fsSet(`arena_battles/${bid}`, battle);
+}
+
+function buildFighterData(char, side, idx) {
+  const pvp = pvpData?.characters?.find(c => c.name.toLowerCase() === char.name.toLowerCase());
+  const stats = pvp?.stats || { hp:3000, atk:800, def:600, spd:90, cr:10, cd:150 };
+  return {
+    id:       `${side}_${idx}`,
+    name:     char.name,
+    anime:    char.anime || '',
+    image:    char.image || '',
+    stars:    char.stars || 3,
+    affinity: char.affinity || '',
+    role:     char.role || '',
+    side,
+    maxHp:    stats.hp,
+    hp:       stats.hp,
+    atk:      stats.atk,
+    def:      stats.def,
+    spd:      stats.spd,
+    cr:       stats.cr,
+    cd:       stats.cd,
+    skills:   pvp?.skills || [{ name:'Ataque Básico', desc:'Ataque básico.', type:'activa', cooldown:0 }],
+    cooldowns:{},
+    dead:     false
+  };
+}
+
+/* ══════════════════════════════════════
+   JOIN / REJOIN BATTLE
+══════════════════════════════════════ */
+async function joinBattle(bid, role) {
+  battleId = bid;
+  myRole   = role;
+  phase    = 'battle';
+  localStorage.setItem('arena_battle_id', bid);
+  localStorage.setItem('arena_my_role', role);
+
+  await fsDelete(`arena_queue/${SELF.id}`);
+
+  document.getElementById('lobby').style.display = 'none';
+  document.getElementById('battle-screen').style.display = 'block';
+
+  // Initial load
+  await loadAndRender();
+  // Start polling
+  pollInterval = setInterval(pollBattle, POLL_MS);
+}
+
+async function rejoinBattle(bid) {
+  const role = localStorage.getItem('arena_my_role');
+  if (!role) { localStorage.removeItem('arena_battle_id'); return; }
+  const state = await fsGet(`arena_battles/${bid}`);
+  if (!state || state.status === 'done') {
+    localStorage.removeItem('arena_battle_id');
+    localStorage.removeItem('arena_my_role');
+    return;
+  }
+  battleId = bid;
+  myRole   = role;
+  phase    = 'battle';
+  document.getElementById('lobby').style.display = 'none';
+  document.getElementById('battle-screen').style.display = 'block';
+  await loadAndRender();
+  pollInterval = setInterval(pollBattle, POLL_MS);
+}
+
+/* ══════════════════════════════════════
+   POLL & RENDER
+══════════════════════════════════════ */
+async function pollBattle() {
+  if (phase !== 'battle') { clearInterval(pollInterval); return; }
+  const state = await fsGet(`arena_battles/${battleId}`);
+  if (!state) return;
+  battleState = state;
+
+  if (state.status === 'done') {
+    clearInterval(pollInterval);
+    await handleBattleEnd(state);
+    return;
+  }
+
+  // Check timeout — if opponent hasn't moved in 30s, they forfeit
+  if (Date.now() - (state.lastAction || 0) > 30000) {
+    const mySide  = myRole === 'player1' ? 'p1' : 'p2';
+    const curTurnId = JSON.parse(state.turnOrder)[state.turnIndex];
+    if (!curTurnId?.startsWith(mySide)) {
+      // Opponent timed out — declare me winner
+      await finishBattle(state, myRole);
+      return;
+    }
+  }
+
+  renderBattle(state);
+}
+
+async function loadAndRender() {
+  const state = await fsGet(`arena_battles/${battleId}`);
+  if (!state) return;
+  battleState = state;
+  renderBattle(state);
+}
+
+function renderBattle(state) {
+  const fighters  = JSON.parse(state.fighters  || '[]');
+  const turnOrder = JSON.parse(state.turnOrder || '[]');
+  const log       = JSON.parse(state.log       || '[]');
+  const mySide    = myRole === 'player1' ? 'p1' : 'p2';
+  const themSide  = myRole === 'player1' ? 'p2' : 'p1';
+  const curFId    = turnOrder[state.turnIndex];
+  const isMyTurn  = curFId?.startsWith(mySide);
+
+  localFighters = fighters;
+
+  // VS bar
+  document.getElementById('vs-me-name').textContent    = state[myRole+'Name']   || 'Tú';
+  document.getElementById('vs-them-name').textContent   = state[themSide==='p1'?'player1Name':'player2Name'] || 'Rival';
+  const myAv = state[myRole+'Avatar'];
+  const thAv = state[themSide==='p1'?'player1Avatar':'player2Avatar'];
+  if (myAv) document.getElementById('vs-me-img').src   = myAv;
+  if (thAv) document.getElementById('vs-them-img').src = thAv;
+  document.getElementById('vs-me-cq').textContent   = `⚔ ${state[myRole+'Conquest']||0} pts`;
+  document.getElementById('vs-them-cq').textContent  = `⚔ ${state[themSide==='p1'?'player1Conquest':'player2Conquest']||0} pts`;
+
+  // Turn indicator
+  const ti = document.getElementById('turn-indicator');
+  if (isMyTurn) {
+    ti.className = 'turn-indicator mine';
+    ti.textContent = 'Tu turno — elige personaje y habilidad';
+  } else {
+    const actorName = fighters.find(f => f.id === curFId)?.name || 'Rival';
+    ti.className = 'turn-indicator theirs';
+    ti.textContent = `Turno de ${actorName} (esperando al rival...)`;
+  }
+
+  // Render fighters
+  renderFighters(fighters, mySide, themSide, curFId, isMyTurn);
+
+  // Log — only append new entries
+  const logEl = document.getElementById('battle-log');
+  if (log.length > lastLogCount) {
+    log.slice(lastLogCount).forEach(entry => {
+      const div = document.createElement('div');
+      div.className = `log-entry ${entry.type==='dmg'?'log-dmg':entry.type==='crit'?'log-crit':entry.type==='enemy'?'log-enemy':'log-sys'}`;
+      div.textContent = entry.msg;
+      logEl.appendChild(div);
+    });
+    logEl.scrollTop = logEl.scrollHeight;
+    lastLogCount = log.length;
+  }
+
+  // Action panel
+  if (isMyTurn && !actionLock) {
+    const actor = fighters.find(f => f.id === curFId);
+    if (actor) renderActionPanel(actor);
+  } else if (!isMyTurn) {
+    document.getElementById('action-title').textContent = 'Esperando al rival...';
+    document.getElementById('skill-btns').innerHTML = '<div class="waiting-overlay"><span class="waiting-dot"></span><span class="waiting-dot"></span><span class="waiting-dot"></span></div>';
+    document.getElementById('target-hint').textContent = '';
+    selectedFighter = null; selectedSkill = null;
+  }
+}
+
+function renderFighters(fighters, mySide, themSide, curFId, isMyTurn) {
+  const ally  = fighters.filter(f => f.side === mySide);
+  const enemy = fighters.filter(f => f.side === themSide);
+  buildRow('ally-row',  ally,  true,  curFId, isMyTurn);
+  buildRow('enemy-row', enemy, false, curFId, isMyTurn);
+}
+
+function buildRow(rowId, fts, isAlly, curFId, isMyTurn) {
+  const row = document.getElementById(rowId);
+  fts.forEach(f => {
+    let el = document.getElementById('f-'+f.id);
+    const isNew = !el;
+    if (isNew) {
+      el = document.createElement('div');
+      el.id = 'f-'+f.id;
+      row.appendChild(el);
+    }
+    const col = RC[f.stars] || '#94a3b8';
+    const hpPct = Math.round(f.hp / f.maxHp * 100);
+    let cls = 'fighter';
+    if (isAlly) cls += ' mine';
+    if (f.dead || f.hp <= 0) cls += ' dead';
+    if (selectedFighter?.id === f.id) cls += ' selected';
+    el.className = cls;
+
+    if (isNew) {
+      el.innerHTML = `
+        <div class="f-img">
+          <div class="f-img-bg" style="background:${RG[f.stars]||RG[1]};position:absolute;inset:0;z-index:0;"></div>
+          ${f.image?`<img src="${f.image}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;z-index:1;" onerror="this.style.display='none'"/>`:``}
+          <div class="f-img-overlay" style="position:absolute;inset:0;z-index:2;"></div>
+          <div class="f-aff" style="position:absolute;top:3px;right:4px;z-index:3;">${AFF_ICONS[f.affinity]||''}</div>
+        </div>
+        <div class="f-body">
+          <div class="f-name" style="color:${col}">${f.name}</div>
+          <div class="hp-bar-wrap"><div class="hp-bar ${hpPct<40?'low':hpPct<70?'mid':''}" id="hpbar-${f.id}" style="width:${hpPct}%"></div></div>
+          <div class="hp-text" id="hptxt-${f.id}">${f.hp}/${f.maxHp}</div>
+        </div>`;
+    } else {
+      // Update HP only
+      const bar = document.getElementById('hpbar-'+f.id);
+      const txt = document.getElementById('hptxt-'+f.id);
+      if (bar) { bar.style.width = hpPct+'%'; bar.className=`hp-bar ${hpPct<40?'low':hpPct<70?'mid':''}`; }
+      if (txt) txt.textContent = `${f.hp}/${f.maxHp}`;
+    }
+
+    el.onclick = () => onFighterClick(f.id);
+  });
+}
+
+/* ══════════════════════════════════════
+   PLAYER ACTIONS
+══════════════════════════════════════ */
+function onFighterClick(fid) {
+  if (actionLock) return;
+  const f = localFighters.find(x => x.id === fid);
+  if (!f || f.hp <= 0) return;
+  const mySide = myRole === 'player1' ? 'p1' : 'p2';
+  const curFId = JSON.parse(battleState?.turnOrder||'[]')[battleState?.turnIndex||0];
+  const isMyTurn = curFId?.startsWith(mySide);
+  if (!isMyTurn) return;
+
+  if (f.side === mySide && f.id === curFId) {
+    // Select fighter (already selected — show skills)
+    selectedFighter = f;
+    selectedSkill = null;
+    renderActionPanel(f);
+    return;
+  }
+  if (f.side !== mySide && selectedSkill) {
+    // Attack this enemy
+    document.querySelectorAll('.fighter').forEach(e => e.classList.remove('targeting'));
+    submitAction(selectedFighter, selectedSkill, f);
+    return;
+  }
+  if (f.side !== mySide && !selectedSkill) {
+    document.getElementById('target-hint').textContent = '→ Primero selecciona una habilidad.';
+  }
+}
+
+function renderActionPanel(actor) {
+  document.getElementById('action-title').textContent = `Turno de ${actor.name} — elige habilidad:`;
+  const container = document.getElementById('skill-btns');
+  container.innerHTML = '';
+  actor.skills.forEach((sk, i) => {
+    if (sk.type === 'pasiva') return;
+    const btn = document.createElement('button');
+    btn.className = 'skill-btn';
+    const cd = actor.cooldowns?.[i] || 0;
+    btn.disabled = cd > 0 || actionLock;
+    btn.innerHTML = `<span class="sk-name">${sk.name}</span><span class="sk-cd">${cd>0?`CD: ${cd}`:(sk.cooldown===0?'Básico':'Lista')}</span>`;
+    btn.onclick = () => {
+      selectedSkill = { idx:i, skill:sk };
+      document.getElementById('target-hint').textContent = '→ Click en un enemigo para atacar.';
+      const mySide   = myRole === 'player1' ? 'p1' : 'p2';
+      const themSide = myRole === 'player1' ? 'p2' : 'p1';
+      localFighters.filter(f=>f.side===themSide&&f.hp>0).forEach(f => {
+        document.getElementById('f-'+f.id)?.classList.add('targeting');
+      });
+    };
+    container.appendChild(btn);
+  });
+  document.getElementById('target-hint').textContent = 'Selecciona una habilidad.';
+}
+
+/* ══════════════════════════════════════
+   SUBMIT ACTION → FIRESTORE
+══════════════════════════════════════ */
+async function submitAction(actor, skillChoice, target) {
+  if (actionLock) return;
+  actionLock = true;
+  document.getElementById('action-title').textContent = 'Enviando acción...';
+
+  const state     = await fsGet(`arena_battles/${battleId}`);
+  if (!state || state.status === 'done') { actionLock = false; return; }
+
+  const fighters  = JSON.parse(state.fighters);
+  const turnOrder = JSON.parse(state.turnOrder);
+  const log       = JSON.parse(state.log || '[]');
+  const mySide    = myRole === 'player1' ? 'p1' : 'p2';
+  const themSide  = myRole === 'player1' ? 'p2' : 'p1';
+
+  // Verify it's still our turn
+  const curFId = turnOrder[state.turnIndex];
+  if (!curFId?.startsWith(mySide)) { actionLock = false; return; }
+
+  const actorF  = fighters.find(f => f.id === actor.id);
+  const targetF = fighters.find(f => f.id === target.id);
+  if (!actorF || !targetF) { actionLock = false; return; }
+
+  // Set cooldown
+  if (!actorF.cooldowns) actorF.cooldowns = {};
+  const sk = skillChoice.skill;
+  if (sk.cooldown > 0) actorF.cooldowns[skillChoice.idx] = sk.cooldown;
+
+  // Calc damage
+  const { dmg, isCrit, affMult } = calcDamage(actorF, targetF, 1.1);
+  targetF.hp = Math.max(0, targetF.hp - dmg);
+  if (targetF.hp <= 0) targetF.dead = true;
+
+  // Multi-hit
+  if (sk.desc?.includes('3 veces')) {
+    for (let i=0;i<2;i++) {
+      if (targetF.hp > 0) {
+        const r2 = calcDamage(actorF, targetF, 0.4);
+        targetF.hp = Math.max(0, targetF.hp - r2.dmg);
+        if (targetF.hp <= 0) targetF.dead = true;
+      }
+    }
+  }
+
+  // Show float immediately
+  showDmgFloat('f-'+targetF.id, dmg, isCrit);
+  document.getElementById('f-'+actorF.id)?.classList.add('acting');
+  setTimeout(()=>document.getElementById('f-'+actorF.id)?.classList.remove('acting'), 400);
+
+  const affTxt = affMult>1?' ✦ Super efectivo!':affMult<1?' ▼ Poco efectivo.':'';
+  const logType = isCrit ? 'crit' : (mySide==='p1'?'dmg':'enemy');
+  log.push({ msg:`${actorF.name} usa ${sk.name} en ${targetF.name}: ${dmg}${isCrit?' CRÍTICO!':''}${affTxt}`, type:logType, ts:Date.now() });
+  if (targetF.dead) log.push({ msg:`💀 ${targetF.name} fue derrotado.`, type:'sys', ts:Date.now() });
+
+  // Check winner
+  const p1Alive = fighters.filter(f=>f.side==='p1'&&f.hp>0).length;
+  const p2Alive = fighters.filter(f=>f.side==='p2'&&f.hp>0).length;
+  let newStatus = 'active';
+  let winner = '';
+  if (!p1Alive) { newStatus='done'; winner='player2'; }
+  else if (!p2Alive) { newStatus='done'; winner='player1'; }
+
+  // Advance turn (skip dead)
+  let newIdx = (state.turnIndex + 1) % turnOrder.length;
+  let safety = 0;
+  while (fighters.find(f=>f.id===turnOrder[newIdx])?.dead && safety<20) {
+    newIdx = (newIdx+1) % turnOrder.length;
+    safety++;
+  }
+
+  // Reduce cooldowns on new round
+  if (newIdx < state.turnIndex) {
+    fighters.forEach(f => {
+      if (!f.cooldowns) return;
+      for (const k in f.cooldowns) { if(f.cooldowns[k]>0) f.cooldowns[k]--; }
+    });
+  }
+
+  await fsPatch(`arena_battles/${battleId}`, {
+    fighters:   JSON.stringify(fighters),
+    log:        JSON.stringify(log),
+    turnIndex:  newIdx,
+    status:     newStatus,
+    winner:     winner,
+    lastAction: Date.now()
+  });
+
+  selectedFighter = null;
+  selectedSkill   = null;
+  actionLock = false;
+
+  if (newStatus === 'done') {
+    clearInterval(pollInterval);
+    await handleBattleEnd({ ...state, winner, status:'done' });
+  }
+}
+
+function calcDamage(attacker, target, mult=1) {
+  const isCrit = Math.random()*100 < attacker.cr;
+  const critMult = isCrit ? (attacker.cd/100) : 1;
+  const aff = AFFINITIES[attacker.affinity];
+  const affMult = aff?.strong_vs===target.affinity ? 1.5 : aff?.weak_vs===target.affinity ? 0.75 : 1;
+  const defMit = target.def / (target.def + 1000);
+  const dmg = Math.round(attacker.atk * mult * affMult * critMult * (1 - defMit));
+  return { dmg: Math.max(1, dmg), isCrit, affMult };
+}
+
+/* ══════════════════════════════════════
+   BATTLE END
+══════════════════════════════════════ */
+async function finishBattle(state, winnerRole) {
+  await fsPatch(`arena_battles/${battleId}`, {
+    status: 'done',
+    winner: winnerRole,
+    lastAction: Date.now()
+  });
+  await handleBattleEnd({ ...state, winner: winnerRole, status:'done' });
+}
+
+async function handleBattleEnd(state) {
+  phase = 'done';
+  clearInterval(pollInterval);
+  localStorage.removeItem('arena_battle_id');
+  localStorage.removeItem('arena_my_role');
+
+  const iWon = state.winner === myRole;
+  const isDraw = !state.winner;
+
+  const rs = document.getElementById('result-screen');
+  rs.style.display = 'flex';
+  document.getElementById('battle-screen').style.display = 'none';
+
+  const title = document.getElementById('result-title');
+  const pts   = document.getElementById('result-pts');
+  const vs    = document.getElementById('result-vs');
+
+  const themRole = myRole === 'player1' ? 'player2' : 'player1';
+  const enemyName = state[themRole+'Name'] || 'Rival';
+
+  if (isDraw) {
+    title.className='result-title draw'; title.textContent='EMPATE';
+    pts.className='result-pts draw'; pts.textContent='+0 Conquista';
+    vs.textContent=`vs ${enemyName}`;
+  } else if (iWon) {
+    title.className='result-title win'; title.textContent='VICTORIA';
+    pts.className='result-pts win'; pts.textContent='+15 Conquista';
+    vs.textContent=`Derrotaste a ${enemyName}`;
+    spawnParticles('#fbbf24', 50);
+    if (window.ReAnimeDB) await window.ReAnimeDB.addConquestPoints(15);
+  } else {
+    title.className='result-title lose'; title.textContent='DERROTA';
+    pts.className='result-pts lose'; pts.textContent='-8 Conquista';
+    vs.textContent=`Perdiste contra ${enemyName}`;
+    if (window.ReAnimeDB) await window.ReAnimeDB.addConquestPoints(-8);
+  }
+
+  // Log battle
+  if (window.ReAnimeDB) {
+    const themId = state[themRole];
+    await window.ReAnimeDB.addBattleLog({
+      type: 'arena',
+      result: isDraw ? 'draw' : (iWon ? 'win' : 'lose'),
+      enemyId: themId || '',
+      enemyName,
+      pts: isDraw ? 0 : (iWon ? 15 : -8)
+    });
+  }
+
+  // Cleanup battle doc after a delay
+  setTimeout(() => fsDelete(`arena_battles/${battleId}`).catch(()=>{}), 60000);
+}
+
+/* ══════════════════════════════════════
+   UTILS
+══════════════════════════════════════ */
+function showDmgFloat(elId, dmg, isCrit) {
+  const parent = document.getElementById(elId);
+  if (!parent) return;
+  const fl = document.createElement('div');
+  fl.className = 'dmg-float';
+  fl.textContent = (isCrit?'💥':'')+dmg;
+  fl.style.cssText = `color:${isCrit?'#fbbf24':'#f87171'};top:20%;left:${15+Math.random()*60}%;`;
+  parent.style.position='relative';
+  parent.appendChild(fl);
+  setTimeout(()=>fl.remove(), 950);
+}
+
+function spawnParticles(color, count) {
+  const rs = document.getElementById('result-screen');
+  for (let i=0;i<count;i++) {
+    const p=document.createElement('div');
+    p.className='particle';
+    const sz=4+Math.random()*8;
+    p.style.cssText=`width:${sz}px;height:${sz}px;background:${color};left:${Math.random()*100}%;top:${Math.random()*60}%;--dx:${(Math.random()-.5)*200}px;--dy:${-80-Math.random()*200}px;animation-duration:${1+Math.random()*1.5}s;animation-delay:${Math.random()*.5}s;`;
+    rs.appendChild(p);
+    setTimeout(()=>p.remove(),3000);
+  }
+}
+
+function leavePage() {
+  if (phase === 'queue') cancelQueue();
+  if (phase === 'battle') {
+    // Forfeit
+    if (battleId && battleState) {
+      const opponentRole = myRole === 'player1' ? 'player2' : 'player1';
+      fsPatch(`arena_battles/${battleId}`, { status:'done', winner:opponentRole, lastAction:Date.now() }).catch(()=>{});
+    }
+    localStorage.removeItem('arena_battle_id');
+    localStorage.removeItem('arena_my_role');
+  }
+  location.href = 'index.html';
+}
+
+window.addEventListener('beforeunload', () => {
+  if (phase === 'queue') fsDelete(`arena_queue/${SELF?.id}`);
+});
+
+/* ── BOOT ── */
+if (window.ReAnimeDB) init();
+else window.addEventListener('reanimdb:ready', init, { once:true });
+</script>
+</body>
+</html>
