@@ -123,6 +123,32 @@
     }
     .anime-description { font-size: 0.88rem; color: var(--muted); line-height: 1.65; max-width: 620px; }
 
+    /* ── RATING & YEAR ── */
+    .anime-rating-row { display:flex; align-items:center; gap:.8rem; margin-bottom:.6rem; flex-wrap:wrap; }
+    .anime-rating {
+      display:inline-flex; align-items:center; gap:.35rem;
+      background:linear-gradient(135deg,#1a0a00,#3d1900); border:1px solid #fbbf2455;
+      border-radius:6px; padding:.3rem .7rem; font-family:var(--font-head);
+      font-size:1.2rem; letter-spacing:1px; color:#fbbf24;
+    }
+    .anime-rating-star { font-size:.9rem; }
+    .anime-year { font-size:.75rem; color:var(--muted); letter-spacing:2px; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:.3rem .7rem; }
+
+    /* ── OPINION / DATO CARDS ── */
+    .anime-extra { margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem; }
+    .extra-block { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.2rem; }
+    .extra-block-title { font-family:var(--font-head); font-size:.85rem; letter-spacing:3px; color:var(--muted); margin-bottom:.6rem; text-transform:uppercase; }
+    .extra-block.opinion .extra-block-title { color:var(--rose); }
+    .extra-block.dato .extra-block-title { color:#38bdf8; }
+    .extra-quote {
+      font-size:.82rem; color:var(--muted); line-height:1.6;
+      padding:.45rem .7rem; border-left:2px solid var(--border);
+      margin-bottom:.4rem;
+    }
+    .extra-quote:last-child { margin-bottom:0; }
+    .extra-block.opinion .extra-quote { border-color:var(--pink-dim); color:var(--rose); }
+    .extra-block.dato .extra-quote { border-color:#38bdf822; color:#94a3b8; }
+
     /* List actions */
     .anime-actions { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
     .action-btn {
@@ -367,11 +393,25 @@
           </div>
           <div class="anime-meta">
             <h1 class="anime-name">${anime.name}</h1>
+            <div class="anime-rating-row">
+              ${anime.rating ? `<div class="anime-rating"><span class="anime-rating-star">★</span>${anime.rating}</div>` : ''}
+              ${anime.year   ? `<div class="anime-year">${anime.year}</div>` : ''}
+            </div>
             <div class="anime-genres">
               ${(anime.genre||[]).map(g => `<span class="genre-tag">${g}</span>`).join('')}
             </div>
             <p class="anime-description">${anime.description || ''}</p>
-            <div class="anime-actions">
+            ${anime.opinion?.length ? `
+            <div class="extra-block opinion" style="margin-top:1rem;">
+              <div class="extra-block-title">🌸 Opinión de Ram</div>
+              ${anime.opinion.map(o=>`<div class="extra-quote">${o}</div>`).join('')}
+            </div>` : ''}
+            ${anime.dato?.length ? `
+            <div class="extra-block dato" style="margin-top:.8rem;">
+              <div class="extra-block-title">✦ Datos del anime</div>
+              ${anime.dato.map(d=>`<div class="extra-quote">${d}</div>`).join('')}
+            </div>` : ''}
+            <div class="anime-actions" style="margin-top:1rem;">
               <button class="action-btn" id="btn-fav"     onclick="toggleList('favorites')">Favorito</button>
               <button class="action-btn" id="btn-watch"   onclick="toggleList('watchlist')">Ver despues</button>
               <button class="action-btn" id="btn-watched" onclick="toggleList('completed')">Visto</button>

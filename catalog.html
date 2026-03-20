@@ -352,7 +352,7 @@ function buildSliders() {
   // DESTACADOS — shuffle then take top 20
   const shuffled = [...allAnimes].sort(()=>Math.random()-.5);
   const featured = shuffled.slice(0, Math.min(20, allAnimes.length));
-  buildSlider('dest', featured, false);
+  buildSlider('dest', featured, false, true);
   document.getElementById('count-dest').textContent = featured.length + ' seleccionados';
 
   // GENRE SECTIONS — top 4 genres by count
@@ -383,7 +383,7 @@ function buildSliders() {
   document.getElementById('count-all').textContent = allAnimes.length + ' títulos';
 }
 
-function buildSlider(id, animes, showRank) {
+function buildSlider(id, animes, showRank, autoplay=false) {
   const track = document.getElementById('st-'+id);
   if (!track) return;
   track.innerHTML = '';
@@ -401,58 +401,117 @@ function buildSlider(id, animes, showRank) {
     el.onclick = () => goTo(a.id);
     track.appendChild(el);
   });
-  initSlider(id);
+  initSlider(id, autoplay);
 }
 
 /* ── SLIDER ENGINE ── */
-function initSlider(id) {
+function initSlider(id, autoplay=false) {
   const wrap  = document.getElementById('sw-'+id);
   const track = document.getElementById('st-'+id);
   const prev  = document.getElementById('prev-'+id);
   const next  = document.getElementById('next-'+id);
   if (!wrap || !track) return;
 
-  let pos=0, dragStart=null, dragBase=0, dragDelta=0, dragActive=false, blockClick=false;
-
   const cardW = () => {
     const c = track.querySelector('.acard');
     return c ? c.getBoundingClientRect().width + 13 : 185;
   };
-  const maxPos = () => Math.max(0, track.scrollWidth - wrap.clientWidth - 32);
+
+  let pos=0, origCount=0, autoTimer=null, paused=false;
+
+  /* ── Infinite loop setup for autoplay ── */
+  if (autoplay) {
+    const originals = Array.from(track.children);
+    origCount = originals.length;
+    // Clone all to end and beginning for seamless loop
+    originals.forEach(el => track.appendChild(el.cloneNode(true)));
+    originals.slice().reverse().forEach(el => track.insertBefore(el.cloneNode(true), track.firstChild));
+    // Re-attach click handlers on clones
+    track.querySelectorAll('.acard').forEach(el => {
+      const id = el.querySelector('img')?.alt;
+      if (id) {
+        const a = allAnimes.find(x => x.name === id);
+        if (a) el.onclick = () => goTo(a.id);
+      }
+    });
+    // Start at first real card
+    pos = origCount * cardW();
+    track.style.transition = 'none';
+    track.style.transform = `translateX(-${pos}px)`;
+
+    const wrapLoop = () => {
+      const totalW = origCount * cardW();
+      if (pos >= totalW * 2) { pos -= totalW; track.style.transition='none'; track.style.transform=`translateX(-${pos}px)`; }
+      else if (pos < totalW) { pos += totalW; track.style.transition='none'; track.style.transform=`translateX(-${pos}px)`; }
+    };
+
+    const step = () => {
+      if (paused) return;
+      pos += cardW();
+      track.style.transition = 'transform .7s cubic-bezier(.4,0,.2,1)';
+      track.style.transform  = `translateX(-${pos}px)`;
+      setTimeout(wrapLoop, 750);
+    };
+
+    autoTimer = setInterval(step, 1800);
+
+    // Pause on hover
+    wrap.addEventListener('mouseenter', () => { paused=true; });
+    wrap.addEventListener('mouseleave', () => { paused=false; });
+    wrap.addEventListener('touchstart',  () => { paused=true; }, {passive:true});
+    wrap.addEventListener('touchend',    () => { setTimeout(()=>{ paused=false; }, 1200); });
+  }
+
+  const maxPos = () => {
+    if (autoplay) return Infinity;
+    return Math.max(0, track.scrollWidth - wrap.clientWidth - 32);
+  };
   const setPos = (p, animated) => {
-    pos = Math.max(0, Math.min(p, maxPos()));
+    if (!autoplay) p = Math.max(0, Math.min(p, maxPos()));
+    pos = p;
     track.style.transition = animated ? 'transform .42s cubic-bezier(.77,0,.18,1)' : 'none';
     track.style.transform  = `translateX(-${pos}px)`;
   };
 
-  if (next) next.onclick = () => setPos(pos + cardW()*3, true);
-  if (prev) prev.onclick = () => setPos(pos - cardW()*3, true);
+  if (next) next.onclick = () => { if(autoplay){ paused=true; pos+=cardW(); track.style.transition='transform .42s cubic-bezier(.77,0,.18,1)'; track.style.transform=`translateX(-${pos}px)`; setTimeout(()=>paused=false,800); } else setPos(pos+cardW()*3,true); };
+  if (prev) prev.onclick = () => { if(autoplay){ paused=true; pos-=cardW(); track.style.transition='transform .42s cubic-bezier(.77,0,.18,1)'; track.style.transform=`translateX(-${pos}px)`; setTimeout(()=>paused=false,800); } else setPos(pos-cardW()*3,true); };
 
+  /* ── Drag ── */
+  let dragStart=null, dragBase=0, dragDelta=0, dragActive=false, blockClick=false;
   wrap.addEventListener('mousedown', e => {
-    if (e.button!==0) return;
+    if(e.button!==0) return;
     e.preventDefault();
+    if(autoplay) paused=true;
     dragStart=e.clientX; dragBase=pos; dragDelta=0; dragActive=false;
     track.style.transition='none';
     wrap.classList.add('dragging');
   });
   window.addEventListener('mousemove', e => {
     if(dragStart===null) return;
-    dragDelta = e.clientX-dragStart;
-    if(Math.abs(dragDelta)>6){dragActive=true; track.style.transform=`translateX(-${dragBase-dragDelta}px)`;}
+    dragDelta=e.clientX-dragStart;
+    if(Math.abs(dragDelta)>6){ dragActive=true; track.style.transform=`translateX(-${dragBase-dragDelta}px)`; }
   });
   window.addEventListener('mouseup', () => {
     if(dragStart===null) return;
     wrap.classList.remove('dragging');
     const wasDrag=dragActive; dragStart=null; dragActive=false;
-    if(wasDrag){blockClick=true; setPos(dragBase-dragDelta,true);}
+    if(wasDrag){
+      blockClick=true;
+      const cw=cardW();
+      const rawPos=dragBase-dragDelta;
+      const snapped=autoplay ? rawPos : Math.round(rawPos/cw)*cw;
+      setPos(snapped,true);
+    }
     dragDelta=0;
+    if(autoplay) setTimeout(()=>{ paused=false; }, 1000);
   });
   wrap.addEventListener('click',e=>{if(blockClick){e.preventDefault();e.stopImmediatePropagation();blockClick=false;}},true);
 
-  let tx=null, tb=0, td=0;
+  /* ── Touch ── */
+  let tx=null,tb=0,td=0;
   wrap.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;tb=pos;td=0;track.style.transition='none';},{passive:true});
   wrap.addEventListener('touchmove',e=>{if(tx===null)return;td=e.touches[0].clientX-tx;track.style.transform=`translateX(-${tb-td}px)`;},{passive:true});
-  wrap.addEventListener('touchend',()=>{if(tx===null)return;tx=null;setPos(tb-td,true);td=0;});
+  wrap.addEventListener('touchend',()=>{if(tx===null)return;tx=null;const cw=cardW();const snapped=autoplay?tb-td:Math.round((tb-td)/cw)*cw;setPos(snapped,true);td=0;});
 }
 </script>
 </body>
