@@ -742,32 +742,6 @@
       </div>
     </div>
 
-    <!-- PVP SECTION -->
-    <div class="section" style="padding-bottom:0.5rem;">
-      <div class="section-header" style="padding-bottom:0.75rem;">
-        <h2 class="section-title">Arena <em>PVP</em></h2>
-        <div class="section-line"></div>
-      </div>
-      <div style="padding:0 2rem;display:flex;gap:1rem;flex-wrap:wrap;">
-        <a href="pvp.html" style="display:inline-flex;align-items:center;gap:.5rem;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:var(--radius);padding:.8rem 1.4rem;text-decoration:none;font-size:.88rem;transition:all .2s;font-family:var(--font-body);" onmouseover="this.style.borderColor='#a78bfa';this.style.color='#a78bfa'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
-          <span style="font-size:1.2rem">🛡</span>
-          <div><div style="font-family:var(--font-head);letter-spacing:2px;font-size:1rem">Constructor</div><div style="font-size:.7rem;color:var(--muted)">Arma tu equipo</div></div>
-        </a>
-        <a href="battle.html" style="display:inline-flex;align-items:center;gap:.5rem;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:var(--radius);padding:.8rem 1.4rem;text-decoration:none;font-size:.88rem;transition:all .2s;font-family:var(--font-body);" onmouseover="this.style.borderColor='#fbbf24';this.style.color='#fbbf24'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">
-          <span style="font-size:1.2rem">⚔</span>
-          <div><div style="font-family:var(--font-head);letter-spacing:2px;font-size:1rem">Batalla</div><div style="font-size:.7rem;color:var(--muted)">Buscar rival</div></div>
-        </a>
-        <a href="arena.html" style="display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(255,45,120,.08));border:1px solid rgba(251,191,36,.3);color:var(--text);border-radius:var(--radius);padding:.8rem 1.4rem;text-decoration:none;transition:all .2s;" onmouseover="this.style.borderColor='#fbbf24'" onmouseout="this.style.borderColor='rgba(251,191,36,.3)'">
-          <span>🌐</span>
-          <div><div style="font-family:var(--font-head);letter-spacing:2px;font-size:1rem">Arena Mundial</div><div style="font-size:.7rem;color:var(--muted)">PVP en tiempo real · 50⚔</div></div>
-        </a>
-        <div id="pvp-conquest-display" style="display:none;align-items:center;gap:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.8rem 1.4rem;font-size:.88rem;">
-          <span style="font-size:1.1rem">⚔</span>
-          <div><div id="pvp-cq-val" style="font-family:var(--font-head);font-size:1rem;letter-spacing:2px;color:#fbbf24">0</div><div style="font-size:.7rem;color:var(--muted)">Conquista</div></div>
-        </div>
-      </div>
-    </div>
-
     <!-- GENRE + SEARCH FILTER -->
     <div class="filter-bar">
       <input type="text" id="search-input" placeholder="Buscar anime…" />
@@ -1241,21 +1215,6 @@
     document.getElementById('anime-directory').style.display = 'grid';
     document.querySelector('.filter-bar').style.display = 'flex';
     document.querySelector('.section-header').style.display = 'flex';
-  });
-
-  /* Show conquest in PVP section when Firebase ready */
-  function showPvpConquest() {
-    if (!window.ReAnimeDB) return;
-    window.ReAnimeDB.getConquest().then(pts => {
-      const el = document.getElementById('pvp-conquest-display');
-      const val = document.getElementById('pvp-cq-val');
-      if (el && val) { val.textContent = pts.toLocaleString(); el.style.display = 'flex'; }
-    });
-  }
-  window.addEventListener('reanimdb:ready', showPvpConquest, { once: true });
-  window.addEventListener('reanimdb:update', e => {
-    const val = document.getElementById('pvp-cq-val');
-    if (val && e.detail?.conquest !== undefined) val.textContent = (e.detail.conquest||0).toLocaleString();
   });
 
   /* ── MASCOT — loaded from ram-assistent.js ── */
