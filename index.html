@@ -741,17 +741,15 @@
       </div>
     </div>
 
-    <!-- GENRE + SEARCH FILTER -->
-    <div class="filter-bar">
-      <input type="text" id="search-input" placeholder="Buscar anime…" />
-      <div class="genre-scroll" id="genre-chips"></div>
-    </div>
-
-    <!-- ANIME GRID -->
+    <!-- ANIME GRID + FILTER -->
     <div class="section-header" style="padding-bottom:0.5rem;">
       <h2 class="section-title">Directorio <em>anime</em></h2>
       <div class="section-line"></div>
       <span class="section-count" id="anime-count">0 títulos</span>
+    </div>
+    <div class="filter-bar">
+      <input type="text" id="search-input" placeholder="Buscar anime…" />
+      <div class="genre-scroll" id="genre-chips"></div>
     </div>
     <div id="anime-directory"></div>
 
@@ -1126,7 +1124,7 @@
     const term = document.getElementById('search-input').value.toLowerCase();
     return allAnimes.filter(a =>
       a.name.toLowerCase().includes(term) &&
-      (activeGenres.size === 0 || [...activeGenres].some(g => a.genre.includes(g)))
+      (activeGenres.size === 0 || [...activeGenres].every(g => a.genre.includes(g)))
     );
   }
 
