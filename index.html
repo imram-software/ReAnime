@@ -669,6 +669,23 @@
       #mascot-chat { width: calc(100vw - 2rem); right: 1rem; }
     }
 
+    /* ── PAGINATION ── */
+    #pagination-bar {
+      display:none; align-items:center; justify-content:center;
+      gap:.4rem; padding:.5rem 2rem 1.5rem; flex-wrap:wrap;
+    }
+    #pagination-bar.visible { display:flex; }
+    .pag-btn {
+      background:var(--bg3); border:1px solid var(--border); color:var(--muted);
+      border-radius:6px; padding:.35rem .7rem; font-size:.8rem;
+      cursor:pointer; font-family:var(--font-body); transition:all .2s;
+      min-width:36px; text-align:center;
+    }
+    .pag-btn:hover { border-color:var(--rose); color:var(--rose); }
+    .pag-btn.active { background:var(--pink); border-color:var(--pink); color:#fff; }
+    .pag-btn:disabled { opacity:.3; cursor:default; }
+    .pag-info { font-size:.75rem; color:var(--muted); padding:.35rem .5rem; }
+
     /* Dispositivos lentos o accesibilidad */
     @media (prefers-reduced-motion: reduce) {
       .hero-lines::before { animation: none; }
@@ -746,12 +763,14 @@
       <h2 class="section-title">Directorio <em>anime</em></h2>
       <div class="section-line"></div>
       <span class="section-count" id="anime-count">0 títulos</span>
+      <button id="ver-todos-btn" onclick="toggleVerTodos()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.3rem .8rem;font-size:.75rem;cursor:pointer;font-family:var(--font-body);transition:all .2s;white-space:nowrap;" onmouseover="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Ver todos</button>
     </div>
     <div class="filter-bar">
       <input type="text" id="search-input" placeholder="Buscar anime…" />
       <div class="genre-scroll" id="genre-chips"></div>
     </div>
     <div id="anime-directory"></div>
+    <div id="pagination-bar"></div>
 
     <!-- ANIME DETAIL -->
     <div id="anime-details">
@@ -851,6 +870,10 @@
   ══════════════════════════════════════════════ */
   window.allAnimes = [];
   let activeGenres = new Set(); window.activeGenres = activeGenres;
+  let _verTodos   = false;   // false = mostrar primeros 8, true = paginado
+  let _currentPage = 1;
+  const PAGE_SIZE  = 30;
+  const PREVIEW_COUNT = 8;
 
   const urlParams = new URLSearchParams(location.search);
   const genreFromURL = urlParams.get('genre');
@@ -1114,6 +1137,7 @@
       chip.addEventListener('click', () => {
         chip.classList.toggle('active');
         activeGenres.has(g) ? activeGenres.delete(g) : activeGenres.add(g);
+        _currentPage = 1;
         renderAnimes(filterList());
       });
       container.appendChild(chip);
@@ -1128,20 +1152,39 @@
     );
   }
 
-  document.getElementById('search-input').addEventListener('input', () => renderAnimes(filterList()));
+  document.getElementById('search-input').addEventListener('input', () => { _currentPage = 1; renderAnimes(filterList()); });
 
   /* ══════════════════════════════════════════════
      RENDER
   ══════════════════════════════════════════════ */
   function renderAnimes(list) {
-    const dir = document.getElementById('anime-directory');
-    document.getElementById('anime-count').textContent = `${list.length} títulos`;
+    const dir     = document.getElementById('anime-directory');
+    const pagBar  = document.getElementById('pagination-bar');
+    const verBtn  = document.getElementById('ver-todos-btn');
+    const total   = list.length;
+    document.getElementById('anime-count').textContent = `${total} títulos`;
+
+    let toShow;
+    if (!_verTodos) {
+      toShow = list.slice(0, PREVIEW_COUNT);
+      pagBar.classList.remove('visible');
+      if (verBtn) verBtn.textContent = total > PREVIEW_COUNT ? `Ver todos (${total})` : 'Ver todos';
+    } else {
+      const totalPages = Math.ceil(total / PAGE_SIZE);
+      _currentPage = Math.min(_currentPage, Math.max(1, totalPages));
+      const start = (_currentPage - 1) * PAGE_SIZE;
+      toShow = list.slice(start, start + PAGE_SIZE);
+      if (verBtn) verBtn.textContent = 'Colapsar';
+      renderPagination(pagBar, total, totalPages);
+    }
+
     dir.innerHTML = '';
-    if (!list.length) {
+    if (!toShow.length) {
       dir.innerHTML = '<div class="empty-state"><p>Sin resultados para tu búsqueda.</p></div>';
+      if (_verTodos) pagBar.classList.remove('visible');
       return;
     }
-    list.forEach(a => {
+    toShow.forEach(a => {
       const card = document.createElement('div');
       card.className = 'anime-card';
       card.innerHTML = `
@@ -1156,6 +1199,70 @@
       });
       dir.appendChild(card);
     });
+  }
+
+  function renderPagination(bar, total, totalPages) {
+    bar.classList.add('visible');
+    bar.innerHTML = '';
+    if (totalPages <= 1) { bar.classList.remove('visible'); return; }
+
+    // Prev
+    const prev = document.createElement('button');
+    prev.className = 'pag-btn'; prev.textContent = '←';
+    prev.disabled = _currentPage === 1;
+    prev.onclick = () => { _currentPage--; renderAnimes(filterList()); scrollToDir(); };
+    bar.appendChild(prev);
+
+    // Page numbers — show max 7 around current
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let i=1; i<=totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (_currentPage > 3) pages.push('…');
+      for (let i=Math.max(2,_currentPage-1); i<=Math.min(totalPages-1,_currentPage+1); i++) pages.push(i);
+      if (_currentPage < totalPages-2) pages.push('…');
+      pages.push(totalPages);
+    }
+
+    pages.forEach(p => {
+      if (p === '…') {
+        const sp = document.createElement('span'); sp.className = 'pag-info'; sp.textContent = '…';
+        bar.appendChild(sp);
+      } else {
+        const btn = document.createElement('button');
+        btn.className = 'pag-btn' + (p === _currentPage ? ' active' : '');
+        btn.textContent = p;
+        btn.onclick = () => { _currentPage = p; renderAnimes(filterList()); scrollToDir(); };
+        bar.appendChild(btn);
+      }
+    });
+
+    // Next
+    const next = document.createElement('button');
+    next.className = 'pag-btn'; next.textContent = '→';
+    next.disabled = _currentPage === totalPages;
+    next.onclick = () => { _currentPage++; renderAnimes(filterList()); scrollToDir(); };
+    bar.appendChild(next);
+
+    // Info
+    const info = document.createElement('span');
+    info.className = 'pag-info';
+    const start = (_currentPage-1)*PAGE_SIZE+1;
+    const end   = Math.min(_currentPage*PAGE_SIZE, total);
+    info.textContent = `${start}–${end} de ${total}`;
+    bar.appendChild(info);
+  }
+
+  function scrollToDir() {
+    document.getElementById('anime-directory').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  function toggleVerTodos() {
+    _verTodos = !_verTodos;
+    _currentPage = 1;
+    renderAnimes(filterList());
+    if (_verTodos) scrollToDir();
   }
 
   /* ══════════════════════════════════════════════
