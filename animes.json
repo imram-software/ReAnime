@@ -1,9 +1,9 @@
 [
-{
+{ "Anime": "Re:Zero kara Hajimeru Isekai Seikatsu",
     "id": "re-zero-kara-hajjimeru-isekai-seikatsu",
     "name": "Re:Zero kara Hajimeru Isekai Seikatsu",
     "cover": "https://cdn.myanimelist.net/images/anime/1522/128039.jpg",
-    "genre": ["Isekai", "Fantasia", "Aventura"],
+    "genre": ["Isekai", "Fantasia", "Aventura", "Isekai"],
 
     "opinion": [
       "Subaru es débil… pero su obstinación es lo que lo mantiene con vida.",
@@ -149,12 +149,11 @@
       }
     ]
 },
-
-{
+{ "Anime": "Chichi wa Eiyuu, Haha wa Seirei, Musume no Watashi wa Tenseisha",
   "id": "chichi-wa-eiyuu-haha-wa-seirei",
   "name": "Chichi wa Eiyuu, Haha wa Seirei, Musume no Watashi wa Tenseisha",
   "cover": "https://cdn.myanimelist.net/images/anime/1811/151799l.jpg",
-  "genre": ["Fantasia", "Isekai"],
+  "genre": ["Fantasia", "Isekai", "Recuentos de la vida", "Isekai"],
 
   "opinion": [
     "Pienso que este isekai es demasiado amable… sospechosamente amable.",
@@ -235,7 +234,7 @@
     }
   ]
 },
-{
+{ "Anime": "Kikaijikake no Marie",
   "id": "kikaijikake-no-marie",
   "name": "Kikaijikake no Marie",
   "cover": "https://cdn.myanimelist.net/images/anime/1618/151138.jpg",
@@ -320,7 +319,7 @@
     }
   ]
 },
-{
+{ "Anime": "Shikanoko Nokonoko Koshitantan",
   "id": "shikanoko-nokonoko-koshitantan",
   "name": "Shikanoko Nokonoko Koshitantan",
   "cover": "https://cdn.myanimelist.net/images/anime/1739/142002.jpg",
@@ -405,11 +404,11 @@
     }
   ]
 },
-{
+{ "Anime": "Ragna Crimson",
   "id": "ragna-crimson",
   "name": "Ragna Crimson",
   "cover": "https://myanimelist.net/images/anime/1702/131318.jpg",
-  "genre": ["Accion","Fantasia","Oscuro"],
+  "genre": ["Accion","Fantasia","Sobrenatural"],
   "rating": 7.5,
   "opinion": [
     "Demasiada violencia… pero efectiva.",
@@ -449,7 +448,7 @@
 { "number": 24, "title": "Episodio 24 - Ragna Crimson", "embed": "<iframe src='https://hqq.ac/e/dHlWTDlCa1dreWxsay9CTGtHWnh6Zz09' allowfullscreen></iframe>" }
 ]
 },
-{
+{ "Anime": "Bocchi the Rock!",
   "id": "bocchi-the-rock",
   "name": "Bocchi the Rock!",
   "cover": "https://cdn.myanimelist.net/images/anime/1448/127956.jpg",
@@ -482,6 +481,204 @@
     { "number": 10, "title": "Episodio 10 - Después del concierto", "embed": "<iframe src='https://hqq.ac/e/STdKZVBPbUV2MVp4VDA3WnVpM3UrQT09' allowfullscreen></iframe>" },
     { "number": 11, "title": "Episodio 11 - Duodécimo movimiento", "embed": "<iframe src='https://hqq.ac/e/REtNTHBPQTRid2c5dEZtS0MrTkQzZz09' allowfullscreen></iframe>" },
     { "number": 12, "title": "Episodio 12 - Bocchi the Rock!", "embed": "<iframe src='https://hqq.ac/e/cGhQemRUanArdkU3aXVReUJYRTZuUT09' allowfullscreen></iframe>" }
+  ]
+},
+{ "Anime": "Angel Beats!",
+  "id": "angel-beats",
+  "name": "Angel Beats!",
+  "cover": "https://cdn.myanimelist.net/images/anime/1244/111115.jpg",
+  "genre": ["Accion", "Drama", "Sobrenatural", "Comedia"],
+  "rating": 8.2,
+  "opinion": [
+    "Este lugar… no es normal. Pero tiene su lógica.",
+    "Demasiado ruido para algo tan triste.",
+    "No confían en el sistema… interesante.",
+    "Ese ángel… no es lo que parece.",
+    "Al final, todos buscan lo mismo."
+  ],
+  "dato": [
+    "Angel Beats! ocurre en una especie de purgatorio escolar.",
+    "La historia mezcla comedia con temas bastante serios.",
+    "Fue creado por Jun Maeda, conocido por historias emocionales.",
+    "La banda Girls Dead Monster tiene canciones dentro del anime.",
+    "Cada personaje tiene un pasado trágico que se revela poco a poco."
+  ],
+  "episodes": [
+    { "number": 1, "title": "Episodio 1 - Partida", "embed": "<iframe src='https://hqq.ac/e/NnphT09HVmF4M1JNZlZrYWdadlowQT09' allowfullscreen></iframe>" },
+    { "number": 2, "title": "Episodio 2 - Gremio", "embed": "<iframe src='https://hqq.ac/e/UElKT01SQkxmeWgrcTZmUS9uSm5yUT09' allowfullscreen></iframe>" },
+    { "number": 3, "title": "Episodio 3 - Mi canción", "embed": "<iframe src='https://hqq.ac/e/RGIrbWRMbldzY0dBZUEwY2Z4TlBUZz09' allowfullscreen></iframe>" },
+    { "number": 4, "title": "Episodio 4 - Día de juego", "embed": "<iframe src='https://hqq.ac/e/NXZvbDJpMFY0b2hKVjNmMTB1TXdqQT09' allowfullscreen></iframe>" },
+    { "number": 5, "title": "Episodio 5 - Favorito", "embed": "<iframe src='https://hqq.ac/e/SmxyWnJMTmlnY2tkcWlaMGwrL0hIdz09' allowfullscreen></iframe>" },
+    { "number": 6, "title": "Episodio 6 - Familia", "embed": "<iframe src='https://hqq.ac/e/SlE5U0lxdjFlalhwdnkwNlExYWQvZz09' allowfullscreen></iframe>" },
+    { "number": 7, "title": "Episodio 7 - Vivo", "embed": "<iframe src='https://hqq.ac/e/VEZiajBoQXh4eE85dXJkNExqcG1lQT09' allowfullscreen></iframe>" },
+    { "number": 8, "title": "Episodio 8 - Bailar", "embed": "<iframe src='https://hqq.ac/e/SlA5NDFSUWFYdGhkd0diRldWUnUxQT09' allowfullscreen></iframe>" },
+    { "number": 9, "title": "Episodio 9 - En tus recuerdos", "embed": "<iframe src='https://hqq.ac/e/VmxOS250RzNFaDhycHFrQUF3Vno4QT09' allowfullscreen></iframe>" },
+    { "number": 10, "title": "Episodio 10 - Despedida", "embed": "<iframe src='https://hqq.ac/e/TExjZ0FGK3RLL25oQTNiRERrejdCUT09' allowfullscreen></iframe>" },
+    { "number": 11, "title": "Episodio 11 - Cambio", "embed": "<iframe src='https://hqq.ac/e/TDFFRGpKbmpJVHJJdkJieDBZdnh3dz09' allowfullscreen></iframe>" },
+    { "number": 12, "title": "Episodio 12 - Golpes", "embed": "<iframe src='https://hqq.ac/e/L2JpS1ZidktIdkFWWS9ReFJCVFZEZz09' allowfullscreen></iframe>" },
+    { "number": 13, "title": "Episodio 13 - Escalera al cielo", "embed": "<iframe src='https://hqq.ac/e/NlVVdHNoZGljYzhWbGZKd0Z5TG56UT09' allowfullscreen></iframe>" },
+
+    { "number": 14, "title": "Especial 1 - Escalera al cielo (otra versión)", "embed": "<iframe src='https://hqq.ac/e/VWR1UUlyYXFIYldPSEw0VmJueXBrZz09' allowfullscreen></iframe>" },
+    { "number": 15, "title": "Especial 2 - Especial extra", "embed": "<iframe src='https://hqq.ac/e/aGU1SHZaV3BzRm5NSXZlSGJJMXQydz09' allowfullscreen></iframe>" },
+    { "number": 16, "title": "Epilogo - Another Epilogue", "embed": "<iframe src='https://hqq.ac/e/UlR2ZmxVTkFUUmc1Q1F2cUtYcHoyQT09' allowfullscreen></iframe>" }
+  ]
+},
+{ "Anime": "Gakkougurashi!",
+  "id": "gakkougurashi",
+  "name": "Gakkougurashi!",
+  "cover": "https://myanimelist.net/images/anime/1599/91546.jpg",
+  "genre": ["Horror", "Psicologico", "Recuentos de la vida"],
+  "rating": 8.0,
+  "opinion": [
+    "Esto parece tranquilo… demasiado tranquilo.",
+    "Algo no encaja aquí.",
+    "Esa ilusión… no puede durar.",
+    "No todos están enfrentando la realidad.",
+    "Esto es más oscuro de lo que aparenta."
+  ],
+  "dato": [
+    "Gakkougurashi! mezcla slice of life con horror psicológico.",
+    "El anime cambia completamente de tono después del primer episodio.",
+    "La historia trata sobre supervivencia en una escuela.",
+    "La percepción de la protagonista no siempre refleja la realidad.",
+    "Está basado en un manga bastante más oscuro."
+  ],
+  "episodes": [
+    { "number": 1, "title": "Episodio 1 - Comienzo", "embed": "<iframe src='https://hqq.ac/e/NStQd0JvTWZKaGpZZzFucnF0dU44UT09' allowfullscreen></iframe>" },
+    { "number": 2, "title": "Episodio 2 - Recuerdos", "embed": "<iframe src='https://hqq.ac/e/L2t6QjVXak1DZlN1TFJ1bG9UaWh2dz09' allowfullscreen></iframe>" },
+    { "number": 3, "title": "Episodio 3 - Rutina", "embed": "<iframe src='https://hqq.ac/e/YkhrNUhYZUo0dUNJeFcvM3V2dm03Zz09' allowfullscreen></iframe>" },
+    { "number": 4, "title": "Episodio 4 - Salida", "embed": "<iframe src='https://hqq.ac/e/akVCSUlKbXRMeFpsZzMxWFRxVDA4dz09' allowfullscreen></iframe>" },
+    { "number": 5, "title": "Episodio 5 - Esperanza", "embed": "<iframe src='https://hqq.ac/e/V3VvQ3BTYTBoMXJSKzBobGx4RFhOQT09' allowfullscreen></iframe>" },
+    { "number": 6, "title": "Episodio 6 - Refugio", "embed": "<iframe src='https://hqq.ac/e/aWxBaWd4V3J1K3dPYzUwOG1nWDZLdz09' allowfullscreen></iframe>" },
+    { "number": 7, "title": "Episodio 7 - Pasado", "embed": "<iframe src='https://hqq.ac/e/eVhud0FNMVRCdjhscjlCbEs0UElrdz09' allowfullscreen></iframe>" },
+    { "number": 8, "title": "Episodio 8 - Decisión", "embed": "<iframe src='https://hqq.ac/e/bk4zN3R6cStUaWg0VzdjNmEzNzJNQT09' allowfullscreen></iframe>" },
+    { "number": 9, "title": "Episodio 9 - Verdad", "embed": "<iframe src='https://hqq.ac/e/ZmlWSVp2RFRad1dQNWIyRWJHRXNXUT09' allowfullscreen></iframe>" },
+    { "number": 10, "title": "Episodio 10 - Colapso", "embed": "<iframe src='https://hqq.ac/e/QTRYSWFHVk1iRjhNcDVEZ2szK3VXdz09' allowfullscreen></iframe>" },
+    { "number": 11, "title": "Episodio 11 - Desesperación", "embed": "<iframe src='https://hqq.ac/e/a0xzejIwblpyMW02R1kvTmtwVDE1UT09' allowfullscreen></iframe>" },
+    { "number": 12, "title": "Episodio 12 - Fin del día", "embed": "<iframe src='https://hqq.ac/e/aUNjdWFZT3BpMStzUGp0QS9sZDdvZz09' allowfullscreen></iframe>" }
+  ]
+},
+{ "Anime": "Kono Subarashii Sekai ni Shukufuku wo!",
+  "id": "konosuba",
+  "name": "Kono Subarashii Sekai ni Shukufuku wo!",
+  "cover": "https://cdn.myanimelist.net/images/anime/8/77831.jpg",
+  "genre": ["Comedia", "Fantasia", "Aventura", "Isekai"],
+  "rating": 8.1,
+  "opinion": [
+    "Inútiles… todos.",
+    "Ese grupo no debería sobrevivir.",
+    "Demasiado caos para una misión simple.",
+    "Esa diosa… completamente incompetente.",
+    "No es eficiente… pero funciona, de alguna forma."
+  ],
+  "dato": [
+    "Konosuba es una parodia del género isekai.",
+    "Los personajes son conocidos por ser incompetentes pero carismáticos.",
+    "Aqua es una diosa, pero inútil en combate práctico.",
+    "Megumin solo puede usar una magia poderosa una vez al día.",
+    "Darkness tiene una personalidad… cuestionable."
+  ],
+  "episodes": [
+    { "number": 1, "title": "Episodio 1 - ¡Una bendición para este mundo maravilloso!", "embed": "<iframe src='https://hqq.ac/e/bXQvejIzRTk5QnphR0RndjFWTkt6dz09' allowfullscreen></iframe>" },
+    { "number": 2, "title": "Episodio 2 - ¡Una explosión para esta chunibyo!", "embed": "<iframe src='https://hqq.ac/e/U0RSeGdxN1F4VlRQNTArMTEycXRDdz09' allowfullscreen></iframe>" },
+    { "number": 3, "title": "Episodio 3 - ¡Una recompensa para esta chica excéntrica!", "embed": "<iframe src='https://hqq.ac/e/UTlQckloZjAzbFlMaTFLN3pTU3IzQT09' allowfullscreen></iframe>" },
+    { "number": 4, "title": "Episodio 4 - ¡Una explosión para este enemigo formidable!", "embed": "<iframe src='https://hqq.ac/e/V3d6OHQwUEpQb1diUUMrd01Jc2Zsdz09' allowfullscreen></iframe>" },
+    { "number": 5, "title": "Episodio 5 - ¡Un precio para esta espada maldita!", "embed": "<iframe src='https://hqq.ac/e/Ky9jSEZXb3dnTHJhb2xJTDhwcXIyZz09' allowfullscreen></iframe>" },
+    { "number": 6, "title": "Episodio 6 - ¡Un final para esta absurda batalla!", "embed": "<iframe src='https://hqq.ac/e/eVErR2xhcXJFR3l5RkZJUjZSN1RNdz09' allowfullscreen></iframe>" },
+    { "number": 7, "title": "Episodio 7 - ¡Un segundo amigo para este frío invierno!", "embed": "<iframe src='https://hqq.ac/e/SjhGckxqeTExeEtmTloydkhlVnJ5QT09' allowfullscreen></iframe>" },
+    { "number": 8, "title": "Episodio 8 - ¡Un servicio para este grupo inútil!", "embed": "<iframe src='https://hqq.ac/e/MUFmTURPcUcyb0RxdmhJRUJnWjR0dz09' allowfullscreen></iframe>" },
+    { "number": 9, "title": "Episodio 9 - ¡Una bendición para este nuevo comienzo!", "embed": "<iframe src='https://hqq.ac/e/UEJ2S09pVm1zTWFVN0hCTExSNEMvUT09' allowfullscreen></iframe>" },
+    { "number": 10, "title": "Episodio 10 - ¡Un cierre para esta aventura ridícula!", "embed": "<iframe src='https://hqq.ac/e/dEMrNWV4Y3J3M1hubjBwUkxOVmR5QT09' allowfullscreen></iframe>" },
+    { "number": 11, "title": "OVA - ¡Una bendición extra para este grupo!", "embed": "<iframe src='https://hqq.ac/e/bUwwOXFDUXluNE0vM3FqNUZ4NmxBUT09' allowfullscreen></iframe>" }
+  ]
+},
+{ "Anime": "No Game No Life",
+  "id": "no-game-no-life",
+  "name": "No Game No Life",
+  "cover": "https://cdn.myanimelist.net/images/anime/1074/111944.jpg",
+  "genre": ["Fantasia", "Juegos", "Estrategia", "Comedia"],
+  "rating": 8.3,
+  "opinion": [
+    "Todo es un juego… reglas simples, consecuencias complejas.",
+    "Esos dos… no pierden. Sospechoso.",
+    "Demasiada confianza, pero respaldada.",
+    "La lógica aquí lo es todo.",
+    "Si fallan, no habrá segunda oportunidad."
+  ],
+  "dato": [
+    "En este mundo todo se decide mediante juegos.",
+    "Sora y Shiro son conocidos como 'Blank', jugadores invencibles.",
+    "Hay 16 razas inteligentes llamadas Exceed.",
+    "Las reglas del mundo prohíben la violencia directa.",
+    "Cada partida tiene consecuencias absolutas."
+  ],
+  "episodes": [
+    { "number": 1, "title": "Episodio 1 - Principiante", "embed": "<iframe src='https://hqq.ac/e/Z21kQzMwZFdvN0RtYm1UNytSMC9SUT09' allowfullscreen></iframe>" },
+    { "number": 2, "title": "Episodio 2 - Retador", "embed": "<iframe src='https://hqq.ac/e/SEZDdEt3Rmh6S0xqU0krVnYzUk5pZz09' allowfullscreen></iframe>" },
+    { "number": 3, "title": "Episodio 3 - Experto", "embed": "<iframe src='https://hqq.ac/e/ekswTzhzejF5SVdPNUhmS2Ryd2RqUT09' allowfullscreen></iframe>" },
+    { "number": 4, "title": "Episodio 4 - Gran maestro", "embed": "<iframe src='https://hqq.ac/e/YWpPVXZZbDNPVFcremFoZTBTdEg4Zz09' allowfullscreen></iframe>" },
+    { "number": 5, "title": "Episodio 5 - Débil", "embed": "<iframe src='https://hqq.ac/e/VVJTaEdha1pIWFoyOW5JWnArQjRwQT09' allowfullscreen></iframe>" },
+    { "number": 6, "title": "Episodio 6 - Interesante", "embed": "<iframe src='https://hqq.ac/e/OFpRYm1NSU9nQWgwNlB4YmpSR2lqZz09' allowfullscreen></iframe>" },
+    { "number": 7, "title": "Episodio 7 - Sacrificio", "embed": "<iframe src='https://hqq.ac/e/Um8zTWNHZ3ZzTTdKbGROdVBUNVlxQT09' allowfullscreen></iframe>" },
+    { "number": 8, "title": "Episodio 8 - Falso final", "embed": "<iframe src='https://hqq.ac/e/S1UvNUdySytuakZRcGl2VHgzZWhHdz09' allowfullscreen></iframe>" },
+    { "number": 9, "title": "Episodio 9 - Cielo azul", "embed": "<iframe src='https://hqq.ac/e/RkwrdjFJaXV2K3pjb3VkSlA3dXVGQT09' allowfullscreen></iframe>" },
+    { "number": 10, "title": "Episodio 10 - Línea roja", "embed": "<iframe src='https://hqq.ac/e/bTEvTnZhTlM4Mnh6QVVLSytpL2dIdz09' allowfullscreen></iframe>" },
+    { "number": 11, "title": "Episodio 11 - Matar", "embed": "<iframe src='https://hqq.ac/e/bmwyT2tmdW5taVdFMEdoMzRncVFLZz09' allowfullscreen></iframe>" },
+    { "number": 12, "title": "Episodio 12 - Regla número 10", "embed": "<iframe src='https://hqq.ac/e/ZDF0ZSt4QU9XQVFld1dMTFB4YmRodz09' allowfullscreen></iframe>" },
+
+    { "number": 13, "title": "Especial 1 - Comedia 1", "embed": "<iframe src='https://hqq.ac/e/a0crRWxrVGpzRkU1cXZabzhHUXJBUT09' allowfullscreen></iframe>" },
+    { "number": 14, "title": "Especial 2 - Comedia 2", "embed": "<iframe src='https://hqq.ac/e/dzBYWnRlZWdLQzhHeWQzdXllR3Nhdz09' allowfullscreen></iframe>" },
+    { "number": 15, "title": "Especial 3 - Comedia 3", "embed": "<iframe src='https://hqq.ac/e/dkRpRU0ybzJjTGU1bTlGVDFhbFE4QT09' allowfullscreen></iframe>" },
+    { "number": 16, "title": "Especial 4 - Comedia 4", "embed": "<iframe src='https://hqq.ac/e/TnlFNUczT3hhdGdoTDlaRHVsbGZhZz09' allowfullscreen></iframe>" },
+    { "number": 17, "title": "Especial 5 - Comedia 5", "embed": "<iframe src='https://hqq.ac/e/dXlid0xrdHM3Y1FGeHQ4dE5WRTY2QT09' allowfullscreen></iframe>" },
+    { "number": 18, "title": "Especial 6 - Comedia 6", "embed": "<iframe src='https://hqq.ac/e/bFlDeTJEY0NCZVkwSmgreWtUakR5QT09' allowfullscreen></iframe>" }
+  ]
+},
+{ "Anime": "Shigatsu wa Kimi no Uso",
+  "id": "shigatsu-wa-kimi-no-uso",
+  "name": "Shigatsu wa Kimi no Uso",
+  "cover": "https://cdn.myanimelist.net/images/anime/3/67177.jpg",
+  "genre": ["Drama", "Romance", "Musical", "Recuentos de la vida"],
+  "rating": 8.6,
+  "opinion": [
+    "La música… dice más que ellos.",
+    "Ese silencio no es vacío.",
+    "Demasiados sentimientos sin decir.",
+    "No todos pueden seguir adelante.",
+    "Esto no terminará bien…"
+  ],
+  "dato": [
+    "El anime gira en torno al piano y el violín.",
+    "Cada presentación refleja el estado emocional de los personajes.",
+    "La historia mezcla música clásica con drama personal.",
+    "El protagonista perdió la capacidad de escuchar el piano.",
+    "Es conocido por su fuerte impacto emocional."
+  ],
+  "episodes": [
+    { "number": 1, "title": "Episodio 1 - Monótono / Colorido", "embed": "<iframe src='https://hqq.ac/e/RW42L3ltWmhnTGJEdHVqSEhuc1JvUT09' allowfullscreen></iframe>" },
+    { "number": 2, "title": "Episodio 2 - Amigo A", "embed": "<iframe src='https://hqq.ac/e/Z1EyM1IwOGo0RFdGRHdpdlZ3VTRWQT09' allowfullscreen></iframe>" },
+    { "number": 3, "title": "Episodio 3 - Dentro de la primavera", "embed": "<iframe src='https://hqq.ac/e/Y3BHcHdJQWEya2ludzFabFE4dUFvZz09' allowfullscreen></iframe>" },
+    { "number": 4, "title": "Episodio 4 - El viaje", "embed": "<iframe src='https://hqq.ac/e/aHB5ZEVWanFxSnpxMG9VRjZIMFNXdz09' allowfullscreen></iframe>" },
+    { "number": 5, "title": "Episodio 5 - Nublado", "embed": "<iframe src='https://hqq.ac/e/eFpwTU8xNldtL3hMMGVMVEdCWndxdz09' allowfullscreen></iframe>" },
+    { "number": 6, "title": "Episodio 6 - Camino", "embed": "<iframe src='https://hqq.ac/e/d3FZQVNySzZQYUZNUFNhZ2Q1MkZZdz09' allowfullscreen></iframe>" },
+    { "number": 7, "title": "Episodio 7 - Sombras", "embed": "<iframe src='https://hqq.ac/e/WDUxa0lCQkFwWVVVTnA3cFlLck5Wdz09' allowfullscreen></iframe>" },
+    { "number": 8, "title": "Episodio 8 - Resonancia", "embed": "<iframe src='https://hqq.ac/e/Vnh0bFl1eHpiZVE4UzlVRGYvQWhFQT09' allowfullscreen></iframe>" },
+    { "number": 9, "title": "Episodio 9 - Repetición", "embed": "<iframe src='https://hqq.ac/e/c2g4cmY1L3RUQ2wvT3RtMWh0VnYxZz09' allowfullscreen></iframe>" },
+    { "number": 10, "title": "Episodio 10 - Amor", "embed": "<iframe src='https://hqq.ac/e/SFlwdnRWT1hmZk05RGVvbzFXYlJUUT09' allowfullscreen></iframe>" },
+    { "number": 11, "title": "Episodio 11 - Luz y oscuridad", "embed": "<iframe src='https://hqq.ac/e/VFdiZmtlbXhxV250THJWOUlLWXdQUT09' allowfullscreen></iframe>" },
+    { "number": 12, "title": "Episodio 12 - Amor y dolor", "embed": "<iframe src='https://hqq.ac/e/Zml6ZzRyK29DL2ROc2wwL3ViUVJpUT09' allowfullscreen></iframe>" },
+    { "number": 13, "title": "Episodio 13 - Amor y despedida", "embed": "<iframe src='https://hqq.ac/e/anFMSjF5Q1doc25QVXJUVDNvUGgxZz09' allowfullscreen></iframe>" },
+    { "number": 14, "title": "Episodio 14 - Pasado", "embed": "<iframe src='https://hqq.ac/e/MVlBa2txOGU4amhsajRsK0VZNEtkQT09' allowfullscreen></iframe>" },
+    { "number": 15, "title": "Episodio 15 - Mentira", "embed": "<iframe src='https://hqq.ac/e/TW1qT1Z2TTlSVzhyVVJxQ04xRzFXQT09' allowfullscreen></iframe>" },
+    { "number": 16, "title": "Episodio 16 - Dos personas", "embed": "<iframe src='https://hqq.ac/e/MVhLODd4VktEL1JVQnIvUnNid1FBUT09' allowfullscreen></iframe>" },
+    { "number": 17, "title": "Episodio 17 - Crecimiento", "embed": "<iframe src='https://hqq.ac/e/a3Nja0tsVmtjaVFKTFpQMzR5US9TZz09' allowfullscreen></iframe>" },
+    { "number": 18, "title": "Episodio 18 - Corazón", "embed": "<iframe src='https://hqq.ac/e/cnVhU3k2eUdrMTFMZFladm13UEJWUT09' allowfullscreen></iframe>" },
+    { "number": 19, "title": "Episodio 19 - Decisión", "embed": "<iframe src='https://hqq.ac/e/VVYrKzUxaFF1Vis0WDM1RDZLUXhkUT09' allowfullscreen></iframe>" },
+    { "number": 20, "title": "Episodio 20 - Adiós", "embed": "<iframe src='https://hqq.ac/e/WWdWUktSYmVhTGUrU21ybzJMVS8xZz09' allowfullscreen></iframe>" },
+    { "number": 21, "title": "Episodio 21 - Última presentación", "embed": "<iframe src='https://hqq.ac/e/YWVEUmdhYkVaQWtwd3JFVzV6RHRkUT09' allowfullscreen></iframe>" },
+    { "number": 22, "title": "Episodio 22 - Primavera", "embed": "<iframe src='https://hqq.ac/e/NVdMM09yZjlXQVV5dWJnMVFPcmlaZz09' allowfullscreen></iframe>" },
+
+    { "number": 23, "title": "OVA - Momentos especiales", "embed": "<iframe src='https://hqq.ac/e/Y2Qzd0lYMXJjekJwYmZLQkVMNzlNUT09' allowfullscreen></iframe>" }
   ]
 }
 ]
