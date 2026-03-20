@@ -680,5 +680,41 @@
 
     { "number": 23, "title": "OVA - Momentos especiales", "embed": "<iframe src='https://hqq.ac/e/Y2Qzd0lYMXJjekJwYmZLQkVMNzlNUT09' allowfullscreen></iframe>" }
   ]
+},
+{ "Anime": "Yofukashi no Uta",
+  "id": "yofukashi-no-uta",
+  "name": "Yofukashi no Uta",
+  "cover": "https://cdn.myanimelist.net/images/anime/1184/125420.jpg",
+  "genre": ["Romance", "Sobrenatural", "Recuentos de la vida"],
+  "rating": 8.2,
+  "opinion": [
+    "La noche cambia a las personas.",
+    "Ese chico… está buscando algo.",
+    "No es solo libertad… es escape.",
+    "Los vampiros no son el problema.",
+    "Esto es más tranquilo de lo que parece… pero no es seguro."
+  ],
+  "dato": [
+    "El anime gira en torno a la vida nocturna.",
+    "Está inspirado en la canción 'Yofukashi no Uta' de Creepy Nuts.",
+    "El protagonista quiere convertirse en vampiro.",
+    "Explora temas de libertad, insomnio y adolescencia.",
+    "Tiene un estilo visual muy marcado con luces nocturnas."
+  ],
+  "episodes": [
+    { "number": 1, "title": "Episodio 1 - Noche", "embed": "<iframe src='https://hqq.ac/e/YmEreGp0N05NVjFhclZ1SDl2eXRCdz09' allowfullscreen></iframe>" },
+    { "number": 2, "title": "Episodio 2 - Salida nocturna", "embed": "<iframe src='https://hqq.ac/e/cURJQVZkd2FlS2o5ZjgzRERrY0x3Zz09' allowfullscreen></iframe>" },
+    { "number": 3, "title": "Episodio 3 - Primer encuentro", "embed": "<iframe src='https://hqq.ac/e/YmNlZzZVK1prM3YyaEdvOWU4QXFKdz09' allowfullscreen></iframe>" },
+    { "number": 4, "title": "Episodio 4 - Vampiro", "embed": "<iframe src='https://hqq.ac/e/UTkwTjdHa0M5MHlrWHlGNzZLZU5PZz09' allowfullscreen></iframe>" },
+    { "number": 5, "title": "Episodio 5 - Relación", "embed": "<iframe src='https://hqq.ac/e/VjlROUlzYjRmNGR4TDFiTHFtcWRqQT09' allowfullscreen></iframe>" },
+    { "number": 6, "title": "Episodio 6 - Sentimientos", "embed": "<iframe src='https://hqq.ac/e/ZDZDclVicWEzQjJjMStUVFppT0NyQT09' allowfullscreen></iframe>" },
+    { "number": 7, "title": "Episodio 7 - Cambio", "embed": "<iframe src='https://hqq.ac/e/TFlhZFBhRXVkbFRRekd3NmdjbVNIUT09' allowfullscreen></iframe>" },
+    { "number": 8, "title": "Episodio 8 - Deseo", "embed": "<iframe src='https://hqq.ac/e/aFBZczBqbnhlcHY5OVBjZUtIQTRkZz09' allowfullscreen></iframe>" },
+    { "number": 9, "title": "Episodio 9 - Decisión", "embed": "<iframe src='https://hqq.ac/e/VWoyamNYT3VTM3N5V2dHL1g4TjZMQT09' allowfullscreen></iframe>" },
+    { "number": 10, "title": "Episodio 10 - Noche profunda", "embed": "<iframe src='https://hqq.ac/e/YXkrQVRLVEJXZTZwSWVrNTczazh2dz09' allowfullscreen></iframe>" },
+    { "number": 11, "title": "Episodio 11 - Conflicto", "embed": "<iframe src='https://hqq.ac/e/VzZJTUV6NWVrc0EvYzlnWDBoQnJaQT09' allowfullscreen></iframe>" },
+    { "number": 12, "title": "Episodio 12 - Elección", "embed": "<iframe src='https://hqq.ac/e/NkM1d3VGR3ovTUxySUI1UXBNZGxQUT09' allowfullscreen></iframe>" },
+    { "number": 13, "title": "Episodio 13 - Noche eterna", "embed": "<iframe src='https://hqq.ac/e/OHAwa3J6eFd2Z2c0VVhwM1VtckdHdz09' allowfullscreen></iframe>" }
+  ]
 }
 ]
