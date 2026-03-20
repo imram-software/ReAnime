@@ -448,5 +448,40 @@
 { "number": 23, "title": "Episodio 23 - Batalla final", "embed": "<iframe src='https://hqq.ac/e/MVNIZTQzVUR5NWtwMlZkeklQL2NEdz09' allowfullscreen></iframe>" },
 { "number": 24, "title": "Episodio 24 - Ragna Crimson", "embed": "<iframe src='https://hqq.ac/e/dHlWTDlCa1dreWxsay9CTGtHWnh6Zz09' allowfullscreen></iframe>" }
 ]
+},
+{
+  "id": "bocchi-the-rock",
+  "name": "Bocchi the Rock!",
+  "cover": "https://cdn.myanimelist.net/images/anime/1448/127956.jpg",
+  "genre": ["Comedia", "Musical", "Recuentos de la vida"],
+  "rating": 8.8,
+  "opinion": [
+    "Demasiada ansiedad social… pero curiosamente entretenido.",
+    "Esa chica necesita ayuda… o una banda.",
+    "No es fuerte, pero sigue adelante. Interesante.",
+    "Es caótico… pero funciona.",
+    "No lo admitiré, pero tiene encanto."
+  ],
+  "dato": [
+    "Bocchi the Rock! se volvió viral por sus animaciones creativas.",
+    "La banda Kessoku Band tiene canciones reales publicadas.",
+    "El anime mezcla estilos de animación para representar la ansiedad.",
+    "El estudio CloverWorks hizo este anime.",
+    "La protagonista practica guitarra desde sola antes de unirse a la banda."
+  ],
+  "episodes": [
+    { "number": 1, "title": "Episodio 1 - Bocchi the Rock!", "embed": "<iframe src='https://hqq.ac/e/WTg0ZGVxMFhOenppUzNDUEI0ZmgvQT09' allowfullscreen></iframe>" },
+    { "number": 2, "title": "Episodio 2 - Nos vemos mañana", "embed": "<iframe src='https://hqq.ac/e/R3p4RVdacENEVnFjMVdBYWdvemhvUT09' allowfullscreen></iframe>" },
+    { "number": 3, "title": "Episodio 3 - Velocidad 8", "embed": "<iframe src='https://hqq.ac/e/MmxQL3ZUTUFqRFJ3ald5NEUyekFqZz09' allowfullscreen></iframe>" },
+    { "number": 4, "title": "Episodio 4 - Salto de banda", "embed": "<iframe src='https://hqq.ac/e/MUZSMjVkTmMrSzdRbWh0UW5WaGlGUT09' allowfullscreen></iframe>" },
+    { "number": 5, "title": "Episodio 5 - Volar", "embed": "<iframe src='https://hqq.ac/e/a25lMnFTTE9oYThWT21HQmN0QUI1UT09' allowfullscreen></iframe>" },
+    { "number": 6, "title": "Episodio 6 - Ocho vistas", "embed": "<iframe src='https://hqq.ac/e/bE84Vzl0KzFhb3Ntd1JLNzRnU2hsUT09' allowfullscreen></iframe>" },
+    { "number": 7, "title": "Episodio 7 - A ti", "embed": "<iframe src='https://hqq.ac/e/MXFubkwwVStOM1k1Rjk4RkM2bkpjZz09' allowfullscreen></iframe>" },
+    { "number": 8, "title": "Episodio 8 - La banda", "embed": "<iframe src='https://hqq.ac/e/ekM3bFIzUW1RRmVxT2orMVpJTExwdz09' allowfullscreen></iframe>" },
+    { "number": 9, "title": "Episodio 9 - Enoshima", "embed": "<iframe src='https://hqq.ac/e/NFE5T3JnYnA0cDNubit1UUR3MkxDdz09' allowfullscreen></iframe>" },
+    { "number": 10, "title": "Episodio 10 - Después del concierto", "embed": "<iframe src='https://hqq.ac/e/STdKZVBPbUV2MVp4VDA3WnVpM3UrQT09' allowfullscreen></iframe>" },
+    { "number": 11, "title": "Episodio 11 - Duodécimo movimiento", "embed": "<iframe src='https://hqq.ac/e/REtNTHBPQTRid2c5dEZtS0MrTkQzZz09' allowfullscreen></iframe>" },
+    { "number": 12, "title": "Episodio 12 - Bocchi the Rock!", "embed": "<iframe src='https://hqq.ac/e/cGhQemRUanArdkU3aXVReUJYRTZuUT09' allowfullscreen></iframe>" }
+  ]
 }
 ]
