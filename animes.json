@@ -1966,5 +1966,94 @@
       "embed": "<iframe src='https://hqq.ac/e/a2Mvck52T0k5MFJrOXlwUmw1MVFuQT09' allowfullscreen></iframe>"
     }
   ]
+  },
+  { "Anime": "Gakusen Toshi Asterisk",
+  "id": "gakusen-toshi-asterisk",
+  "name": "Gakusen Toshi Asterisk",
+  "cover": "https://cdn.myanimelist.net/images/anime/5/76090.jpg",
+  "genre": ["Accion", "Escolar", "Ciencia Ficcion", "Fantasia"],
+
+  "opinion": [
+    "Demasiados estudiantes… muy poco control.",
+    "El sistema es inestable, pero lo aceptan igual.",
+    "Confían demasiado en la fuerza.",
+    "Al menos algunos entienden lo que está en juego.",
+    "No es eficiente… pero funciona."
+  ],
+
+  "dato": [
+    "Se desarrolla en una ciudad académica con combates entre estudiantes.",
+    "Los estudiantes poseen habilidades especiales llamadas Genestella.",
+    "El torneo Festas es el eje principal de la historia.",
+    "Está basado en una novela ligera.",
+    "Combina acción con elementos escolares y romance."
+  ],
+
+  "year": 2015,
+  "rating": 7.2,
+  "description": "En una academia donde estudiantes con habilidades especiales compiten en torneos, un nuevo alumno se ve envuelto en conflictos, alianzas y combates que determinan el destino de la ciudad.",
+
+  "episodes": [
+    {
+      "number": 1,
+      "title": "Encuentro en la academia",
+      "embed": "<iframe src='https://hqq.ac/e/SlB1ZFA0YWlZMUlIRDR5cGUzVzB2dz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 2,
+      "title": "La bruja resplandeciente",
+      "embed": "<iframe src='https://hqq.ac/e/a1ZpTzJ3WkFPSUxCVXFlWCswTVd3QT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 3,
+      "title": "La princesa de la espada",
+      "embed": "<iframe src='https://hqq.ac/e/aDZBaWh0VjNRMVFTQUlLUDRWVEdRZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 4,
+      "title": "La academia Seidoukan",
+      "embed": "<iframe src='https://hqq.ac/e/SGNrZDAzTnFkcUF4UUpCbWhzZjBXUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 5,
+      "title": "La lucha comienza",
+      "embed": "<iframe src='https://hqq.ac/e/cTF6ZzcyK0k1OFBFQUhheWZHWjZ6dz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 6,
+      "title": "El torneo Festa",
+      "embed": "<iframe src='https://hqq.ac/e/RUhyMTVubU1RS01ESXZGM3BCYWI4QT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 7,
+      "title": "Batalla en equipo",
+      "embed": "<iframe src='https://hqq.ac/e/VFh2RjJkUTJLQmh6WGQ3RUdKR3B0QT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 8,
+      "title": "Estrategia y combate",
+      "embed": "<iframe src='https://hqq.ac/e/b2cxTkN4UElXYjZwQUJiNHF6VUdXdz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 9,
+      "title": "Choque de voluntades",
+      "embed": "<iframe src='https://hqq.ac/e/bWRVTlJrUnptNXltN0hrcjRJbXRCZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 10,
+      "title": "Determinación",
+      "embed": "<iframe src='https://hqq.ac/e/R0Z1QlZDRkYwSlZaTkxEaFdGSm9hdz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 11,
+      "title": "Duelo decisivo",
+      "embed": "<iframe src='https://hqq.ac/e/Q2Fnays5ZDhwYTJQVXdZVFIyaVRxUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 12,
+      "title": "Más allá de la victoria",
+      "embed": "<iframe src='https://hqq.ac/e/MXpINStIT0JKT0JQam5zMFJyb2ZVdz09' allowfullscreen></iframe>"
+    }
+  ]
   }
 ]
