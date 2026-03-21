@@ -1557,7 +1557,7 @@
   { "Anime": "Kekkai Sensen & Beyond",
   "id": "kekkai-sensen-beyond",
   "name": "Kekkai Sensen & Beyond",
-  "cover": "https://cdn.myanimelist.net/images/anime/1/87330.jpg",
+  "cover": "https://myanimelist.net/images/anime/3/88282.jpg",
   "genre": ["Accion", "Sobrenatural", "Comedia"],
 
   "opinion": [
@@ -1640,6 +1640,330 @@
       "number": 12,
       "title": "Más allá de todo",
       "embed": "<iframe src='https://hqq.ac/e/T1JINTdBakFieE5LU0t1ZEhxM1JMZz09' allowfullscreen></iframe>"
+    }
+  ]
+  },
+  { "Anime": "Sekai Saikou no Ansatsusha, Isekai Kizoku ni Tensei suru",
+  "id": "sekai-saikou-no-ansatsusha-isekai-kizoku-ni-tensei-suru",
+  "name": "Sekai Saikou no Ansatsusha, Isekai Kizoku ni Tensei suru",
+  "cover": "https://myanimelist.net/images/anime/1928/117620.jpg",
+  "genre": ["Isekai", "Accion", "Fantasia"],
+
+  "opinion": [
+    "Reencarnar… solo para seguir matando.",
+    "Al menos esta vez lo hace con propósito.",
+    "Es eficiente. Nada más.",
+    "No desperdicia movimientos innecesarios.",
+    "Un asesino sigue siendo un asesino."
+  ],
+
+  "dato": [
+    "El protagonista era el mejor asesino del mundo antes de reencarnar.",
+    "Su misión es matar a un héroe que destruirá el mundo.",
+    "Combina tácticas modernas con magia.",
+    "Está basado en una novela ligera.",
+    "El enfoque es más estratégico que emocional."
+  ],
+
+  "year": 2021,
+  "rating": 7.6,
+  "description": "El mejor asesino del mundo es traicionado y reencarna en un mundo de fantasía como heredero de una familia noble de asesinos, con la misión de eliminar a un héroe destinado a destruir el mundo.",
+
+  "episodes": [
+    {
+      "number": 1,
+      "title": "Cantidad de asesinato",
+      "embed": "<iframe src='https://hqq.ac/e/NkVMbGh4OWZCdlVjc1Y0aVZzUGgwUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 2,
+      "title": "Acuerdo de reencarnación",
+      "embed": "<iframe src='https://hqq.ac/e/eUI3cUJRUjNpaEhuVHJVZnk0TXUzdz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 3,
+      "title": "Planificación de asesinato",
+      "embed": "<iframe src='https://hqq.ac/e/enlxdG5Sc09pZGRvbnZEV3IyVVlLQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 4,
+      "title": "Operación de asesinato",
+      "embed": "<iframe src='https://hqq.ac/e/S2M5V0NPb2QrQjFYU1ZhR2EzcSs0QT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 5,
+      "title": "Calificaciones de asesinato",
+      "embed": "<iframe src='https://hqq.ac/e/TklCMW9DK3NGL3Z1cHZaUTVyRTlWZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 6,
+      "title": "Maestra de asesinato",
+      "embed": "<iframe src='https://hqq.ac/e/c0Jyc0pEUlhKTCs1cW1ZdWNkN0ZXZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 7,
+      "title": "Vida de asesinato",
+      "embed": "<iframe src='https://hqq.ac/e/ZFo4K1A0eVhOU25BMjdOb2JPWndOQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 8,
+      "title": "Selección de asesinato",
+      "embed": "<iframe src='https://hqq.ac/e/UHM2bXJHYVlzMXVjdUhiMzZmQWFRQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 9,
+      "title": "Compensación de asesinato",
+      "embed": "<iframe src='https://hqq.ac/e/THZvV0VGazhUVWNtNjlLUHhBWUNRdz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 10,
+      "title": "Primer asesinato",
+      "embed": "<iframe src='https://hqq.ac/e/ZUdKbFNPY0FTWDVCUmRZQ21DV3dXUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 11,
+      "title": "Misión de asesinato",
+      "embed": "<iframe src='https://hqq.ac/e/d0txYUhnUEt1UzZ2WjdJVTRzNjlLQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 12,
+      "title": "Resultado de asesinato",
+      "embed": "<iframe src='https://hqq.ac/e/M0RsTzZLRWl2QWdIeEIzc3pibEs4UT09' allowfullscreen></iframe>"
+    }
+  ]
+  },
+  { "Anime": "Charlotte",
+  "id": "charlotte",
+  "name": "Charlotte",
+  "cover": "https://cdn.myanimelist.net/images/anime/12/74683.jpg",
+  "genre": ["Drama", "Sobrenatural", "Escolar"],
+
+  "opinion": [
+    "Poderes… usados de forma mediocre.",
+    "Al menos aprende cuando ya es demasiado tarde.",
+    "Las consecuencias llegan, aunque intente evitarlas.",
+    "No todos pueden soportar lo que conlleva el poder.",
+    "Es más frágil de lo que aparenta."
+  ],
+
+  "dato": [
+    "Los poderes son temporales y desaparecen al crecer.",
+    "Cada habilidad tiene limitaciones específicas.",
+    "La historia cambia de tono a mitad de la serie.",
+    "Fue creada por Jun Maeda (Clannad, Angel Beats).",
+    "Explora el costo real de usar habilidades sobrenaturales."
+  ],
+
+  "year": 2015,
+  "rating": 8.0,
+  "description": "Un grupo de adolescentes con habilidades especiales enfrenta las consecuencias de sus poderes en un mundo donde estos no son una bendición, sino una carga.",
+
+  "episodes": [
+    {
+      "number": 1,
+      "title": "Creo que otros están pensando en cosas que no entiendo",
+      "embed": "<iframe src='https://hqq.ac/e/djB5YUVvUWpjMHlvNUZ3UG9sM3Fodz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 2,
+      "title": "La melodía de la desesperación",
+      "embed": "<iframe src='https://hqq.ac/e/azF1NzdHWU5majQxQnR0ZmRFdnI1UT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 3,
+      "title": "Amor y llamas",
+      "embed": "<iframe src='https://hqq.ac/e/dnVWRjlZZHM0OW54MXc3eFd0N3JoUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 4,
+      "title": "Momento de seriedad",
+      "embed": "<iframe src='https://hqq.ac/e/eW5XcWU5bktvSGxyRVVNOGR0M2JlUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 5,
+      "title": "El sonido que escuché",
+      "embed": "<iframe src='https://hqq.ac/e/cTRHc3BMd1Y3U0UrbTVSWmZSSWJaQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 6,
+      "title": "Días felices",
+      "embed": "<iframe src='https://hqq.ac/e/SEpvQ21BK29WZ3lic1FsQmlrQXkzdz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 7,
+      "title": "El fin del escape",
+      "embed": "<iframe src='https://hqq.ac/e/OEZMajR0N0ZLUGNFamxnSDlBbzBRQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 8,
+      "title": "Encuentro",
+      "embed": "<iframe src='https://hqq.ac/e/NklNbW9OMklXN2pyNldzOGZQR3BQZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 9,
+      "title": "El mundo que no sabías",
+      "embed": "<iframe src='https://hqq.ac/e/bDdnL0dMc3F2bHBreE9QQUZxVVZrZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 10,
+      "title": "Saquear",
+      "embed": "<iframe src='https://hqq.ac/e/SXAzQ3FidzR6NDg3bnpXZTVPS2RBZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 11,
+      "title": "Charlotte",
+      "embed": "<iframe src='https://hqq.ac/e/dlR3MFBtc2U3Rk1vdEw0UFd5OU90UT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 12,
+      "title": "Promesa",
+      "embed": "<iframe src='https://hqq.ac/e/ZElpWWFqbFViRnhUSVI3STVlQ1QyQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 13,
+      "title": "Recuerdos por venir",
+      "embed": "<iframe src='https://hqq.ac/e/c3NOcmtrbnRWTGFVRnJmY0lyYTY5QT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 14,
+      "title": "Especial: Fuerte voluntad (OVA)",
+      "embed": "<iframe src='https://hqq.ac/e/cEY1SGduS2s4Y2ZvRUx0ZXZJMnQ0Zz09' allowfullscreen></iframe>"
+    }
+  ]
+  },
+  { "Anime": "Chuunibyou demo Koi ga Shitai!",
+  "id": "chuunibyou-demo-koi-ga-shitai",
+  "name": "Chuunibyou demo Koi ga Shitai!",
+  "cover": "https://myanimelist.net/images/anime/1905/142840.jpg",
+  "genre": ["Romance", "Comedia", "Escolar"],
+
+  "opinion": [
+    "Vergonzoso… pero honesto.",
+    "Prefieren fantasías antes que enfrentar la realidad.",
+    "Aun así, no es algo que deba negarse completamente.",
+    "Es infantil… pero genuino.",
+    "Algunos necesitan eso para seguir adelante."
+  ],
+
+  "dato": [
+    "Chuunibyou se refiere a delirios de grandeza en adolescentes.",
+    "El anime fue producido por Kyoto Animation.",
+    "Combina comedia con desarrollo emocional real.",
+    "Rikka es uno de los personajes más icónicos del género.",
+    "Tiene múltiples especiales y contenido adicional."
+  ],
+
+  "year": 2012,
+  "rating": 8.2,
+  "description": "Un estudiante que intenta dejar atrás su pasado vergonzoso conoce a una chica que aún vive en su fantasía chuunibyou, lo que desencadena una relación entre lo absurdo y lo emocional.",
+
+  "episodes": [
+    {
+      "number": 1,
+      "title": "Encuentro con… el ojo malvado",
+      "embed": "<iframe src='https://hqq.ac/e/TG5HYXF5VkJuTUtERkdqVyt0K3Vkdz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 2,
+      "title": "Sacerdotisa… del hechizo prohibido",
+      "embed": "<iframe src='https://hqq.ac/e/UHQ3SWpZeVhobWoxc01zUU4wZi81Zz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 3,
+      "title": "La hereje… del ojo malvado",
+      "embed": "<iframe src='https://hqq.ac/e/YXRtaUlEa1ZoNDg5ekx2dXYwTTZLZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 4,
+      "title": "El contrato… del caos",
+      "embed": "<iframe src='https://hqq.ac/e/Rk1wZHRQZ1RCKzE4RkppRVlsTWllQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 5,
+      "title": "La canción… de la culpa",
+      "embed": "<iframe src='https://hqq.ac/e/RGI3OVZ1cVl3UGZqWU93dE85czNkZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 6,
+      "title": "La redención… del pasado",
+      "embed": "<iframe src='https://hqq.ac/e/RzdFZm5VY1FRcnVqd1pJaHYvTTArZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 7,
+      "title": "La verdad… del ojo malvado",
+      "embed": "<iframe src='https://hqq.ac/e/SlJuOHZIQnN3bkd4M09ud1I1djVCUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 8,
+      "title": "La realidad… que no quiere ver",
+      "embed": "<iframe src='https://hqq.ac/e/ejZvV29UYTRlRHpHMS82b0hxdEt1UT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 9,
+      "title": "El conflicto… interno",
+      "embed": "<iframe src='https://hqq.ac/e/a2RHM1RIUU9vaUQ1aE9IR09vd0dIUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 10,
+      "title": "El colapso… de la ilusión",
+      "embed": "<iframe src='https://hqq.ac/e/QVNDNU5WNTNtRWNUMGNZOWxlQmZwZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 11,
+      "title": "El final… de la fantasía",
+      "embed": "<iframe src='https://hqq.ac/e/OXl5NHgycWFtbUpIRGZTcUIva3QxQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 12,
+      "title": "Incluso así… el amor continúa",
+      "embed": "<iframe src='https://hqq.ac/e/MENKT3QxNFpDQWg2WGZKVE80UzF3UT09' allowfullscreen></iframe>"
+    },
+
+    {
+      "number": 13,
+      "title": "Especial 1: Descanso del ojo malvado",
+      "embed": "<iframe src='https://hqq.ac/e/WllmZHZWUDBIV3Z0SE95UUlqdDZFUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 14,
+      "title": "Especial 2: Caos cotidiano",
+      "embed": "<iframe src='https://hqq.ac/e/UjUrMWtaZzlnQUFoVm5yeCtwSktUdz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 15,
+      "title": "Especial 3: Fantasías descontroladas",
+      "embed": "<iframe src='https://hqq.ac/e/N2V6WDFPaGNkRnVYQWdpMjhzTzdwQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 16,
+      "title": "Especial 4: Día absurdo",
+      "embed": "<iframe src='https://hqq.ac/e/ZVZ2NmJNV21GSkFVQXhTQzl6eWNXdz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 17,
+      "title": "Especial 5: Más allá de la fantasía",
+      "embed": "<iframe src='https://hqq.ac/e/RGZyTDZXa0R0VURPUmJkdFJKUHFDUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 18,
+      "title": "Especial 6: Ilusión continua",
+      "embed": "<iframe src='https://hqq.ac/e/cG41ZnFhY3hOMzJVQ2ZPMU5JaEhXZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 19,
+      "title": "Especial 7: Mundo chuunibyou",
+      "embed": "<iframe src='https://hqq.ac/e/TVNuQmZNY3pZNjhNekN0R1NMaS9yZz09' allowfullscreen></iframe>"
+    },
+
+    {
+      "number": 20,
+      "title": "OVA: Viaje… del ojo malvado",
+      "embed": "<iframe src='https://hqq.ac/e/ampzL2VlQS9xKzUxck9MbnJqdS9kQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 21,
+      "title": "Lite: Cortos chuunibyou",
+      "embed": "<iframe src='https://hqq.ac/e/a2Mvck52T0k5MFJrOXlwUmw1MVFuQT09' allowfullscreen></iframe>"
     }
   ]
   }
