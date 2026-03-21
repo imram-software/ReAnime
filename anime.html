@@ -401,16 +401,6 @@
               ${(anime.genre||[]).map(g => `<span class="genre-tag">${g}</span>`).join('')}
             </div>
             <p class="anime-description">${anime.description || ''}</p>
-            ${anime.opinion?.length ? `
-            <div class="extra-block opinion" style="margin-top:1rem;">
-              <div class="extra-block-title">🌸 Opinión de Ram</div>
-              ${anime.opinion.map(o=>`<div class="extra-quote">${o}</div>`).join('')}
-            </div>` : ''}
-            ${anime.dato?.length ? `
-            <div class="extra-block dato" style="margin-top:.8rem;">
-              <div class="extra-block-title">✦ Datos del anime</div>
-              ${anime.dato.map(d=>`<div class="extra-quote">${d}</div>`).join('')}
-            </div>` : ''}
             <div class="anime-actions" style="margin-top:1rem;">
               <button class="action-btn" id="btn-fav"     onclick="toggleList('favorites')">Favorito</button>
               <button class="action-btn" id="btn-watch"   onclick="toggleList('watchlist')">Ver despues</button>
