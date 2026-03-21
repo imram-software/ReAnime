@@ -178,12 +178,42 @@
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
     }
+    /* Season tabs */
+    .season-tabs {
+      display: flex; gap: 0.4rem; flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+    }
+    .season-tab {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 6px;
+      padding: 0.3rem 0.75rem; font-size: 0.75rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font-body);
+      transition: all 0.2s; letter-spacing: 0.5px;
+    }
+    .season-tab:hover { border-color: var(--rose); color: var(--rose); }
+    .season-tab.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+
     .ep-sidebar-title {
       font-family: var(--font-head); font-size: 1rem;
       letter-spacing: 2px; color: var(--muted);
       margin-bottom: 0.6rem; padding-bottom: 0.5rem;
       border-bottom: 1px solid var(--border);
     }
+    /* ── SEASON TABS ── */
+    .season-tabs {
+      display: flex; gap: 0.4rem; flex-wrap: wrap;
+      margin-bottom: 0.75rem; padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .season-tab {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 6px;
+      padding: 0.3rem 0.7rem; font-size: 0.75rem;
+      cursor: pointer; font-family: var(--font-body);
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .season-tab:hover { border-color: var(--rose); color: var(--rose); }
+    .season-tab.active { background: var(--pink); border-color: var(--pink); color: #fff; }
     .ep-btn {
       width: 100%; text-align: left;
       background: none; border: none; border-radius: 6px;
@@ -437,33 +467,74 @@
       utterances.async = true;
       document.getElementById('utterances-container').appendChild(utterances);
 
-      /* Build episode list */
+      /* Build episode list — supports seasons */
       const epList = document.getElementById('ep-list');
-      anime.episodes?.forEach((ep, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'ep-btn';
-        btn.textContent = `${ep.number}. ${ep.title}`;
-        btn.onclick = () => {
-          document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          document.getElementById('ep-title').innerHTML = `Ep ${ep.number}: <em>${ep.title}</em>`;
-          const tmp = document.createElement('div'); tmp.innerHTML = ep.embed;
-          const iframe = tmp.querySelector('iframe');
-          const player = document.getElementById('video-player');
-          player.innerHTML = '';
-          if (iframe) {
-            iframe.style.width = '100%'; iframe.style.height = '100%';
-            iframe.style.border = 'none';
-            player.appendChild(iframe);
-          } else {
-            player.innerHTML = ep.embed;
-          }
-          localStorage.setItem('lastWatched', JSON.stringify({ id: anime.id, index: i }));
-          /* Iniciar contador de Holy al cambiar de episodio */
-          startHolyEarning(anime.id, i);
-        };
-        epList.appendChild(btn);
-      });
+
+      function playEp(ep, animeRef, epIndex) {
+        document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+        const activeBtn = document.querySelector(`.ep-btn[data-ep="${ep.number}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
+        document.getElementById('ep-title').innerHTML = `Ep ${ep.number}: <em>${ep.title}</em>`;
+        const player = document.getElementById('video-player');
+        if (!ep.embed || ep.embed.includes('placeholder')) {
+          player.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.85rem;flex-direction:column;gap:.5rem;"><span style="font-size:2rem;opacity:.3">🔒</span>Link no disponible aún</div>';
+          return;
+        }
+        const tmp = document.createElement('div'); tmp.innerHTML = ep.embed;
+        const iframe = tmp.querySelector('iframe');
+        player.innerHTML = '';
+        if (iframe) {
+          iframe.style.width = '100%'; iframe.style.height = '100%';
+          iframe.style.border = 'none';
+          player.appendChild(iframe);
+        } else {
+          player.innerHTML = ep.embed;
+        }
+        localStorage.setItem('lastWatched', JSON.stringify({ id: animeRef.id, index: epIndex }));
+        startHolyEarning(animeRef.id, epIndex);
+      }
+
+      function buildEpList(episodes, animeRef) {
+        epList.innerHTML = '';
+        episodes.forEach((ep, i) => {
+          const btn = document.createElement('button');
+          btn.className = 'ep-btn';
+          btn.dataset.ep = ep.number;
+          btn.textContent = `${ep.number}. ${ep.title}`;
+          if (!ep.embed || ep.embed.includes('placeholder')) btn.style.opacity = '0.45';
+          btn.onclick = () => playEp(ep, animeRef, i);
+          epList.appendChild(btn);
+        });
+        // Auto-play first available episode
+        const firstAvail = episodes.find(ep => ep.embed && !ep.embed.includes('placeholder'));
+        if (firstAvail) {
+          playEp(firstAvail, animeRef, episodes.indexOf(firstAvail));
+        } else if (episodes.length) {
+          playEp(episodes[0], animeRef, 0);
+        }
+      }
+
+      if (anime.seasons?.length > 1) {
+        // Multi-season
+        const tabsWrap = document.createElement('div');
+        tabsWrap.className = 'season-tabs';
+        anime.seasons.forEach((s, si) => {
+          const tab = document.createElement('button');
+          tab.className = 'season-tab' + (si === 0 ? ' active' : '');
+          tab.textContent = `T${s.number} · ${s.year || ''}`.trim().replace('· ', '· ');
+          tab.title = s.title || `Temporada ${s.number}`;
+          tab.onclick = () => {
+            document.querySelectorAll('.season-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            buildEpList(s.episodes, anime);
+          };
+          tabsWrap.appendChild(tab);
+        });
+        epList.parentNode.insertBefore(tabsWrap, epList);
+        buildEpList(anime.seasons[0].episodes, anime);
+      } else {
+        buildEpList(anime.episodes || [], anime);
+      }
 
       /* Auto-select last watched or first */
       const last = JSON.parse(localStorage.getItem('lastWatched') || 'null');
