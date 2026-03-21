@@ -1553,5 +1553,94 @@
       "embed": "<iframe src='https://hqq.ac/e/ZDRpTklPaU90dVhYdExJMjdQRTgxQT09' allowfullscreen></iframe>"
     }
   ]
+  },
+  { "Anime": "Kekkai Sensen & Beyond",
+  "id": "kekkai-sensen-beyond",
+  "name": "Kekkai Sensen & Beyond",
+  "cover": "https://cdn.myanimelist.net/images/anime/1/87330.jpg",
+  "genre": ["Accion", "Sobrenatural", "Comedia"],
+
+  "opinion": [
+    "Demasiado caótico… pero funcional.",
+    "No todo necesita sentido si el resultado funciona.",
+    "Es ridículo… y aun así efectivo.",
+    "El desorden es parte del sistema.",
+    "No es elegante… pero cumple."
+  ],
+
+  "dato": [
+    "Es la segunda temporada de Kekkai Sensen.",
+    "Se ambienta en Hellsalem's Lot, una versión alterada de Nueva York.",
+    "Combina acción sobrenatural con comedia absurda.",
+    "Cada episodio suele ser una historia independiente.",
+    "El estilo visual y dirección son altamente dinámicos."
+  ],
+
+  "year": 2017,
+  "rating": 7.8,
+  "description": "En una ciudad donde lo humano y lo sobrenatural coexisten, una organización secreta mantiene el equilibrio mientras enfrenta amenazas caóticas en un entorno impredecible.",
+
+  "episodes": [
+    {
+      "number": 1,
+      "title": "Buenos días, Hellsalem’s Lot",
+      "embed": "<iframe src='https://hqq.ac/e/OWVQQVpsd0IrL0NqZjhZQVE2L0ZFZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 2,
+      "title": "Cazadores de sangre",
+      "embed": "<iframe src='https://hqq.ac/e/VEU3bExiZmo1Y2JNZnlhdlg5dUEwUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 3,
+      "title": "Día de caos",
+      "embed": "<iframe src='https://hqq.ac/e/U0tTSWFBVGt3WjkweThXbE9BTmtzZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 4,
+      "title": "La organización Libra",
+      "embed": "<iframe src='https://hqq.ac/e/TE43RXdHZWQyVUdZbGlrU0tXYW1udz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 5,
+      "title": "Una misión peligrosa",
+      "embed": "<iframe src='https://hqq.ac/e/UE1Xeis3TUZQZkcvajYzSVNjeEVTUT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 6,
+      "title": "Batalla en la ciudad",
+      "embed": "<iframe src='https://hqq.ac/e/VExjTVNyNWdtNWRxb0Qra25YSjhKZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 7,
+      "title": "Más allá del límite",
+      "embed": "<iframe src='https://hqq.ac/e/MHpNSVFKYjFpOHNzTzFGRHIzZS9RQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 8,
+      "title": "Noche interminable",
+      "embed": "<iframe src='https://hqq.ac/e/T3NvcTZlVSsyOVI5TFBYL3ptUXJtQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 9,
+      "title": "El equilibrio se rompe",
+      "embed": "<iframe src='https://hqq.ac/e/MFI4K1NVeFNHYm11Y3FCMlJVUGQwQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 10,
+      "title": "Confrontación",
+      "embed": "<iframe src='https://hqq.ac/e/MzFtTWZXV2tmbC9aNHVjVHI3bGlPQT09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 11,
+      "title": "El caos continúa",
+      "embed": "<iframe src='https://hqq.ac/e/UEUveFRYUE9wZXRGM2pqZUIzSUhyZz09' allowfullscreen></iframe>"
+    },
+    {
+      "number": 12,
+      "title": "Más allá de todo",
+      "embed": "<iframe src='https://hqq.ac/e/T1JINTdBakFieE5LU0t1ZEhxM1JMZz09' allowfullscreen></iframe>"
+    }
+  ]
   }
 ]
