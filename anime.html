@@ -477,7 +477,7 @@
         document.getElementById('ep-title').innerHTML = `Ep ${ep.number}: <em>${ep.title}</em>`;
         const player = document.getElementById('video-player');
         if (!ep.embed || ep.embed.includes('placeholder')) {
-          player.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.85rem;flex-direction:column;gap:.5rem;"><span style="font-size:2rem;opacity:.3">🔒</span>Link no disponible aún</div>';
+          player.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.85rem;flex-direction:column;gap:.5rem;"><span style="font-size:2rem;opacity:.3">🔒</span>Capitulo no disponible por el momento, vuelva en otro momento.</div>';
           return;
         }
         const tmp = document.createElement('div'); tmp.innerHTML = ep.embed;
