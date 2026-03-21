@@ -763,7 +763,7 @@
       <h2 class="section-title">Directorio <em>anime</em></h2>
       <div class="section-line"></div>
       <span class="section-count" id="anime-count">0 títulos</span>
-      <a href="catalog.html" id="ver-todos-btn" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.3rem .8rem;font-size:.75rem;cursor:pointer;font-family:var(--font-body);transition:all .2s;white-space:nowrap;" onmouseover="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Ver catálogo →</a>
+      <a href="catalog.html" id="ver-todos-btn" style="background:var(--pink-dim);border:1px solid var(--pink);color:var(--pink);border-radius:6px;padding:.35rem 1rem;font-size:.78rem;font-weight:700;font-family:var(--font-body);transition:all .2s;white-space:nowrap;text-decoration:none;letter-spacing:.5px;" onmouseover="this.style.background='var(--pink)';this.style.color='#fff'" onmouseout="this.style.background='var(--pink-dim)';this.style.color='var(--pink)'">Ver catálogo completo →</a>
     </div>
     <div class="filter-bar">
       <input type="text" id="search-input" placeholder="Buscar anime…" />
@@ -870,7 +870,7 @@
   ══════════════════════════════════════════════ */
   window.allAnimes = [];
   let activeGenres = new Set(); window.activeGenres = activeGenres;
-  const PREVIEW_COUNT = 8;
+  const PREVIEW_COUNT = 30;
 
   const urlParams = new URLSearchParams(location.search);
   const genreFromURL = urlParams.get('genre');
@@ -1241,7 +1241,6 @@
     document.getElementById('app').style.display = 'block';
     const gb = document.getElementById('gacha-header-btn');
     if (gb) gb.style.display = 'inline-flex';
-    if (pb) pb.style.display = 'inline-flex';
     loadApp();
   }
   </script>
