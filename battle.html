@@ -122,28 +122,6 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .f-buffs{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);display:flex;gap:2px;z-index:5;}
 .f-buff-icon{font-size:.7rem;background:rgba(0,0,0,.8);border-radius:4px;padding:1px 3px;border:1px solid rgba(255,255,255,.1);}
 
-/* ── SYNERGY BONUSES ── */
-function applySynergies(team, isEnemy) {
-  if (!pvpData.synergies) return;
-  const seriesCount = {};
-  fighters.filter(f => f.isEnemy === isEnemy).forEach(f => {
-    const pvp = (pvpData.characters||[]).find(c=>c.name===f.name);
-    if (pvp?.series) seriesCount[pvp.series] = (seriesCount[pvp.series]||0)+1;
-  });
-  pvpData.synergies.forEach(syn => {
-    if ((seriesCount[syn.series]||0) >= 2) {
-      fighters.filter(f=>f.isEnemy===isEnemy).forEach(f=>{
-        const pvp = (pvpData.characters||[]).find(c=>c.name===f.name);
-        if (pvp?.series !== syn.series) return;
-        if (syn.bonus==='atk') f.atk = Math.round(f.atk*(1+syn.value));
-        if (syn.bonus==='spd') f.spd = Math.round(f.spd*(1+syn.value));
-        if (syn.bonus==='cr')  f.cr  = Math.round(f.cr +syn.value);
-      });
-      logMsg(`✨ Sinergia ${syn.series}: ${syn.desc}`, 'buff');
-    }
-  });
-}
-
 /* ── SKILL TOOLTIP ── */
 #skill-tooltip{position:fixed;background:#1a0030;border:1px solid #a78bfa55;border-radius:8px;padding:.6rem .85rem;font-size:.75rem;color:#e9d5ff;max-width:220px;z-index:9999;pointer-events:none;opacity:0;transition:opacity .15s;line-height:1.55;box-shadow:0 4px 20px rgba(0,0,0,.6);}
 #skill-tooltip.show{opacity:1;}
@@ -1242,10 +1220,16 @@ function enemyAI(actor) {
   if (skill.cooldown > 0) actor.cooldowns[skillChoice.i] = skill.cooldown;
 
   const r = calcDamage(actor, target, 1.1);
-  applyDamage(target, r.dmg);
-  showDmgFloat('f-'+target.id, r.dmg, r.isCrit);
-  const affTxt = r.affMult > 1 ? ' Super efectivo!' : r.affMult < 1 ? ' No muy efectivo.' : '';
-  logMsg(`${actor.name} usa ${skill.name} en ${target.name}: ${r.dmg}${r.isCrit?' CRÍTICO!':''}${affTxt}`, r.isCrit?'crit':'dmg');
+  if (!tryDodge(actor, target)) {
+    const blocked = tryBlock(actor, target, r.dmg);
+    applyDamageWithShield(target, blocked.blocked ? 0 : blocked.dmg);
+    showDmgFloat('f-'+target.id, blocked.blocked ? 'Bloq!' : blocked.dmg, r.isCrit);
+    const affTxt = r.affMult > 1 ? ' ✦ Super efectivo!' : r.affMult < 1 ? ' ▼ No muy efectivo.' : '';
+    logMsg(`${actor.name} usa ${skill.name} en ${target.name}: ${blocked.dmg}${r.isCrit?' 💥 CRÍTICO!':''}${affTxt}`, r.isCrit?'crit':'dmg');
+  } else {
+    showDmgFloat('f-'+target.id, 'Esquiva!', false, 'dodge');
+    logMsg(`💨 ${target.name} esquivó el ataque de ${actor.name}.`, 'dodge');
+  }
 
   document.getElementById('f-'+actor.id)?.classList.add('acting');
   setTimeout(()=>document.getElementById('f-'+actor.id)?.classList.remove('acting'), 400);
@@ -1387,16 +1371,17 @@ function logMsg(txt, type='') {
   log.scrollTop = log.scrollHeight;
 }
 
-function showDmgFloat(elId, dmg, isCrit) {
+function showDmgFloat(elId, dmg, isCrit, type='dmg') {
   const parent = document.getElementById(elId);
   if (!parent) return;
+  const colors = { dmg:'#f87171', heal:'#4ade80', shield:'#60a5fa', buff:'#c084fc', debuff:'#f97316', dodge:'#a78bfa', block:'#94a3b8' };
   const fl = document.createElement('div');
-  fl.className = 'dmg-float';
-  fl.textContent = (isCrit ? '💥' : '') + dmg;
-  fl.style.cssText = `color:${isCrit?'#fbbf24':'#f87171'};top:30%;left:${20+Math.random()*60}%;`;
+  fl.className = 'dmg-float' + (isCrit?' crit':'') + (type!=='dmg'?' '+type:'');
+  fl.textContent = (isCrit ? '💥 ' : '') + dmg;
+  fl.style.cssText = `color:${colors[type]||'#f87171'};top:10%;left:${15+Math.random()*50}%;position:absolute;`;
   parent.style.position = 'relative';
   parent.appendChild(fl);
-  setTimeout(() => fl.remove(), 1000);
+  setTimeout(() => fl.remove(), 950);
 }
 
 function spawnParticles(color, count) {
