@@ -322,14 +322,14 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
   <!-- BATTLE SCREEN -->
   <div id="battle-screen" style="position:relative;">
     <!-- Affinity chart -->
-    <div id="aff-chart" style="position:absolute;top:0;right:0;background:rgba(8,8,8,.92);border:1px solid var(--border);border-radius:8px 0 0 8px;padding:.4rem .6rem;font-size:.6rem;z-index:50;line-height:1.7;min-width:130px;">
-      <div style="font-family:var(--font-h);font-size:.7rem;letter-spacing:2px;color:var(--muted);margin-bottom:.25rem;">AFINIDADES</div>
-      <div>🌿<b style="color:#86efac">Verde</b> → 💧 Azul</div>
-      <div>💧<b style="color:#38bdf8">Azul</b> → 🔥 Rojo</div>
-      <div>🔥<b style="color:#ef4444">Rojo</b> → ⚡ Amarillo</div>
-      <div>⚡<b style="color:#fbbf24">Amarillo</b> → 🌑 Morado</div>
-      <div>🌑<b style="color:#a78bfa">Morado</b> → 🌿 Verde</div>
-      <div>✦<b style="color:#fef9c3">Luz</b> ⇄ 🌑 Oscuridad</div>
+    <div id="aff-chart" style="position:absolute;top:0;right:0;background:rgba(8,8,8,.88);border:1px solid var(--border);border-radius:8px 0 0 8px;padding:.35rem .55rem;font-size:.75rem;z-index:50;line-height:1.9;">
+      <div style="font-family:var(--font-h);font-size:.6rem;letter-spacing:2px;color:var(--muted);margin-bottom:.15rem;">✦ GANA A</div>
+      <div title="Verde gana a Azul">🌿→💧</div>
+      <div title="Azul gana a Rojo">💧→🔥</div>
+      <div title="Rojo gana a Amarillo">🔥→⚡</div>
+      <div title="Amarillo gana a Morado">⚡→🌑</div>
+      <div title="Morado gana a Verde">🌑→🌿</div>
+      <div title="Luz gana a Oscuridad (y viceversa)">✦⇄🌑</div>
     </div>
     <!-- Turn order bar -->
     <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem;overflow-x:auto;padding:.1rem 0;">
@@ -1721,6 +1721,7 @@ async function endBattle(playerWon) {
   const rsub   = document.getElementById('result-sub');
 
   if (playerWon) {
+    // Player wins: +10 for attacker, -5 for defender (their defense failed)
     rtitle.textContent = 'VICTORIA';
     rtitle.className   = 'result-title win';
     rpts.textContent   = '+10 Conquista';
@@ -1730,10 +1731,19 @@ async function endBattle(playerWon) {
     if (window.ReAnimeDB) {
       await window.ReAnimeDB.addConquestPoints(10);
       await window.ReAnimeDB.addBattleLog({ type:'attack', result:'win', enemyId, enemyName, pts:10 });
-      if (enemyId) await window.ReAnimeDB.recordDefenseWin(enemyId); // +10 to defender too? No — -5/+10 means attacker +10, defender +10 if they win (defense wins = enemy wins)
-      // Actually: if enemy wins (defense holds), enemy gets +10. We lost = -5.
+      // Defender lost → -5 for them
+      if (enemyId) {
+        try {
+          const commitUrl = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents:commit?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
+          await fetch(commitUrl, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ writes:[{ transform:{ document:`projects/reanime-1a781/databases/(default)/documents/users/${enemyId}`, fieldTransforms:[{ fieldPath:'conquest', increment:{integerValue:-5} }] }}] })
+          });
+        } catch(e) {}
+      }
     }
   } else {
+    // Player loses: -5 for attacker, +10 for defender (their defense held)
     rtitle.textContent = 'DERROTA';
     rtitle.className   = 'result-title lose';
     rpts.textContent   = '-5 Conquista';
@@ -1742,7 +1752,7 @@ async function endBattle(playerWon) {
     if (window.ReAnimeDB) {
       await window.ReAnimeDB.addConquestPoints(-5);
       await window.ReAnimeDB.addBattleLog({ type:'attack', result:'lose', enemyId, enemyName, pts:-5 });
-      // Enemy defense won → give them +10
+      // Defender won → +10 for them
       if (enemyId) await window.ReAnimeDB.recordDefenseWin(enemyId);
     }
   }
