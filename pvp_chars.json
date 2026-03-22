@@ -1,38 +1,129 @@
 {
   "_readme": "Sistema PVP completo. name debe coincidir con la coleccion. skins = array de imagenes. passive_pool = pasivas intercambiables. level escala stats.",
-
   "affinities": {
-    "tierra":    { "color":"#86efac", "icon":"🌿", "strong_vs":"agua",      "weak_vs":"oscuridad", "label":"Verde" },
-    "agua":      { "color":"#38bdf8", "icon":"💧", "strong_vs":"fuego",     "weak_vs":"tierra",    "label":"Azul"  },
-    "fuego":     { "color":"#ef4444", "icon":"🔥", "strong_vs":"rayo",      "weak_vs":"agua",      "label":"Rojo"  },
-    "rayo":      { "color":"#fbbf24", "icon":"⚡", "strong_vs":"oscuridad", "weak_vs":"fuego",     "label":"Amarillo" },
-    "oscuridad": { "color":"#a78bfa", "icon":"🌑", "strong_vs":"tierra",    "weak_vs":"rayo",      "label":"Morado" },
-    "luz":       { "color":"#fef9c3", "icon":"✦",  "strong_vs":"oscuridad", "weak_vs":"oscuridad", "label":"Luz"   }
+    "tierra": {
+      "color": "#86efac",
+      "icon": "🌿",
+      "strong_vs": "agua",
+      "weak_vs": "oscuridad",
+      "label": "Verde"
+    },
+    "agua": {
+      "color": "#38bdf8",
+      "icon": "💧",
+      "strong_vs": "fuego",
+      "weak_vs": "tierra",
+      "label": "Azul"
+    },
+    "fuego": {
+      "color": "#ef4444",
+      "icon": "🔥",
+      "strong_vs": "rayo",
+      "weak_vs": "agua",
+      "label": "Rojo"
+    },
+    "rayo": {
+      "color": "#fbbf24",
+      "icon": "⚡",
+      "strong_vs": "oscuridad",
+      "weak_vs": "fuego",
+      "label": "Amarillo"
+    },
+    "oscuridad": {
+      "color": "#a78bfa",
+      "icon": "🌑",
+      "strong_vs": "tierra",
+      "weak_vs": "rayo",
+      "label": "Morado"
+    },
+    "luz": {
+      "color": "#fef9c3",
+      "icon": "✦",
+      "strong_vs": "oscuridad",
+      "weak_vs": "oscuridad",
+      "label": "Luz"
+    }
   },
-
   "roles": {
-    "guerrero": { "icon":"⚔",  "desc":"Alto daño fisico, stats balanceadas" },
-    "mago":     { "icon":"🔮", "desc":"Alto daño magico, baja defensa" },
-    "tanque":   { "icon":"🛡",  "desc":"Alta vida y defensa" },
-    "sanador":  { "icon":"💚", "desc":"Restaura HP del equipo" },
-    "soporte":  { "icon":"⭐", "desc":"Buffs y debuffs al equipo" }
+    "guerrero": {
+      "icon": "⚔",
+      "desc": "Alto daño fisico, stats balanceadas"
+    },
+    "mago": {
+      "icon": "🔮",
+      "desc": "Alto daño magico, baja defensa"
+    },
+    "tanque": {
+      "icon": "🛡",
+      "desc": "Alta vida y defensa"
+    },
+    "sanador": {
+      "icon": "💚",
+      "desc": "Restaura HP del equipo"
+    },
+    "soporte": {
+      "icon": "⭐",
+      "desc": "Buffs y debuffs al equipo"
+    }
   },
-
   "synergies": [
-    { "series":"Re:Zero",   "bonus":"atk", "value":0.08, "desc":"+8% ATK al equipo Re:Zero" },
-    { "series":"KonoSuba",  "bonus":"spd", "value":0.10, "desc":"+10% SPD al equipo KonoSuba" },
-    { "series":"Angel Beats","bonus":"cr", "value":5,    "desc":"+5% Crit al equipo Angel Beats" }
+    {
+      "series": "Re:Zero",
+      "bonus": "atk",
+      "value": 0.08,
+      "desc": "+8% ATK al equipo Re:Zero"
+    },
+    {
+      "series": "KonoSuba",
+      "bonus": "spd",
+      "value": 0.1,
+      "desc": "+10% SPD al equipo KonoSuba"
+    },
+    {
+      "series": "Angel Beats",
+      "bonus": "cr",
+      "value": 5,
+      "desc": "+5% Crit al equipo Angel Beats"
+    },
+    {
+      "series": "Attack on Titan",
+      "bonus": "def",
+      "value": 0.1,
+      "desc": "+10% DEF al equipo AoT"
+    },
+    {
+      "series": "Naruto",
+      "bonus": "hp",
+      "value": 0.1,
+      "desc": "+10% HP al equipo Naruto"
+    },
+    {
+      "series": "One Piece",
+      "bonus": "atk",
+      "value": 0.08,
+      "desc": "+8% ATK al equipo One Piece"
+    },
+    {
+      "series": "Demon Slayer",
+      "bonus": "cr",
+      "value": 5,
+      "desc": "+5% Crit al equipo Demon Slayer"
+    },
+    {
+      "series": "Chainsaw Man",
+      "bonus": "atk",
+      "value": 0.12,
+      "desc": "+12% ATK al equipo Chainsaw Man"
+    }
   ],
-
   "level_scaling": {
-    "hp_per_level":  120,
-    "atk_per_level":  35,
-    "def_per_level":  20,
-    "spd_per_level":   1,
+    "hp_per_level": 120,
+    "atk_per_level": 35,
+    "def_per_level": 20,
+    "spd_per_level": 1,
     "max_level": 10,
     "dupes_per_level": 1
   },
-
   "characters": [
     {
       "name": "Subaru Natsuki",
@@ -44,17 +135,62 @@
         "https://cdn.myanimelist.net/images/characters/15/271553.jpg",
         "https://cdn.myanimelist.net/images/characters/9/276232.jpg"
       ],
-      "stats": { "hp":4200, "atk":820,  "def":960,  "spd":98,  "cr":12, "cd":140, "dodge":8  },
+      "stats": {
+        "hp": 4200,
+        "atk": 820,
+        "def": 960,
+        "spd": 98,
+        "cr": 12,
+        "cd": 140,
+        "dodge": 8
+      },
       "skills": [
-        { "name":"Resistencia",       "desc":"Ataque básico. 30% chance de reducir ATK del objetivo 1 turno.",  "type":"activa", "cooldown":0, "effect":"debuff_atk",  "mult":1.0 },
-        { "name":"Llamada de auxilio","desc":"Aumenta SPD de todos los aliados 20% por 2 turnos.",              "type":"activa", "cooldown":3, "effect":"buff_spd_team","mult":0   },
-        { "name":"Escudo de voluntad","desc":"Otorga escudo equivalente a 15% HP max al aliado con menos HP.",  "type":"activa", "cooldown":4, "effect":"shield",       "mult":0   }
+        {
+          "name": "Resistencia",
+          "desc": "Ataque básico. 30% de reducir ATK del objetivo 1 turno.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "debuff_atk",
+          "mult": 1.0
+        },
+        {
+          "name": "Llamada de auxilio",
+          "desc": "Aumenta SPD de todos los aliados 20% por 2 turnos.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "buff_spd_team",
+          "mult": 0.2
+        },
+        {
+          "name": "Escudo de voluntad",
+          "desc": "Otorga escudo 15% HP max al aliado con menos HP.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "shield",
+          "mult": 0.15
+        }
       ],
       "passive_pool": [
-        { "name":"Vuelta a la vida",  "desc":"Revive una vez con 30% HP al ser derrotado en la batalla.",           "id":"revive"     },
-        { "name":"Instinto de escape","desc":"+12% probabilidad de esquivar ataques.",                               "id":"dodge_up"   },
-        { "name":"Lazos del pasado",  "desc":"Al inicio de la batalla, reduce CD de todas las skills en 1.",         "id":"cd_start"   },
-        { "name":"Aura de apoyo",     "desc":"Aliados adyacentes reciben +5% DEF pasivamente.",                      "id":"def_aura"   }
+        {
+          "name": "Vuelta a la vida",
+          "desc": "Revive una vez con 30% HP al ser derrotado.",
+          "id": "revive"
+        },
+        {
+          "name": "Instinto de escape",
+          "desc": "+12% probabilidad de esquivar ataques.",
+          "id": "dodge_up"
+        },
+        {
+          "name": "Lazos del pasado",
+          "desc": "Al inicio, reduce CD de todas las skills en 1.",
+          "id": "cd_start"
+        },
+        {
+          "name": "Aura de apoyo",
+          "desc": "Aliados adyacentes reciben +5% DEF pasivamente.",
+          "id": "def_aura"
+        }
       ]
     },
     {
@@ -68,17 +204,62 @@
         "https://cdn.myanimelist.net/images/characters/14/280396.jpg",
         "https://cdn.myanimelist.net/images/characters/11/309076.jpg"
       ],
-      "stats": { "hp":5100, "atk":1620, "def":980,  "spd":108, "cr":20, "cd":160, "dodge":5  },
+      "stats": {
+        "hp": 5100,
+        "atk": 1620,
+        "def": 980,
+        "spd": 108,
+        "cr": 20,
+        "cd": 160,
+        "dodge": 5
+      },
       "skills": [
-        { "name":"Lluvia de Golpes",  "desc":"Golpea al objetivo 3 veces seguidas (cada golpe hace 40% daño).",    "type":"activa", "cooldown":0, "effect":"multihit3",  "mult":0.4 },
-        { "name":"Maza de Hierro",    "desc":"Ataque fuerte (180% ATK). 50% chance de aturdir 1 turno.",           "type":"activa", "cooldown":3, "effect":"stun",       "mult":1.8 },
-        { "name":"Furia Oni",         "desc":"Duplica su ATK por 2 turnos. Pierde 8% HP al activar.",              "type":"activa", "cooldown":5, "effect":"double_atk",  "mult":0   }
+        {
+          "name": "Lluvia de Golpes",
+          "desc": "Golpea 3 veces (40% ATK c/u). Roba vida 10% del daño.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "multihit3",
+          "mult": 0.4
+        },
+        {
+          "name": "Maza de Hierro",
+          "desc": "180% ATK. 50% de aturdir 1 turno.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "stun",
+          "mult": 1.8
+        },
+        {
+          "name": "Furia Oni",
+          "desc": "Duplica ATK por 2 turnos. Pierde 8% HP.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "double_atk",
+          "mult": 0
+        }
       ],
       "passive_pool": [
-        { "name":"Despertar Oni",     "desc":"Ignora 25% de la DEF del objetivo en cada ataque.",                   "id":"def_pen"    },
-        { "name":"Amor incondicional","desc":"Si un aliado cae, gana +30% ATK por el resto de la batalla.",         "id":"revenge"    },
-        { "name":"Resiliencia",       "desc":"Cuando HP baja de 40%, regenera 5% HP por turno.",                    "id":"regen_low"  },
-        { "name":"Protectora",        "desc":"20% de chance de interceptar ataques dirigidos a aliados.",           "id":"intercept"  }
+        {
+          "name": "Despertar Oni",
+          "desc": "Ignora 25% DEF del objetivo.",
+          "id": "def_pen"
+        },
+        {
+          "name": "Amor incondicional",
+          "desc": "Al caer un aliado, gana +30% ATK permanente.",
+          "id": "revenge"
+        },
+        {
+          "name": "Resiliencia",
+          "desc": "HP < 40%: regenera 5% HP por turno.",
+          "id": "regen_low"
+        },
+        {
+          "name": "Protectora",
+          "desc": "20% de interceptar ataques a aliados.",
+          "id": "intercept"
+        }
       ]
     },
     {
@@ -91,17 +272,62 @@
         "https://cdn.myanimelist.net/images/characters/15/266067.jpg",
         "https://cdn.myanimelist.net/images/characters/10/271555.jpg"
       ],
-      "stats": { "hp":3800, "atk":1480, "def":720,  "spd":112, "cr":22, "cd":175, "dodge":10 },
+      "stats": {
+        "hp": 3800,
+        "atk": 1480,
+        "def": 720,
+        "spd": 112,
+        "cr": 22,
+        "cd": 175,
+        "dodge": 10
+      },
       "skills": [
-        { "name":"Dardo Mágico",      "desc":"Ataque mágico básico con elemento rayo.",                             "type":"activa", "cooldown":0, "effect":"damage",      "mult":1.1 },
-        { "name":"Viento Cortante",   "desc":"Daño mágico a todos los enemigos (80% ATK cada uno).",               "type":"activa", "cooldown":4, "effect":"aoe",         "mult":0.8 },
-        { "name":"Clairvoyance",      "desc":"Revela la pasiva activa del enemigo objetivo y reduce su DEF 20%.",  "type":"activa", "cooldown":3, "effect":"debuff_def",  "mult":0   }
+        {
+          "name": "Dardo Mágico",
+          "desc": "Ataque mágico básico con elemento rayo (110% ATK).",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.1
+        },
+        {
+          "name": "Viento Cortante",
+          "desc": "Daño mágico a todos los enemigos (80% ATK c/u).",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "aoe",
+          "mult": 0.8
+        },
+        {
+          "name": "Clairvoyance",
+          "desc": "Reduce DEF del objetivo 20% por 2 turnos.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "debuff_def",
+          "mult": 0
+        }
       ],
       "passive_pool": [
-        { "name":"Doble ataque",      "desc":"30% de chance de atacar dos veces consecutivas.",                     "id":"double_hit" },
-        { "name":"Ojo de maga",       "desc":"+8% probabilidad de crítico extra.",                                  "id":"crit_up"    },
-        { "name":"Fría eficiencia",   "desc":"Reduce el CD de Viento Cortante en 1 al hacer un crítico.",          "id":"cd_on_crit" },
-        { "name":"Orgullo de Oni",    "desc":"Daño +15% cuando el objetivo tiene debuffs activos.",                 "id":"debuff_amp" }
+        {
+          "name": "Doble ataque",
+          "desc": "30% de atacar dos veces consecutivas.",
+          "id": "double_hit"
+        },
+        {
+          "name": "Ojo de maga",
+          "desc": "+8% probabilidad de crítico.",
+          "id": "crit_up"
+        },
+        {
+          "name": "Fría eficiencia",
+          "desc": "Al criticar, reduce CD de Viento Cortante en 1.",
+          "id": "cd_on_crit"
+        },
+        {
+          "name": "Orgullo de Oni",
+          "desc": "+15% daño si objetivo tiene debuffs.",
+          "id": "debuff_amp"
+        }
       ]
     },
     {
@@ -114,17 +340,62 @@
         "https://cdn.myanimelist.net/images/characters/10/265177.jpg",
         "https://cdn.myanimelist.net/images/characters/9/289519.jpg"
       ],
-      "stats": { "hp":4600, "atk":1050, "def":860,  "spd":102, "cr":14, "cd":150, "dodge":8  },
+      "stats": {
+        "hp": 4600,
+        "atk": 1050,
+        "def": 860,
+        "spd": 102,
+        "cr": 14,
+        "cd": 150,
+        "dodge": 8
+      },
       "skills": [
-        { "name":"Curación de hielo", "desc":"Cura al aliado con menos HP por 20% de su HP máximo.",               "type":"activa", "cooldown":0, "effect":"heal",        "mult":0.20 },
-        { "name":"Barrera de hielo",  "desc":"Otorga escudo a todo el equipo equivalente a 12% HP max cada uno.",  "type":"activa", "cooldown":4, "effect":"shield_team", "mult":0.12 },
-        { "name":"Tormenta ártica",   "desc":"Congela al objetivo: -30% SPD y no puede atacar el siguiente turno.","type":"activa", "cooldown":5, "effect":"freeze",      "mult":0.9  }
+        {
+          "name": "Curación de hielo",
+          "desc": "Cura al aliado con menos HP por 20% HP máx.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "heal",
+          "mult": 0.2
+        },
+        {
+          "name": "Barrera de hielo",
+          "desc": "Escudo a todo el equipo (12% HP máx c/u).",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "shield_team",
+          "mult": 0.12
+        },
+        {
+          "name": "Tormenta ártica",
+          "desc": "90% ATK + reduce SPD 30% 2 turnos (freeze).",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "freeze",
+          "mult": 0.9
+        }
       ],
       "passive_pool": [
-        { "name":"Espíritu de apoyo", "desc":"Cada cura otorga +5% DEF al objetivo curado por 2 turnos.",          "id":"heal_def"   },
-        { "name":"Aura de luz",       "desc":"Aumenta resistencia a debuffs del equipo en 25%.",                   "id":"debuff_res" },
-        { "name":"Voluntad de reina", "desc":"Al quedar con HP < 30%, activa cura automática de 15% HP.",          "id":"auto_heal"  },
-        { "name":"Juramento eterno",  "desc":"Sinergia con Subaru: ambos ganan +10% de todas las stats.",          "id":"emilia_sub" }
+        {
+          "name": "Espíritu de apoyo",
+          "desc": "Cada cura da +5% DEF al curado por 2 turnos.",
+          "id": "heal_def"
+        },
+        {
+          "name": "Aura de luz",
+          "desc": "+25% resistencia a debuffs del equipo.",
+          "id": "debuff_res"
+        },
+        {
+          "name": "Voluntad de reina",
+          "desc": "HP < 30%: cura automática 15% HP.",
+          "id": "auto_heal"
+        },
+        {
+          "name": "Juramento eterno",
+          "desc": "Sinergia Subaru: +10% todas las stats.",
+          "id": "emilia_sub"
+        }
       ]
     },
     {
@@ -136,17 +407,62 @@
       "skins": [
         "https://cdn.myanimelist.net/images/characters/7/289130.jpg"
       ],
-      "stats": { "hp":4200, "atk":780,  "def":650,  "spd":115, "cr":10, "cd":130, "dodge":12 },
+      "stats": {
+        "hp": 4200,
+        "atk": 780,
+        "def": 650,
+        "spd": 115,
+        "cr": 10,
+        "cd": 130,
+        "dodge": 12
+      },
       "skills": [
-        { "name":"Agua Sagrada",      "desc":"Cura a todo el equipo por 12% HP max. Daño extra vs oscuridad.",     "type":"activa", "cooldown":0, "effect":"heal_team",   "mult":0.12 },
-        { "name":"Purificación",      "desc":"Elimina todos los debuffs del aliado objetivo y lo cura 10% HP.",    "type":"activa", "cooldown":3, "effect":"cleanse",     "mult":0.10 },
-        { "name":"Tormenta sagrada",  "desc":"Daño luz masivo a un enemigo. Extra daño si es oscuridad.",          "type":"activa", "cooldown":5, "effect":"damage_light","mult":2.2  }
+        {
+          "name": "Agua Sagrada",
+          "desc": "Cura todo el equipo 12% HP máx. Extra vs oscuridad.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "heal_team",
+          "mult": 0.12
+        },
+        {
+          "name": "Purificación",
+          "desc": "Elimina todos los debuffs de un aliado y cura 10% HP.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "cleanse",
+          "mult": 0.1
+        },
+        {
+          "name": "Tormenta sagrada",
+          "desc": "Daño luz masivo (220% ATK). Extra si enemigo es oscuridad.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "damage_light",
+          "mult": 2.2
+        }
       ],
       "passive_pool": [
-        { "name":"Diosa inútil",      "desc":"20% de chance de fallar el ataque pero curar al aliado más débil.",  "id":"goddess"    },
-        { "name":"Resurrección",      "desc":"Una vez por batalla puede resucitar a un aliado caído con 25% HP.",  "id":"revive_ally"},
-        { "name":"Bendición divina",  "desc":"Aliados ganan +8% CR al inicio de la batalla.",                      "id":"divine_bless"},
-        { "name":"Capricho divino",   "desc":"Al usar Agua Sagrada, 25% de chance de curar el doble.",             "id":"double_heal" }
+        {
+          "name": "Diosa inútil",
+          "desc": "20% de fallar el ataque pero curar al aliado más débil.",
+          "id": "goddess"
+        },
+        {
+          "name": "Resurrección",
+          "desc": "Una vez por batalla resucita un aliado caído con 25% HP.",
+          "id": "revive_ally"
+        },
+        {
+          "name": "Bendición divina",
+          "desc": "+8% CR a todos al inicio.",
+          "id": "divine_bless"
+        },
+        {
+          "name": "Capricho divino",
+          "desc": "25% de curar el doble con Agua Sagrada.",
+          "id": "double_heal"
+        }
       ]
     },
     {
@@ -158,17 +474,62 @@
       "skins": [
         "https://cdn.myanimelist.net/images/characters/9/289128.jpg"
       ],
-      "stats": { "hp":2900, "atk":2100, "def":450,  "spd":105, "cr":28, "cd":200, "dodge":14 },
+      "stats": {
+        "hp": 2900,
+        "atk": 2100,
+        "def": 450,
+        "spd": 105,
+        "cr": 28,
+        "cd": 200,
+        "dodge": 14
+      },
       "skills": [
-        { "name":"Explosión",         "desc":"Daño masivo a un enemigo (250% ATK). Queda en CD 3 turnos. Insustituible.", "type":"activa", "cooldown":3, "effect":"damage","mult":2.5 },
-        { "name":"Chispa de magia",   "desc":"Ataque mágico básico mientras Explosión está en cooldown.",           "type":"activa", "cooldown":0, "effect":"damage",      "mult":0.7  },
-        { "name":"Magia en cadena",   "desc":"La siguiente Explosión afecta a todos los enemigos (CD +1).",         "type":"activa", "cooldown":4, "effect":"next_aoe",    "mult":0    }
+        {
+          "name": "Chispa de magia",
+          "desc": "Ataque mágico básico (70% ATK).",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 0.7
+        },
+        {
+          "name": "Explosión",
+          "desc": "250% ATK. Ignora 20% DEF. CD 3 turnos.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "nuke",
+          "mult": 2.5
+        },
+        {
+          "name": "Magia en cadena",
+          "desc": "Próxima Explosión afecta a todos los enemigos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "next_aoe",
+          "mult": 0
+        }
       ],
       "passive_pool": [
-        { "name":"Magia de explosión","desc":"Explosión ignora 30% de la DEF del objetivo.",                        "id":"explo_pen"  },
-        { "name":"Chunibyo",          "desc":"Al hacer un crítico, recarga 1 turno de CD de Explosión.",            "id":"crit_reload" },
-        { "name":"Entusiasmo",        "desc":"+15% daño cuando Explosión está disponible.",                         "id":"ready_boost" },
-        { "name":"Sacrificio mágico", "desc":"Puede usar Explosión sin CD pero pierde 20% HP al hacerlo.",          "id":"sacrifice"  }
+        {
+          "name": "Magia de explosión",
+          "desc": "Explosión ignora 30% DEF adicional.",
+          "id": "explo_pen"
+        },
+        {
+          "name": "Chunibyo",
+          "desc": "Al criticar, reduce CD de Explosión en 1.",
+          "id": "crit_reload"
+        },
+        {
+          "name": "Entusiasmo",
+          "desc": "+15% daño cuando Explosión está disponible.",
+          "id": "ready_boost"
+        },
+        {
+          "name": "Sacrificio mágico",
+          "desc": "Puede usar Explosión sin CD perdiendo 20% HP.",
+          "id": "sacrifice"
+        }
       ]
     },
     {
@@ -180,17 +541,62 @@
       "skins": [
         "https://cdn.myanimelist.net/images/characters/7/289131.jpg"
       ],
-      "stats": { "hp":4100, "atk":950,  "def":880,  "spd":120, "cr":16, "cd":145, "dodge":20 },
+      "stats": {
+        "hp": 4100,
+        "atk": 950,
+        "def": 880,
+        "spd": 120,
+        "cr": 16,
+        "cd": 145,
+        "dodge": 20
+      },
       "skills": [
-        { "name":"Robar",             "desc":"Roba 1 buff activo del objetivo y lo aplica a sí mismo.",             "type":"activa", "cooldown":0, "effect":"steal_buff",  "mult":0.8  },
-        { "name":"Drenaje",           "desc":"Inflige 100% ATK de daño y roba 15% HP del daño infligido.",         "type":"activa", "cooldown":3, "effect":"lifesteal",   "mult":1.0  },
-        { "name":"Suerte extrema",    "desc":"Aumenta Dodge y CR de todo el equipo en 15% por 3 turnos.",          "type":"activa", "cooldown":5, "effect":"buff_luck",   "mult":0    }
+        {
+          "name": "Robar",
+          "desc": "Roba 1 buff activo del objetivo. 80% ATK de daño.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "steal_buff",
+          "mult": 0.8
+        },
+        {
+          "name": "Drenaje",
+          "desc": "100% ATK de daño. Roba 15% HP del daño hecho (lifesteal).",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "lifesteal",
+          "mult": 1.0
+        },
+        {
+          "name": "Suerte extrema",
+          "desc": "+15% Dodge y CR a todo el equipo por 3 turnos.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "buff_luck",
+          "mult": 0
+        }
       ],
       "passive_pool": [
-        { "name":"Afortunado",        "desc":"+15% probabilidad de esquivar todos los ataques.",                    "id":"lucky"      },
-        { "name":"Líder casual",      "desc":"El equipo KonoSuba gana +12% SPD si hay 2+ miembros.",               "id":"konosuba_spd"},
-        { "name":"Multirol",          "desc":"Puede usar habilidades de cualquier rol sin penalización.",           "id":"multirole"  },
-        { "name":"Táctico",           "desc":"Al inicio de la batalla, reduce el CD de un aliado aleatorio en 2.", "id":"tactician"  }
+        {
+          "name": "Afortunado",
+          "desc": "+15% dodge permanente.",
+          "id": "lucky"
+        },
+        {
+          "name": "Líder casual",
+          "desc": "KonoSuba +12% SPD si hay 2+ miembros.",
+          "id": "konosuba_spd"
+        },
+        {
+          "name": "Multirol",
+          "desc": "Puede usar habilidades sin penalización.",
+          "id": "multirole"
+        },
+        {
+          "name": "Táctico",
+          "desc": "Al inicio, reduce CD de un aliado aleatorio en 2.",
+          "id": "tactician"
+        }
       ]
     },
     {
@@ -202,17 +608,1537 @@
       "skins": [
         "https://cdn.myanimelist.net/images/characters/14/66484.jpg"
       ],
-      "stats": { "hp":6200, "atk":980,  "def":1400, "spd":88,  "cr":10, "cd":130, "dodge":5  },
+      "stats": {
+        "hp": 6200,
+        "atk": 980,
+        "def": 1400,
+        "spd": 88,
+        "cr": 10,
+        "cd": 130,
+        "dodge": 5
+      },
       "skills": [
-        { "name":"Proteger",          "desc":"Intercepta el siguiente ataque dirigido a cualquier aliado (0 daño).", "type":"activa", "cooldown":0, "effect":"taunt",       "mult":0    },
-        { "name":"Contraataque",      "desc":"Bloquea el ataque y responde con 80% ATK al atacante.",               "type":"activa", "cooldown":3, "effect":"counter",     "mult":0.8  },
-        { "name":"Aura de recuerdo",  "desc":"Reduce 25% ATK de todos los enemigos por 2 turnos.",                  "type":"activa", "cooldown":5, "effect":"debuff_aoe",   "mult":0    }
+        {
+          "name": "Proteger",
+          "desc": "Intercepta el siguiente ataque a cualquier aliado (0 daño).",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "taunt",
+          "mult": 0
+        },
+        {
+          "name": "Contraataque",
+          "desc": "80% ATK al atacante. Reduce 40% daño recibido este turno.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "counter",
+          "mult": 0.8
+        },
+        {
+          "name": "Aura de recuerdo",
+          "desc": "Reduce 25% ATK de todos los enemigos por 2 turnos.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "debuff_aoe",
+          "mult": 0
+        }
       ],
       "passive_pool": [
-        { "name":"Voluntad de vivir", "desc":"Sobrevive 1 golpe mortal con 1 HP (1 vez por batalla).",              "id":"survive"    },
-        { "name":"Muro inquebrantable","desc":"Bloquea hasta 400 de daño de cualquier golpe.",                      "id":"flat_block" },
-        { "name":"Espíritu eterno",   "desc":"Al recibir crítico, contraataca automáticamente con 50% ATK.",        "id":"auto_counter"},
-        { "name":"Nexo",              "desc":"Aliados Angel Beats ganan +10% DEF si hay 2+ miembros en el equipo.", "id":"ab_def"     }
+        {
+          "name": "Voluntad de vivir",
+          "desc": "Sobrevive 1 golpe mortal con 1 HP (1 vez por batalla).",
+          "id": "survive"
+        },
+        {
+          "name": "Muro inquebrantable",
+          "desc": "Bloquea hasta 400 de daño por golpe.",
+          "id": "flat_block"
+        },
+        {
+          "name": "Espíritu eterno",
+          "desc": "Al recibir crítico, contraataca con 50% ATK.",
+          "id": "auto_counter"
+        },
+        {
+          "name": "Nexo",
+          "desc": "Angel Beats +10% DEF si hay 2+ miembros.",
+          "id": "ab_def"
+        }
+      ]
+    },
+    {
+      "name": "Satoru Gojo",
+      "series": "Jujutsu Kaisen",
+      "affinity": "luz",
+      "role": "mago",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/10/431252.jpg",
+        "https://cdn.myanimelist.net/images/characters/2/431253.jpg"
+      ],
+      "stats": {
+        "hp": 4800,
+        "atk": 2000,
+        "def": 900,
+        "spd": 115,
+        "cr": 30,
+        "cd": 190,
+        "dodge": 18
+      },
+      "skills": [
+        {
+          "name": "Azul",
+          "desc": "Atrae enemigos y hace 140% ATK AoE.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "aoe",
+          "mult": 1.4
+        },
+        {
+          "name": "Infinito",
+          "desc": "Reduce daño recibido 50% por 2 turnos.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "dmg_reduce_self",
+          "mult": 0.5
+        },
+        {
+          "name": "Hollow Purple",
+          "desc": "300% ATK. Ignora 40% DEF.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "nuke",
+          "mult": 3.0
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Seis Ojos",
+          "desc": "+20% CR y no puede fallar ataques.",
+          "id": "perfect_hit"
+        },
+        {
+          "name": "Hechicero Supremo",
+          "desc": "Reduce CD de skills en 1 cada ronda.",
+          "id": "cd_loop"
+        },
+        {
+          "name": "Dominio",
+          "desc": "Al usar ultimate, aturde 1 turno a todos los enemigos.",
+          "id": "aoe_stun"
+        },
+        {
+          "name": "Intocable",
+          "desc": "Primer golpe recibido cada turno hace 0 daño.",
+          "id": "first_null"
+        }
+      ]
+    },
+    {
+      "name": "Levi Ackerman",
+      "series": "Attack on Titan",
+      "affinity": "rayo",
+      "role": "guerrero",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/2/241413.jpg"
+      ],
+      "stats": {
+        "hp": 4200,
+        "atk": 1850,
+        "def": 850,
+        "spd": 130,
+        "cr": 28,
+        "cd": 180,
+        "dodge": 25
+      },
+      "skills": [
+        {
+          "name": "Corte giratorio",
+          "desc": "3 golpes de 50% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "multihit3",
+          "mult": 0.5
+        },
+        {
+          "name": "Ataque relámpago",
+          "desc": "200% ATK + aplica sangrado (5% HP/turno 2 turnos).",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "bleed",
+          "mult": 2.0
+        },
+        {
+          "name": "Modo capitán",
+          "desc": "+40% SPD y +40% Dodge por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff_spd_team",
+          "mult": 0.4
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Perfección",
+          "desc": "+25% daño si el enemigo tiene menos HP que Levi.",
+          "id": "execute"
+        },
+        {
+          "name": "Velocidad extrema",
+          "desc": "Al matar un objetivo, actúa de nuevo.",
+          "id": "extra_turn"
+        },
+        {
+          "name": "Anti gigante",
+          "desc": "+30% daño a tanques.",
+          "id": "tank_buster"
+        },
+        {
+          "name": "Instinto",
+          "desc": "+15% dodge permanente.",
+          "id": "dodge_up"
+        }
+      ]
+    },
+    {
+      "name": "Eren Yeager",
+      "series": "Attack on Titan",
+      "affinity": "fuego",
+      "role": "guerrero",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/10/216895.jpg"
+      ],
+      "stats": {
+        "hp": 5200,
+        "atk": 1700,
+        "def": 1100,
+        "spd": 105,
+        "cr": 22,
+        "cd": 170,
+        "dodge": 8
+      },
+      "skills": [
+        {
+          "name": "Golpe titán",
+          "desc": "180% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.8
+        },
+        {
+          "name": "Transformación",
+          "desc": "+50% ATK y DEF por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        },
+        {
+          "name": "Pisotear",
+          "desc": "120% ATK AoE + 30% de aturdir.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "aoe_stun_multi",
+          "mult": 1.2
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Ira",
+          "desc": "+20% ATK acumulativo al recibir daño (máx 3 veces).",
+          "id": "rage"
+        },
+        {
+          "name": "Regeneración titán",
+          "desc": "Regenera 8% HP por turno.",
+          "id": "regen"
+        },
+        {
+          "name": "Determinación",
+          "desc": "No puede morir en el primer golpe recibido.",
+          "id": "survive"
+        },
+        {
+          "name": "Venganza",
+          "desc": "+30% daño si un aliado ha muerto.",
+          "id": "revenge"
+        }
+      ]
+    },
+    {
+      "name": "Mikasa Ackerman",
+      "series": "Attack on Titan",
+      "affinity": "tierra",
+      "role": "guerrero",
+      "rarity": 4,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/9/215563.jpg"
+      ],
+      "stats": {
+        "hp": 4500,
+        "atk": 1500,
+        "def": 1000,
+        "spd": 118,
+        "cr": 20,
+        "cd": 160,
+        "dodge": 18
+      },
+      "skills": [
+        {
+          "name": "Ataque rápido",
+          "desc": "140% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.4
+        },
+        {
+          "name": "Protección",
+          "desc": "Escudo 20% HP a aliado.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "shield",
+          "mult": 0.2
+        },
+        {
+          "name": "Furia Ackerman",
+          "desc": "+35% ATK por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Lealtad",
+          "desc": "+15% DEF a todo el equipo.",
+          "id": "team_def"
+        },
+        {
+          "name": "Reflejos",
+          "desc": "+15% dodge.",
+          "id": "dodge_up"
+        },
+        {
+          "name": "Cazadora",
+          "desc": "+20% daño a enemigos con debuffs.",
+          "id": "debuff_amp"
+        },
+        {
+          "name": "Instinto protector",
+          "desc": "15% de interceptar ataques a aliados.",
+          "id": "intercept"
+        }
+      ]
+    },
+    {
+      "name": "Rimuru Tempest",
+      "series": "Tensei Shitara Slime Datta Ken",
+      "affinity": "agua",
+      "role": "soporte",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/9/366382.jpg"
+      ],
+      "stats": {
+        "hp": 5000,
+        "atk": 1500,
+        "def": 1200,
+        "spd": 110,
+        "cr": 18,
+        "cd": 160,
+        "dodge": 12
+      },
+      "skills": [
+        {
+          "name": "Depredador",
+          "desc": "Roba 1 buff del objetivo. 100% ATK de daño.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "steal_buff",
+          "mult": 1.0
+        },
+        {
+          "name": "Gran Sabio",
+          "desc": "Reduce CD de todo el equipo en 1 turno.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "cd_reduce_team",
+          "mult": 0
+        },
+        {
+          "name": "Tormenta negra",
+          "desc": "160% AoE.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "aoe",
+          "mult": 1.6
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Adaptabilidad",
+          "desc": "Reduce daño recibido 20%.",
+          "id": "dmg_reduce"
+        },
+        {
+          "name": "Análisis",
+          "desc": "Al inicio, revela pasivas enemigas en el log.",
+          "id": "reveal"
+        },
+        {
+          "name": "Rey demonio",
+          "desc": "+25% ATK al matar un objetivo.",
+          "id": "snowball"
+        },
+        {
+          "name": "Absorción",
+          "desc": "Cura 10% del daño infligido.",
+          "id": "lifesteal"
+        }
+      ]
+    },
+    {
+      "name": "Zero Two",
+      "series": "Darling in the FranXX",
+      "affinity": "fuego",
+      "role": "guerrero",
+      "rarity": 4,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/12/332225.jpg"
+      ],
+      "stats": {
+        "hp": 4400,
+        "atk": 1600,
+        "def": 850,
+        "spd": 120,
+        "cr": 24,
+        "cd": 165,
+        "dodge": 14
+      },
+      "skills": [
+        {
+          "name": "Embestida",
+          "desc": "150% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.5
+        },
+        {
+          "name": "Modo berserk",
+          "desc": "+45% ATK. Pierde 5% HP.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "buff",
+          "mult": 0
+        },
+        {
+          "name": "Ataque crítico",
+          "desc": "220% ATK garantiza crítico.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "guaranteed_crit",
+          "mult": 2.2
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Instinto salvaje",
+          "desc": "+20% CR.",
+          "id": "crit_up"
+        },
+        {
+          "name": "Frenesí",
+          "desc": "25% de atacar dos veces.",
+          "id": "double_hit"
+        },
+        {
+          "name": "Agresividad",
+          "desc": "+15% daño constante.",
+          "id": "flat_dmg"
+        },
+        {
+          "name": "Resistencia",
+          "desc": "Reduce daño 10%.",
+          "id": "dmg_reduce"
+        }
+      ]
+    },
+    {
+      "name": "Naruto Uzumaki",
+      "series": "Naruto",
+      "affinity": "luz",
+      "role": "guerrero",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/13/284885.jpg"
+      ],
+      "stats": {
+        "hp": 5400,
+        "atk": 1750,
+        "def": 1000,
+        "spd": 110,
+        "cr": 22,
+        "cd": 170,
+        "dodge": 10
+      },
+      "skills": [
+        {
+          "name": "Rasengan",
+          "desc": "180% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.8
+        },
+        {
+          "name": "Modo Sabio",
+          "desc": "+40% ATK y SPD por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        },
+        {
+          "name": "Kurama",
+          "desc": "AoE 160%.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "aoe",
+          "mult": 1.6
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Voluntad de fuego",
+          "desc": "+20% HP máximo.",
+          "id": "hp_up"
+        },
+        {
+          "name": "Regeneración",
+          "desc": "5% HP por turno.",
+          "id": "regen"
+        },
+        {
+          "name": "Determinación",
+          "desc": "Sobrevive 1 golpe mortal.",
+          "id": "survive"
+        },
+        {
+          "name": "Líder",
+          "desc": "+10% a todas las stats del equipo.",
+          "id": "team_buff"
+        }
+      ]
+    },
+    {
+      "name": "Sasuke Uchiha",
+      "series": "Naruto",
+      "affinity": "oscuridad",
+      "role": "mago",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/13/284888.jpg"
+      ],
+      "stats": {
+        "hp": 4300,
+        "atk": 1900,
+        "def": 850,
+        "spd": 120,
+        "cr": 28,
+        "cd": 185,
+        "dodge": 15
+      },
+      "skills": [
+        {
+          "name": "Chidori",
+          "desc": "200% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 2.0
+        },
+        {
+          "name": "Amaterasu",
+          "desc": "160% ATK + sangrado 5% HP/turno 2 turnos.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "bleed",
+          "mult": 1.6
+        },
+        {
+          "name": "Susanoo",
+          "desc": "Escudo masivo equivalente a 30% HP propio.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "shield",
+          "mult": 0.3
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Sharingan",
+          "desc": "+20% CR.",
+          "id": "crit_up"
+        },
+        {
+          "name": "Venganza",
+          "desc": "+25% daño cuando HP < 50%.",
+          "id": "execute"
+        },
+        {
+          "name": "Genjutsu",
+          "desc": "Ataques básicos 10% de aturdir.",
+          "id": "stun_basic"
+        },
+        {
+          "name": "Rivalidad",
+          "desc": "+15% vs personajes de la misma serie.",
+          "id": "rival"
+        }
+      ]
+    },
+    {
+      "name": "Ichigo Kurosaki",
+      "series": "Bleach",
+      "affinity": "oscuridad",
+      "role": "guerrero",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/3/266379.jpg"
+      ],
+      "stats": {
+        "hp": 5200,
+        "atk": 1800,
+        "def": 950,
+        "spd": 112,
+        "cr": 24,
+        "cd": 175,
+        "dodge": 12
+      },
+      "skills": [
+        {
+          "name": "Getsuga Tensho",
+          "desc": "180% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.8
+        },
+        {
+          "name": "Bankai",
+          "desc": "+35% SPD y +35% ATK por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        },
+        {
+          "name": "Forma final",
+          "desc": "250% ATK. Ignora 20% DEF.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "nuke",
+          "mult": 2.5
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Hollow",
+          "desc": "+20% daño base.",
+          "id": "flat_dmg"
+        },
+        {
+          "name": "Instinto",
+          "desc": "+15% dodge.",
+          "id": "dodge_up"
+        },
+        {
+          "name": "Resistencia",
+          "desc": "Reduce daño recibido 15%.",
+          "id": "dmg_reduce"
+        },
+        {
+          "name": "Dualidad",
+          "desc": "+10% CR y CD.",
+          "id": "crit_mix"
+        }
+      ]
+    },
+    {
+      "name": "Tanjiro Kamado",
+      "series": "Demon Slayer",
+      "affinity": "agua",
+      "role": "guerrero",
+      "rarity": 4,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/10/386521.jpg"
+      ],
+      "stats": {
+        "hp": 4600,
+        "atk": 1500,
+        "def": 900,
+        "spd": 115,
+        "cr": 20,
+        "cd": 160,
+        "dodge": 14
+      },
+      "skills": [
+        {
+          "name": "Respiración de agua",
+          "desc": "140% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.4
+        },
+        {
+          "name": "Hinokami",
+          "desc": "200% ATK. Garantiza crítico.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "guaranteed_crit",
+          "mult": 2.0
+        },
+        {
+          "name": "Determinación",
+          "desc": "+30% ATK por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Olfato",
+          "desc": "+15% CR.",
+          "id": "crit_up"
+        },
+        {
+          "name": "Protector",
+          "desc": "Reduce daño a aliados 10%.",
+          "id": "team_def"
+        },
+        {
+          "name": "Corazón puro",
+          "desc": "Resiste debuffs 25%.",
+          "id": "debuff_res"
+        },
+        {
+          "name": "Cazador",
+          "desc": "+15% daño base.",
+          "id": "flat_dmg"
+        }
+      ]
+    },
+    {
+      "name": "Nezuko Kamado",
+      "series": "Demon Slayer",
+      "affinity": "fuego",
+      "role": "guerrero",
+      "rarity": 4,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/2/386522.jpg"
+      ],
+      "stats": {
+        "hp": 4800,
+        "atk": 1550,
+        "def": 950,
+        "spd": 110,
+        "cr": 18,
+        "cd": 160,
+        "dodge": 12
+      },
+      "skills": [
+        {
+          "name": "Patada demoníaca",
+          "desc": "150% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.5
+        },
+        {
+          "name": "Explosión de sangre",
+          "desc": "AoE fuego 140% + sangrado.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "aoe_bleed",
+          "mult": 1.4
+        },
+        {
+          "name": "Regeneración",
+          "desc": "Cura 20% HP propio.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "heal",
+          "mult": 0.2
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Demonio",
+          "desc": "Regenera 6% HP por turno.",
+          "id": "regen"
+        },
+        {
+          "name": "Furia",
+          "desc": "+20% daño.",
+          "id": "flat_dmg"
+        },
+        {
+          "name": "Resistencia",
+          "desc": "Reduce daño 10%.",
+          "id": "dmg_reduce"
+        },
+        {
+          "name": "Protección",
+          "desc": "15% de interceptar ataques.",
+          "id": "intercept"
+        }
+      ]
+    },
+    {
+      "name": "Denji",
+      "series": "Chainsaw Man",
+      "affinity": "oscuridad",
+      "role": "guerrero",
+      "rarity": 4,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/3/456662.jpg"
+      ],
+      "stats": {
+        "hp": 4700,
+        "atk": 1650,
+        "def": 900,
+        "spd": 115,
+        "cr": 22,
+        "cd": 165,
+        "dodge": 12
+      },
+      "skills": [
+        {
+          "name": "Motosierra",
+          "desc": "160% ATK con sangrado.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "bleed",
+          "mult": 1.6
+        },
+        {
+          "name": "Frenesí",
+          "desc": "Doble ataque 120% ATK c/u.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "multihit3",
+          "mult": 0.6
+        },
+        {
+          "name": "Forma demonio",
+          "desc": "+40% ATK por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Sangre",
+          "desc": "Roba vida: 12% del daño hecho.",
+          "id": "lifesteal"
+        },
+        {
+          "name": "Locura",
+          "desc": "+20% CR.",
+          "id": "crit_up"
+        },
+        {
+          "name": "Agresivo",
+          "desc": "+15% daño.",
+          "id": "flat_dmg"
+        },
+        {
+          "name": "Resistencia",
+          "desc": "Reduce daño 10%.",
+          "id": "dmg_reduce"
+        }
+      ]
+    },
+    {
+      "name": "Power",
+      "series": "Chainsaw Man",
+      "affinity": "fuego",
+      "role": "guerrero",
+      "rarity": 3,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/11/456663.jpg"
+      ],
+      "stats": {
+        "hp": 4300,
+        "atk": 1500,
+        "def": 800,
+        "spd": 110,
+        "cr": 18,
+        "cd": 150,
+        "dodge": 10
+      },
+      "skills": [
+        {
+          "name": "Martillo sangre",
+          "desc": "150% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.5
+        },
+        {
+          "name": "Explosión sangre",
+          "desc": "AoE 130% a todos los enemigos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "aoe",
+          "mult": 1.3
+        },
+        {
+          "name": "Caos",
+          "desc": "+30% ATK por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Orgullo",
+          "desc": "+10% daño.",
+          "id": "flat_dmg"
+        },
+        {
+          "name": "Impulsiva",
+          "desc": "+10% SPD.",
+          "id": "spd_up"
+        },
+        {
+          "name": "Demonio",
+          "desc": "Regenera 5% HP por turno.",
+          "id": "regen"
+        },
+        {
+          "name": "Resistencia",
+          "desc": "Reduce daño 8%.",
+          "id": "dmg_reduce"
+        }
+      ]
+    },
+    {
+      "name": "Monkey D. Luffy",
+      "series": "One Piece",
+      "affinity": "fuego",
+      "role": "guerrero",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/9/310307.jpg"
+      ],
+      "stats": {
+        "hp": 5600,
+        "atk": 1800,
+        "def": 1100,
+        "spd": 115,
+        "cr": 24,
+        "cd": 180,
+        "dodge": 12
+      },
+      "skills": [
+        {
+          "name": "Gomu Gomu no Pistol",
+          "desc": "180% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.8
+        },
+        {
+          "name": "Gear Second",
+          "desc": "+40% SPD por 3 turnos.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "buff",
+          "mult": 0
+        },
+        {
+          "name": "Gear Fifth",
+          "desc": "AoE 170%.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "aoe",
+          "mult": 1.7
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Haki",
+          "desc": "+20% daño.",
+          "id": "flat_dmg"
+        },
+        {
+          "name": "Resistencia",
+          "desc": "Reduce daño 12%.",
+          "id": "dmg_reduce"
+        },
+        {
+          "name": "Capitán",
+          "desc": "+10% a todas las stats del equipo.",
+          "id": "team_buff"
+        },
+        {
+          "name": "Voluntad",
+          "desc": "Sobrevive 1 golpe mortal.",
+          "id": "survive"
+        }
+      ]
+    },
+    {
+      "name": "Roronoa Zoro",
+      "series": "One Piece",
+      "affinity": "tierra",
+      "role": "guerrero",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/3/315878.jpg"
+      ],
+      "stats": {
+        "hp": 5200,
+        "atk": 1850,
+        "def": 1200,
+        "spd": 105,
+        "cr": 26,
+        "cd": 175,
+        "dodge": 10
+      },
+      "skills": [
+        {
+          "name": "Santoryu",
+          "desc": "200% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 2.0
+        },
+        {
+          "name": "Asura",
+          "desc": "+50% ATK por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        },
+        {
+          "name": "Corte final",
+          "desc": "250% ATK. Ignora 25% DEF.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "nuke",
+          "mult": 2.5
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Espadachín",
+          "desc": "+20% daño.",
+          "id": "flat_dmg"
+        },
+        {
+          "name": "Determinación",
+          "desc": "+15% DEF.",
+          "id": "def_up"
+        },
+        {
+          "name": "Resistencia",
+          "desc": "Reduce daño 12%.",
+          "id": "dmg_reduce"
+        },
+        {
+          "name": "Crítico",
+          "desc": "+15% CR.",
+          "id": "crit_up"
+        }
+      ]
+    },
+    {
+      "name": "Sanji",
+      "series": "One Piece",
+      "affinity": "fuego",
+      "role": "guerrero",
+      "rarity": 4,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/5/136769.jpg"
+      ],
+      "stats": {
+        "hp": 4800,
+        "atk": 1600,
+        "def": 950,
+        "spd": 125,
+        "cr": 22,
+        "cd": 160,
+        "dodge": 18
+      },
+      "skills": [
+        {
+          "name": "Diable Jambe",
+          "desc": "170% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.7
+        },
+        {
+          "name": "Patada rápida",
+          "desc": "Multi hit 3 golpes 50% c/u.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "multihit3",
+          "mult": 0.5
+        },
+        {
+          "name": "Sky Walk",
+          "desc": "+40% Dodge y +20% SPD por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Velocidad",
+          "desc": "+15% SPD.",
+          "id": "spd_up"
+        },
+        {
+          "name": "Crítico",
+          "desc": "+15% CR.",
+          "id": "crit_up"
+        },
+        {
+          "name": "Evasión",
+          "desc": "+15% dodge.",
+          "id": "dodge_up"
+        },
+        {
+          "name": "Fuego",
+          "desc": "+10% daño.",
+          "id": "flat_dmg"
+        }
+      ]
+    },
+    {
+      "name": "Asta",
+      "series": "Black Clover",
+      "affinity": "oscuridad",
+      "role": "guerrero",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/2/346543.jpg"
+      ],
+      "stats": {
+        "hp": 5300,
+        "atk": 1750,
+        "def": 1100,
+        "spd": 110,
+        "cr": 22,
+        "cd": 170,
+        "dodge": 10
+      },
+      "skills": [
+        {
+          "name": "Anti magia",
+          "desc": "180% ATK. Elimina 1 buff del objetivo.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage_debuff",
+          "mult": 1.8
+        },
+        {
+          "name": "Modo demonio",
+          "desc": "+45% ATK y +20% DEF por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        },
+        {
+          "name": "Corte negro",
+          "desc": "220% ATK. Ignora toda la DEF.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "ignore_def",
+          "mult": 2.2
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Anti magia",
+          "desc": "Inmune a debuffs mágicos.",
+          "id": "immune"
+        },
+        {
+          "name": "Voluntad",
+          "desc": "+20% HP máximo.",
+          "id": "hp_up"
+        },
+        {
+          "name": "Resistencia",
+          "desc": "Reduce daño 12%.",
+          "id": "dmg_reduce"
+        },
+        {
+          "name": "Furia",
+          "desc": "+20% daño.",
+          "id": "flat_dmg"
+        }
+      ]
+    },
+    {
+      "name": "Yuno",
+      "series": "Black Clover",
+      "affinity": "rayo",
+      "role": "mago",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/8/346544.jpg"
+      ],
+      "stats": {
+        "hp": 4200,
+        "atk": 1850,
+        "def": 800,
+        "spd": 120,
+        "cr": 26,
+        "cd": 180,
+        "dodge": 14
+      },
+      "skills": [
+        {
+          "name": "Espíritu viento",
+          "desc": "170% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.7
+        },
+        {
+          "name": "Forma espíritu",
+          "desc": "+40% ATK y +20% CR por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        },
+        {
+          "name": "Tormenta",
+          "desc": "AoE 160%.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "aoe",
+          "mult": 1.6
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Elegido",
+          "desc": "+20% CR.",
+          "id": "crit_up"
+        },
+        {
+          "name": "Velocidad",
+          "desc": "+15% SPD.",
+          "id": "spd_up"
+        },
+        {
+          "name": "Viento",
+          "desc": "+15% daño.",
+          "id": "flat_dmg"
+        },
+        {
+          "name": "Instinto",
+          "desc": "+10% dodge.",
+          "id": "dodge_up"
+        }
+      ]
+    },
+    {
+      "name": "Kirito",
+      "series": "Sword Art Online",
+      "affinity": "oscuridad",
+      "role": "guerrero",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/8/181561.jpg"
+      ],
+      "stats": {
+        "hp": 5000,
+        "atk": 1750,
+        "def": 950,
+        "spd": 120,
+        "cr": 28,
+        "cd": 180,
+        "dodge": 20
+      },
+      "skills": [
+        {
+          "name": "Dual Blades",
+          "desc": "3 golpes 60% ATK c/u.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "multihit3",
+          "mult": 0.6
+        },
+        {
+          "name": "Starburst",
+          "desc": "200% ATK garantiza crítico.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "guaranteed_crit",
+          "mult": 2.0
+        },
+        {
+          "name": "Modo negro",
+          "desc": "+40% ATK y +20% dodge por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Reflejos",
+          "desc": "+20% dodge.",
+          "id": "dodge_up"
+        },
+        {
+          "name": "Crítico",
+          "desc": "+20% CR.",
+          "id": "crit_up"
+        },
+        {
+          "name": "Velocidad",
+          "desc": "+15% SPD.",
+          "id": "spd_up"
+        },
+        {
+          "name": "Doble ataque",
+          "desc": "25% de atacar dos veces.",
+          "id": "double_hit"
+        }
+      ]
+    },
+    {
+      "name": "Asuna Yuuki",
+      "series": "Sword Art Online",
+      "affinity": "luz",
+      "role": "guerrero",
+      "rarity": 4,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/9/181562.jpg"
+      ],
+      "stats": {
+        "hp": 4600,
+        "atk": 1550,
+        "def": 900,
+        "spd": 125,
+        "cr": 24,
+        "cd": 160,
+        "dodge": 18
+      },
+      "skills": [
+        {
+          "name": "Estocada",
+          "desc": "150% ATK.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "damage",
+          "mult": 1.5
+        },
+        {
+          "name": "Combo rápido",
+          "desc": "3 golpes 50% ATK c/u.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "multihit3",
+          "mult": 0.5
+        },
+        {
+          "name": "Velocidad luz",
+          "desc": "+40% SPD y +20% dodge por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Rapidez",
+          "desc": "+20% SPD.",
+          "id": "spd_up"
+        },
+        {
+          "name": "Crítico",
+          "desc": "+15% CR.",
+          "id": "crit_up"
+        },
+        {
+          "name": "Evasión",
+          "desc": "+15% dodge.",
+          "id": "dodge_up"
+        },
+        {
+          "name": "Precisión",
+          "desc": "Los ataques nunca fallan.",
+          "id": "perfect_hit"
+        }
+      ]
+    },
+    {
+      "name": "Kaneki Ken",
+      "series": "Tokyo Ghoul",
+      "affinity": "oscuridad",
+      "role": "guerrero",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/9/252349.jpg"
+      ],
+      "stats": {
+        "hp": 5100,
+        "atk": 1800,
+        "def": 1000,
+        "spd": 115,
+        "cr": 25,
+        "cd": 175,
+        "dodge": 14
+      },
+      "skills": [
+        {
+          "name": "Kagune",
+          "desc": "180% ATK. Roba vida 15%.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "lifesteal",
+          "mult": 1.8
+        },
+        {
+          "name": "Modo ghoul",
+          "desc": "+45% ATK y +10% CR por 2 turnos.",
+          "type": "activa",
+          "cooldown": 4,
+          "effect": "buff",
+          "mult": 0
+        },
+        {
+          "name": "Frenesí",
+          "desc": "3 golpes 70% ATK c/u.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "multihit3",
+          "mult": 0.7
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Regeneración",
+          "desc": "Regenera 7% HP por turno.",
+          "id": "regen"
+        },
+        {
+          "name": "Dolor",
+          "desc": "+20% daño.",
+          "id": "flat_dmg"
+        },
+        {
+          "name": "Locura",
+          "desc": "+20% CR.",
+          "id": "crit_up"
+        },
+        {
+          "name": "Resistencia",
+          "desc": "Reduce daño 12%.",
+          "id": "dmg_reduce"
+        }
+      ]
+    },
+    {
+      "name": "Albedo",
+      "series": "Overlord",
+      "affinity": "oscuridad",
+      "role": "tanque",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/14/284121.jpg"
+      ],
+      "stats": {
+        "hp": 6500,
+        "atk": 1200,
+        "def": 1500,
+        "spd": 90,
+        "cr": 12,
+        "cd": 140,
+        "dodge": 6
+      },
+      "skills": [
+        {
+          "name": "Guardia",
+          "desc": "Reduce daño a todo el equipo 20% este turno.",
+          "type": "activa",
+          "cooldown": 0,
+          "effect": "team_def_skill",
+          "mult": 0.2
+        },
+        {
+          "name": "Provocar",
+          "desc": "Fuerza al enemigo a atacarla. Se cura 10% HP.",
+          "type": "activa",
+          "cooldown": 3,
+          "effect": "taunt",
+          "mult": 0
+        },
+        {
+          "name": "Escudo oscuro",
+          "desc": "Escudo masivo 30% HP a sí misma.",
+          "type": "activa",
+          "cooldown": 5,
+          "effect": "shield",
+          "mult": 0.3
+        }
+      ],
+      "passive_pool": [
+        {
+          "name": "Defensa suprema",
+          "desc": "+25% DEF.",
+          "id": "def_up"
+        },
+        {
+          "name": "Guardiana",
+          "desc": "Reduce daño al equipo 10% pasivamente.",
+          "id": "team_def"
+        },
+        {
+          "name": "Resistencia",
+          "desc": "Reduce daño recibido 15%.",
+          "id": "dmg_reduce"
+        },
+        {
+          "name": "Fidelidad",
+          "desc": "Sinergia con Ainz: +10% stats.",
+          "id": "synergy"
+        }
       ]
     }
   ]

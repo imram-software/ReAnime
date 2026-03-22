@@ -112,6 +112,15 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .fighter.selected{border-color:var(--pink) !important;box-shadow:0 0 16px var(--pink-dim) !important;}
 .fighter.acting{animation:actPulse .35s ease;z-index:10;}
 @keyframes actPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12);}}
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-8px)}30%{transform:translateX(8px)}45%{transform:translateX(-6px)}60%{transform:translateX(6px)}75%{transform:translateX(-3px)}90%{transform:translateX(3px)}}
+@keyframes hitFlash{0%,100%{filter:brightness(1)}20%{filter:brightness(2.5) saturate(0)}60%{filter:brightness(1.2)}}
+@keyframes absorbPulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.8)}70%{box-shadow:0 0 0 20px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+@keyframes shieldPulse{0%{box-shadow:0 0 0 0 rgba(96,165,250,.8)}70%{box-shadow:0 0 0 16px rgba(96,165,250,0)}100%{box-shadow:0 0 0 0 rgba(96,165,250,0)}}
+@keyframes critFlash{0%{filter:brightness(1)}10%{filter:brightness(3) sepia(1) hue-rotate(20deg)}40%{filter:brightness(1.8)}100%{filter:brightness(1)}}
+.fighter.shake-hit{animation:shake .4s ease,hitFlash .4s ease;}
+.fighter.crit-hit{animation:shake .5s ease,critFlash .5s ease;}
+.fighter.absorb-hit{animation:absorbPulse .6s ease;}
+.fighter.shield-hit{animation:shieldPulse .5s ease;}
 .fighter.dead{opacity:.3;filter:grayscale(1);pointer-events:none;}
 .fighter.dimmed{opacity:.45;filter:brightness(.55);}
 .fighter.stunned-vis{filter:hue-rotate(200deg) brightness(.7);}
@@ -120,7 +129,13 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .f-shield{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#3b82f6;color:#fff;font-size:.55rem;border-radius:10px;padding:.1rem .4rem;white-space:nowrap;z-index:5;border:1px solid #60a5fa;}
 /* Buff icon row */
 .f-buffs{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);display:flex;gap:2px;z-index:5;}
-.f-buff-icon{font-size:.7rem;background:rgba(0,0,0,.8);border-radius:4px;padding:1px 3px;border:1px solid rgba(255,255,255,.1);}
+.f-buff-icon{font-size:.65rem;background:rgba(0,0,0,.85);border-radius:4px;padding:1px 4px;border:1px solid rgba(255,255,255,.15);white-space:nowrap;cursor:default;}
+.f-buffs{position:absolute;top:-22px;left:50%;transform:translateX(-50%);display:flex;gap:2px;z-index:6;flex-wrap:nowrap;}
+/* Fighter hover tooltip */
+.fighter-tooltip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#0d001a;border:1px solid #a78bfa55;border-radius:8px;padding:.45rem .7rem;font-size:.68rem;color:#e9d5ff;min-width:150px;max-width:200px;z-index:100;pointer-events:none;white-space:normal;line-height:1.5;box-shadow:0 4px 20px rgba(0,0,0,.8);}
+.fighter-tooltip .ft-title{font-family:var(--font-h);font-size:.85rem;color:#c4b5fd;margin-bottom:.25rem;letter-spacing:1px;}
+.fighter-tooltip .ft-row{display:flex;justify-content:space-between;gap:.5rem;}
+.fighter-tooltip .ft-buff{color:#4ade80;} .fighter-tooltip .ft-debuff{color:#f97316;} .fighter-tooltip .ft-stat{color:#94a3b8;}
 
 /* ── SKILL TOOLTIP ── */
 #skill-tooltip{position:fixed;background:#1a0030;border:1px solid #a78bfa55;border-radius:8px;padding:.6rem .85rem;font-size:.75rem;color:#e9d5ff;max-width:220px;z-index:9999;pointer-events:none;opacity:0;transition:opacity .15s;line-height:1.55;box-shadow:0 4px 20px rgba(0,0,0,.6);}
@@ -719,6 +734,7 @@ function startBattle() {
 
   renderBattleField();
   renderTurnOrder();
+  renderAllBuffIcons();
   logMsg('⚔ Batalla comenzando — orden por velocidad.', 'sys');
   logMsg(`${turnQueue.map(f=>f.name).join(', ')}`, 'sys');
   nextTurn();
@@ -741,13 +757,35 @@ function nextTurn() {
     // Rebuild with alive fighters sorted by spd
     turnQueue = fighters.filter(f=>f.hp>0).sort((a,b)=>b.spd - a.spd);
     logMsg('── Nueva ronda ──', 'sys');
-    // Reduce buff/debuff durations and cooldowns
     fighters.forEach(f => {
+      if (f.hp <= 0) return;
+      // Bleed
+      if (f.bleed > 0) {
+        f.hp = Math.max(0, f.hp - f.bleed);
+        updateFighterHP(f);
+        shakeHit('f-'+f.id, 'dmg');
+        showDmgFloat('f-'+f.id, '🩸 -'+f.bleed, false, 'debuff');
+        if (--f.bleedTurns <= 0) { f.bleed = 0; }
+        if (f.hp <= 0) { document.getElementById('f-'+f.id)?.classList.add('dead'); logMsg(`💀 ${f.name} murió por sangrado.`,'sys'); }
+      }
+      // Regen passive
+      if ((f.activePassive==='regen'||f.activePassive==='regen_low') && f.hp > 0) {
+        const healPct = f.activePassive==='regen_low' && f.hp/f.maxHp<0.40 ? 0.05 : f.activePassive==='regen' ? 0.05 : 0;
+        if (healPct > 0) {
+          const heal = Math.round(f.maxHp * healPct);
+          f.hp = Math.min(f.maxHp, f.hp + heal);
+          updateFighterHP(f);
+          showDmgFloat('f-'+f.id, '+'+heal+'💚', false, 'heal');
+        }
+      }
+      // Expire buffs/debuffs
       f.buffs   = f.buffs.filter(b  => { b.turns--;  return b.turns > 0; });
       f.debuffs = f.debuffs.filter(d => { d.turns--; return d.turns > 0; });
+      // Expire frozen
+      if (f.frozenTurns > 0) { f.frozenTurns--; if(!f.frozenTurns){ f.frozen=false; f.spd=Math.round(f.spd/0.70); } }
       f.stunned = false;
-      // reduce cooldowns
       Object.keys(f.cooldowns).forEach(k => { if(f.cooldowns[k]>0) f.cooldowns[k]--; });
+      renderBuffIcons(f);
     });
   }
 
@@ -798,7 +836,6 @@ function renderSkills(f) {
     btn.disabled = cd > 0 || phase !== 'ally_pick';
     const affLabel = AFF_LABELS[f.affinity] || '';
     btn.innerHTML = `<span class="sk-name">${sk.name}</span><span class="sk-cd">${cd > 0 ? 'CD: '+cd : (sk.cooldown===0?'Básico':'Lista')}</span>`;
-    btn.title = sk.desc;
     btn.addEventListener('mouseenter', (e) => showTooltip(e, sk));
     btn.addEventListener('mouseleave', hideTooltip);
     if (sk.type !== 'pasiva') {
@@ -933,7 +970,7 @@ function calcDamage(attacker, target, skillMult = 1) {
 
 // applyDamage replaced by applyDamageWithShield
 
-function executeAction(actor, skillChoice, target) {
+async function executeAction(actor, skillChoice, target) {
   const skill  = skillChoice.skill;
   const sk_idx = skillChoice.idx;
   const eff    = skill.effect || 'damage';
@@ -943,98 +980,228 @@ function executeAction(actor, skillChoice, target) {
   if (skill.cooldown > 0) actor.cooldowns[sk_idx] = skill.cooldown;
 
   // ── EFFECT DISPATCH ──
+
   if (eff === 'heal' || eff === 'heal_team') {
-    // Find heal target: ally with least HP
-    const healTargets = eff === 'heal_team'
-      ? fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0)
-      : [fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0).sort((a,b)=>a.hp/a.maxHp - b.hp/b.maxHp)[0]];
-    healTargets.forEach(t => {
+    const teammates = fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0);
+    const targets = eff === 'heal_team' ? teammates
+      : [teammates.sort((a,b)=>a.hp/a.maxHp - b.hp/b.maxHp)[0]];
+    targets.forEach(t => {
       if (!t) return;
       const healAmt = Math.round(t.maxHp * mult);
       t.hp = Math.min(t.maxHp, t.hp + healAmt);
       updateFighterHP(t);
+      shakeHit('f-'+t.id, 'heal');
       showDmgFloat('f-'+t.id, '+'+healAmt, false, 'heal');
-      logMsg(`💚 ${actor.name} cura a ${t.name} por ${healAmt} HP.`, 'heal');
+      renderBuffIcons(t);
     });
+    logMsg(`💚 ${actor.name} cura${eff==='heal_team'?' a todo el equipo':''} por ${Math.round((targets[0]?.maxHp||0)*mult)} HP.`, 'heal');
 
   } else if (eff === 'shield' || eff === 'shield_team') {
-    const shTargets = eff === 'shield_team'
-      ? fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0)
-      : [fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0).sort((a,b)=>a.hp/a.maxHp - b.hp/b.maxHp)[0]];
+    const teammates = fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0);
+    const shTargets = eff === 'shield_team' ? teammates
+      : [teammates.sort((a,b)=>a.hp/a.maxHp - b.hp/b.maxHp)[0]];
     shTargets.forEach(t => {
       if (!t) return;
       const shAmt = Math.round(t.maxHp * mult);
       t.shield = (t.shield || 0) + shAmt;
-      updateFighterHP(t);
-      showDmgFloat('f-'+t.id, '🛡'+shAmt, false, 'shield');
-      logMsg(`🛡 ${actor.name} otorga escudo a ${t.name} (${shAmt}).`, 'shield');
+      shakeHit('f-'+t.id, 'shield');
+      showDmgFloat('f-'+t.id, '🛡 +'+shAmt, false, 'shield');
+      renderBuffIcons(t);
     });
+    logMsg(`🛡 ${actor.name} otorga escudo${eff==='shield_team'?' a todo el equipo':''}.`, 'shield');
+
+  } else if (eff === 'buff' || eff === 'buff_spd' || eff === 'buff_dodge') {
+    // Generic buff — +% ATK/SPD/DEF
+    actor.buffs.push({ type:'atk', value: 0.35, turns: 2 });
+    actor.atk = Math.round(actor.atk * 1.35);
+    shakeHit('f-'+actor.id, 'heal');
+    showDmgFloat('f-'+actor.id, '⬆ BUFF', false, 'buff');
+    logMsg(`⬆ ${actor.name} se potencia.`, 'buff');
+    renderBuffIcons(actor);
 
   } else if (eff === 'buff_spd_team') {
     const allies = fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0);
     allies.forEach(f => {
       f.buffs.push({ type:'spd', value: mult || 0.20, turns: 2 });
       f.spd = Math.round(f.spd * (1 + (mult||0.20)));
+      renderBuffIcons(f);
     });
-    logMsg(`⚡ ${actor.name} aumenta SPD del equipo 20% por 2 turnos.`, 'buff');
+    showDmgFloat('f-'+actor.id, '⚡ +SPD', false, 'buff');
+    logMsg(`⚡ ${actor.name} aumenta SPD del equipo ${Math.round((mult||0.20)*100)}% por 2 turnos.`, 'buff');
+
+  } else if (eff === 'buff_luck') {
+    const allies = fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0);
+    allies.forEach(f => {
+      f.dodge = (f.dodge||0) + 15;
+      f.cr    = (f.cr||0) + 15;
+      f.buffs.push({ type:'dodge', value:15, turns:3 });
+      renderBuffIcons(f);
+    });
+    showDmgFloat('f-'+actor.id, '🍀 Suerte', false, 'buff');
+    logMsg(`🍀 ${actor.name} da suerte: +15% Dodge y CR al equipo por 3 turnos.`, 'buff');
+
+  } else if (eff === 'double_atk') {
+    actor.buffs.push({ type:'atk', value:1.0, turns:2 });
+    actor.atk = Math.round(actor.atk * 2.0);
+    const hpCost = Math.round(actor.maxHp * 0.08);
+    actor.hp = Math.max(1, actor.hp - hpCost);
+    updateFighterHP(actor);
+    shakeHit('f-'+actor.id, 'heal');
+    showDmgFloat('f-'+actor.id, '💪 ×2 ATK', false, 'buff');
+    logMsg(`💪 ${actor.name} duplica ATK por 2 turnos. (−${hpCost} HP)`, 'buff');
+    renderBuffIcons(actor);
+
+  } else if (eff === 'dmg_reduce_self') {
+    actor.buffs.push({ type:'dmg_reduce', value: mult||0.5, turns:2 });
+    actor.shield = (actor.shield||0) + Math.round(actor.maxHp * 0.3); // large shield
+    shakeHit('f-'+actor.id, 'shield');
+    showDmgFloat('f-'+actor.id, '🔵 Infinito', false, 'shield');
+    logMsg(`🔵 ${actor.name} activa Infinito: −50% daño por 2 turnos.`, 'shield');
+    renderBuffIcons(actor);
+
+  } else if (eff === 'cd_reduce_team') {
+    const allies = fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0);
+    allies.forEach(f => {
+      Object.keys(f.cooldowns).forEach(k => { if(f.cooldowns[k]>0) f.cooldowns[k]--; });
+    });
+    showDmgFloat('f-'+actor.id, '⏫ CD-1', false, 'buff');
+    logMsg(`⏫ ${actor.name} reduce CD de todo el equipo en 1.`, 'buff');
+    if (actor.id !== target?.id) selectFighter(fighters.find(f=>f.id===actor.id)||actor);
+
+  } else if (eff === 'team_def_skill') {
+    fighters.filter(f=>f.isEnemy===actor.isEnemy&&f.hp>0).forEach(f=>{
+      f.buffs.push({type:'def',value:mult||0.20,turns:1});
+    });
+    showDmgFloat('f-'+actor.id,'🛡 Guardia',false,'shield');
+    logMsg(`🛡 ${actor.name} reduce daño al equipo ${Math.round((mult||0.20)*100)}% este turno.`,'shield');
 
   } else if (eff === 'debuff_atk') {
+    animateAttack('f-'+actor.id, 'f-'+target.id);
     const r = calcDamage(actor, target, 1.0);
     if (!tryDodge(actor, target)) {
-      applyDamageWithShield(target, r.dmg);
-      showDmgFloat('f-'+target.id, r.dmg, r.isCrit);
+      const blocked = tryBlock(actor, target, r.dmg);
+      applyDamageWithShield(target, blocked.dmg, r.isCrit);
+      showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
       if (Math.random() < 0.30) {
         target.debuffs.push({ type:'atk', value:-0.20, turns:1 });
         target.atk = Math.round(target.atk * 0.80);
-        logMsg(`📉 ${actor.name} reduce ATK de ${target.name} 20%.`, 'debuff');
+        showDmgFloat('f-'+target.id, '⚔↓ ATK', false, 'debuff');
+        logMsg(`📉 ATK de ${target.name} reducido 20%.`, 'debuff');
+        renderBuffIcons(target);
       }
-      logMsg(`${actor.name} ataca a ${target.name}: ${r.dmg}${r.isCrit?' 💥 CRÍTICO!':''}`, r.isCrit?'crit':'dmg');
+      logMsg(`${actor.name} → ${target.name}: ${blocked.dmg}${r.isCrit?' 💥 CRÍTICO!':''}`, r.isCrit?'crit':'dmg');
+      logAff(actor, target, r.affMult);
+    } else {
+      showDmgFloat('f-'+target.id,'Esquiva!',false,'dodge');
+      logMsg(`💨 ${target.name} esquivó a ${actor.name}.`,'dodge');
     }
 
   } else if (eff === 'debuff_def') {
+    animateAttack('f-'+actor.id, 'f-'+target.id);
     if (!tryDodge(actor, target)) {
-      target.debuffs.push({ type:'def', value:-0.20, turns: 2 });
+      target.debuffs.push({ type:'def', value:-0.20, turns:2 });
       target.def = Math.round(target.def * 0.80);
-      showDmgFloat('f-'+target.id, '▼DEF', false, 'debuff');
+      showDmgFloat('f-'+target.id, '🛡↓ DEF', false, 'debuff');
+      shakeHit('f-'+target.id, 'dmg');
       logMsg(`🔍 ${actor.name} reduce DEF de ${target.name} 20% por 2 turnos.`, 'debuff');
-    }
+      renderBuffIcons(target);
+    } else { logMsg(`💨 ${target.name} esquivó a ${actor.name}.`,'dodge'); }
 
   } else if (eff === 'debuff_aoe') {
-    const enemies = fighters.filter(f => f.isEnemy === actor.isEnemy ? false : f.hp > 0);
-    enemies.forEach(t => {
-      t.debuffs.push({ type:'atk', value:-0.25, turns:2 });
-      t.atk = Math.round(t.atk * 0.75);
-      showDmgFloat('f-'+t.id, '▼ATK', false, 'debuff');
+    fighters.filter(f=>f.isEnemy!==actor.isEnemy&&f.hp>0).forEach(t=>{
+      t.debuffs.push({type:'atk',value:-0.25,turns:2});
+      t.atk = Math.round(t.atk*0.75);
+      showDmgFloat('f-'+t.id,'⚔↓ ATK',false,'debuff');
+      renderBuffIcons(t);
     });
-    logMsg(`📉 ${actor.name} reduce ATK de todos los enemigos 25%.`, 'debuff');
+    screenFlash('rgba(165,0,255,.2)');
+    logMsg(`📉 ${actor.name} reduce ATK de todos los enemigos 25% por 2 turnos.`,'debuff');
 
   } else if (eff === 'cleanse') {
-    const ally = fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0)[0];
-    if (ally) {
-      ally.debuffs = [];
-      const healAmt = Math.round(ally.maxHp * mult);
-      ally.hp = Math.min(ally.maxHp, ally.hp + healAmt);
-      updateFighterHP(ally);
-      showDmgFloat('f-'+ally.id, '✨Purif', false, 'buff');
-      logMsg(`✨ ${actor.name} purifica debuffs de ${ally.name} y cura ${healAmt} HP.`, 'buff');
+    const allyTarget = target?.isEnemy === actor.isEnemy ? target :
+      fighters.filter(f=>f.isEnemy===actor.isEnemy&&f.hp>0).sort((a,b)=>a.hp/a.maxHp-b.hp/b.maxHp)[0];
+    if (allyTarget) {
+      allyTarget.debuffs=[]; allyTarget.bleed=0; allyTarget.frozen=false; allyTarget.burning=false;
+      const healAmt = Math.round(allyTarget.maxHp * mult);
+      allyTarget.hp = Math.min(allyTarget.maxHp, allyTarget.hp + healAmt);
+      updateFighterHP(allyTarget);
+      shakeHit('f-'+allyTarget.id,'heal');
+      showDmgFloat('f-'+allyTarget.id,'✨ Puro',false,'buff');
+      logMsg(`✨ ${actor.name} purifica a ${allyTarget.name} y cura ${healAmt} HP.`,'heal');
+      renderBuffIcons(allyTarget);
     }
 
-  } else if (eff === 'stun') {
-    const r = calcDamage(actor, target, mult);
+  } else if (eff === 'freeze') {
+    animateAttack('f-'+actor.id, 'f-'+target.id);
     if (!tryDodge(actor, target)) {
+      const r = calcDamage(actor, target, mult);
       const blocked = tryBlock(actor, target, r.dmg);
-      if (!blocked.blocked) {
-        applyDamageWithShield(target, blocked.dmg);
-        showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
-        if (Math.random() < 0.50) {
-          target.stunned = true;
-          document.getElementById('f-'+target.id)?.classList.add('stunned-vis');
-          logMsg(`⚡ ${actor.name} aturde a ${target.name}! Pierde el próximo turno.`, 'debuff');
-        }
-        logAff(actor, target, r.affMult);
-        logMsg(`${actor.name} usa ${skill.name}: ${blocked.dmg}${r.isCrit?' 💥 CRÍTICO!':''}`, r.isCrit?'crit':'dmg');
+      applyDamageWithShield(target, blocked.dmg, r.isCrit);
+      showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
+      target.frozen    = true;
+      target.frozenTurns = 2;
+      target.spd = Math.round(target.spd * 0.70);
+      target.debuffs.push({type:'freeze',turns:2});
+      shakeHit('f-'+target.id,'dmg');
+      showDmgFloat('f-'+target.id,'❄ Congelado',false,'debuff');
+      logMsg(`❄ ${actor.name} congela a ${target.name}: −30% SPD, pierde turno próxima vez.`,'debuff');
+      logAff(actor,target,r.affMult);
+      renderBuffIcons(target);
+    } else { logMsg(`💨 ${target.name} esquivó el congelamiento.`,'dodge'); }
+
+  } else if (eff === 'bleed' || eff === 'aoe_bleed') {
+    animateAttack('f-'+actor.id, 'f-'+target.id);
+    const targets = eff==='aoe_bleed' ? fighters.filter(f=>f.isEnemy!==actor.isEnemy&&f.hp>0) : [target];
+    targets.forEach(t => {
+      if (tryDodge(actor,t)) { showDmgFloat('f-'+t.id,'Esquiva!',false,'dodge'); return; }
+      const r = calcDamage(actor, t, mult);
+      const blocked = tryBlock(actor, t, r.dmg);
+      applyDamageWithShield(t, blocked.dmg, r.isCrit);
+      showDmgFloat('f-'+t.id, blocked.dmg, r.isCrit);
+      t.bleed = Math.round(t.maxHp * 0.05);
+      t.bleedTurns = 2;
+      t.debuffs.push({type:'bleed',turns:2});
+      showDmgFloat('f-'+t.id,'🩸 Sangrado',false,'debuff');
+      logMsg(`🩸 ${actor.name} hace sangrar a ${t.name}: ${Math.round(t.maxHp*0.05)} HP/turno.`,'debuff');
+      logAff(actor,t,r.affMult);
+      renderBuffIcons(t);
+    });
+
+  } else if (eff === 'stun') {
+    animateAttack('f-'+actor.id, 'f-'+target.id);
+    if (!tryDodge(actor, target)) {
+      const r = calcDamage(actor, target, mult);
+      const blocked = tryBlock(actor, target, r.dmg);
+      applyDamageWithShield(target, blocked.dmg, r.isCrit);
+      showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
+      if (Math.random() < 0.50) {
+        target.stunned = true;
+        document.getElementById('f-'+target.id)?.classList.add('stunned-vis');
+        showDmgFloat('f-'+target.id,'💫 STUN',false,'debuff');
+        logMsg(`💫 ${actor.name} aturde a ${target.name}!`,'debuff');
+        renderBuffIcons(target);
       }
-    }
+      logMsg(`${actor.name} → ${target.name}: ${blocked.dmg}${r.isCrit?' 💥 CRÍTICO!':''}`, r.isCrit?'crit':'dmg');
+      logAff(actor,target,r.affMult);
+    } else { showDmgFloat('f-'+target.id,'Esquiva!',false,'dodge'); logMsg(`💨 Esquivó.`,'dodge'); }
+
+  } else if (eff === 'aoe_stun_multi') {
+    screenFlash('rgba(255,100,0,.25)');
+    const enemies = fighters.filter(f=>f.isEnemy!==actor.isEnemy&&f.hp>0);
+    enemies.forEach(t => {
+      if (tryDodge(actor,t)) { showDmgFloat('f-'+t.id,'Esquiva!',false,'dodge'); return; }
+      const r = calcDamage(actor, t, mult);
+      const blocked = tryBlock(actor, t, r.dmg);
+      applyDamageWithShield(t, blocked.dmg, r.isCrit);
+      showDmgFloat('f-'+t.id, blocked.dmg, r.isCrit);
+      if (Math.random() < 0.30) {
+        t.stunned = true;
+        document.getElementById('f-'+t.id)?.classList.add('stunned-vis');
+        showDmgFloat('f-'+t.id,'💫',false,'debuff');
+        renderBuffIcons(t);
+      }
+    });
+    logMsg(`${actor.name} pisotea todo: AoE ${Math.round(mult*100)}% ATK.`,'dmg');
 
   } else if (eff === 'multihit3') {
     let totalDmg = 0;
@@ -1043,88 +1210,160 @@ function executeAction(actor, skillChoice, target) {
       if (tryDodge(actor, target)) { showDmgFloat('f-'+target.id,'Esquiva!',false,'dodge'); continue; }
       const r = calcDamage(actor, target, mult);
       const blocked = tryBlock(actor, target, r.dmg);
-      applyDamageWithShield(target, blocked.dmg);
+      applyDamageWithShield(target, blocked.dmg, r.isCrit);
       showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
       totalDmg += blocked.dmg;
+      animateAttack('f-'+actor.id, 'f-'+target.id);
+      await sleep(120);
     }
-    logMsg(`${actor.name} golpea 3 veces a ${target.name} por ${totalDmg} daño total.`, 'dmg');
+    logMsg(`${actor.name} golpea 3 veces a ${target.name}: ${totalDmg} dmg total.`,'dmg');
 
   } else if (eff === 'aoe') {
-    const enemies = fighters.filter(f => f.isEnemy !== actor.isEnemy && f.hp > 0);
+    screenFlash('rgba(200,0,200,.15)');
+    const enemies = fighters.filter(f=>f.isEnemy!==actor.isEnemy&&f.hp>0);
     enemies.forEach(t => {
-      if (tryDodge(actor, t)) { showDmgFloat('f-'+t.id,'Esquiva!',false,'dodge'); return; }
+      if (tryDodge(actor,t)) { showDmgFloat('f-'+t.id,'Esquiva!',false,'dodge'); return; }
       const r = calcDamage(actor, t, mult);
       const blocked = tryBlock(actor, t, r.dmg);
-      applyDamageWithShield(t, blocked.dmg);
+      applyDamageWithShield(t, blocked.dmg, r.isCrit);
       showDmgFloat('f-'+t.id, blocked.dmg, r.isCrit);
     });
-    logMsg(`${actor.name} usa ${skill.name} en todos los enemigos.`, 'dmg');
-
-  } else if (eff === 'double_atk') {
-    // Self ATK doubled for 2 turns
-    actor.buffs.push({ type:'atk', value: 1.0, turns: 2 });
-    actor.atk = Math.round(actor.atk * 2.0);
-    const hpCost = Math.round(actor.maxHp * 0.08);
-    actor.hp = Math.max(1, actor.hp - hpCost);
-    updateFighterHP(actor);
-    showDmgFloat('f-'+actor.id, '⚡×2', false, 'buff');
-    logMsg(`💪 ${actor.name} entra en furia: ATK x2 por 2 turnos. (-${hpCost} HP)`, 'buff');
+    logMsg(`${actor.name} usa ${skill.name} AoE en todos los enemigos.`,'dmg');
 
   } else if (eff === 'lifesteal') {
+    animateAttack('f-'+actor.id, 'f-'+target.id);
     if (!tryDodge(actor, target)) {
       const r = calcDamage(actor, target, mult);
       const blocked = tryBlock(actor, target, r.dmg);
-      applyDamageWithShield(target, blocked.dmg);
+      applyDamageWithShield(target, blocked.dmg, r.isCrit);
       showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
       const steal = Math.round(blocked.dmg * 0.15);
-      actor.hp = Math.min(actor.maxHp, actor.hp + steal);
-      updateFighterHP(actor);
-      showDmgFloat('f-'+actor.id, '+'+steal, false, 'heal');
-      logMsg(`${actor.name} drena ${steal} HP de ${target.name}.`, 'heal');
-    }
+      if (steal > 0) {
+        actor.hp = Math.min(actor.maxHp, actor.hp + steal);
+        updateFighterHP(actor);
+        shakeHit('f-'+actor.id,'heal');
+        showDmgFloat('f-'+actor.id, '+'+steal+' 🩸', false, 'heal');
+      }
+      logMsg(`🩸 ${actor.name} drena ${steal} HP de ${target.name}.`,'heal');
+      logAff(actor,target,r.affMult);
+    } else { showDmgFloat('f-'+target.id,'Esquiva!',false,'dodge'); }
 
-  } else if (eff === 'taunt') {
-    actor.buffs.push({ type:'taunt', turns:1 });
-    showDmgFloat('f-'+actor.id, '🛡Guarda', false, 'shield');
-    logMsg(`🛡 ${actor.name} protegerá al siguiente aliado en ser atacado.`, 'shield');
+  } else if (eff === 'steal_buff') {
+    animateAttack('f-'+actor.id, 'f-'+target.id);
+    const r = calcDamage(actor, target, mult||0.8);
+    if (!tryDodge(actor, target)) {
+      const blocked = tryBlock(actor, target, r.dmg);
+      applyDamageWithShield(target, blocked.dmg, r.isCrit);
+      showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
+      if (target.buffs?.length > 0) {
+        const stolen = target.buffs.splice(0, 1)[0];
+        actor.buffs.push(stolen);
+        showDmgFloat('f-'+actor.id,'✋ Robado!',false,'buff');
+        showDmgFloat('f-'+target.id,'−Buff',false,'debuff');
+        logMsg(`✋ ${actor.name} roba buff de ${target.name}.`,'buff');
+        renderBuffIcons(target); renderBuffIcons(actor);
+      }
+      logMsg(`${actor.name} → ${target.name}: ${blocked.dmg}.`,'dmg');
+    } else { showDmgFloat('f-'+target.id,'Esquiva!',false,'dodge'); }
 
-  } else if (eff === 'damage' || eff === 'damage_light') {
-    // Standard damage
-    if (tryDodge(actor, target)) {
-      showDmgFloat('f-'+target.id, 'Esquiva!', false, 'dodge');
-      logMsg(`💨 ${target.name} esquivó el ataque de ${actor.name}.`, 'dodge');
-    } else {
+  } else if (eff === 'damage_debuff') {
+    animateAttack('f-'+actor.id, 'f-'+target.id);
+    if (!tryDodge(actor, target)) {
       const r = calcDamage(actor, target, mult);
       const blocked = tryBlock(actor, target, r.dmg);
-      if (blocked.blocked) {
-        showDmgFloat('f-'+target.id, 'Bloqueado!', false, 'block');
-        logMsg(`🛡 ${target.name} bloqueó el ataque de ${actor.name}.`, 'block');
-      } else {
-        applyDamageWithShield(target, blocked.dmg);
-        showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
-        const affTxt = r.affMult > 1 ? ' ✦ ¡Super efectivo!' : r.affMult < 1 ? ' ▼ No muy efectivo.' : '';
-        logMsg(`${actor.name} usa ${skill.name} → ${target.name}: ${blocked.dmg}${r.isCrit?' 💥 CRÍTICO!':''}${affTxt}`, r.isCrit?'crit':'dmg');
-        // Double hit passive
-        if (actor.activePassive === 'double_hit' && Math.random() < 0.30) {
-          const r2 = calcDamage(actor, target, mult*0.7);
-          const b2 = tryBlock(actor, target, r2.dmg);
-          if (!b2.blocked && target.hp > 0) {
-            applyDamageWithShield(target, b2.dmg);
-            showDmgFloat('f-'+target.id, b2.dmg, r2.isCrit);
-            logMsg(`⚡ ${actor.name} ataca de nuevo por doble hit: ${b2.dmg}`, 'crit');
-          }
-        }
-      }
-    }
-  } else {
-    // Fallback: generic damage
+      applyDamageWithShield(target, blocked.dmg, r.isCrit);
+      showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
+      if (target.buffs?.length > 0) { target.buffs.splice(0,1); renderBuffIcons(target); showDmgFloat('f-'+target.id,'−Buff',false,'debuff'); }
+      logMsg(`${actor.name} → ${target.name}: ${blocked.dmg}. Elimina 1 buff.`,'dmg');
+      logAff(actor,target,r.affMult);
+    } else { showDmgFloat('f-'+target.id,'Esquiva!',false,'dodge'); }
+
+  } else if (eff === 'nuke' || eff === 'ignore_def') {
+    animateAttack('f-'+actor.id, 'f-'+target.id);
     if (!tryDodge(actor, target)) {
+      const penMult = eff==='ignore_def' ? 1.5 : 1.3; // nuke ignores partial DEF
+      const r = calcDamage(actor, target, mult * penMult);
+      screenFlash('rgba(255,200,0,.35)', 150);
+      applyDamageWithShield(target, r.dmg, r.isCrit);
+      showDmgFloat('f-'+target.id, r.dmg, r.isCrit);
+      logMsg(`💥 ${actor.name} usa ${skill.name}: ${r.dmg}${r.isCrit?' CRÍTICO MASIVO!':''}. Penetra DEF.`,'crit');
+      logAff(actor,target,r.affMult);
+    } else { showDmgFloat('f-'+target.id,'Esquiva!',false,'dodge'); }
+
+  } else if (eff === 'guaranteed_crit') {
+    animateAttack('f-'+actor.id, 'f-'+target.id);
+    if (!tryDodge(actor, target)) {
+      const critBonus = (actor.cd||150) / 100;
+      const affMult = getAffMult(actor.affinity, target.affinity);
+      const defMit = target.def / (target.def + 1000);
+      const dmg = Math.round(actor.atk * mult * affMult * critBonus * (1-defMit));
+      screenFlash('rgba(251,191,36,.4)', 130);
+      applyDamageWithShield(target, dmg, true);
+      showDmgFloat('f-'+target.id, dmg, true);
+      logMsg(`✦ ${actor.name} garantiza CRÍTICO: ${dmg}!`,'crit');
+      logAff(actor,target,affMult);
+    } else { showDmgFloat('f-'+target.id,'Esquiva!',false,'dodge'); }
+
+  } else if (eff === 'taunt') {
+    actor.buffs.push({type:'taunt',turns:1});
+    shakeHit('f-'+actor.id,'shield');
+    showDmgFloat('f-'+actor.id,'🎯 Provoca',false,'shield');
+    logMsg(`🎯 ${actor.name} provoca: absorbe el próximo ataque.`,'shield');
+    renderBuffIcons(actor);
+
+  } else if (eff === 'counter') {
+    // Counter: reduce damage + punish
+    actor.buffs.push({type:'counter',turns:1});
+    actor.shield = (actor.shield||0) + Math.round(actor.maxHp*0.15);
+    shakeHit('f-'+actor.id,'shield');
+    showDmgFloat('f-'+actor.id,'⚡ Contra',false,'shield');
+    logMsg(`⚡ ${actor.name} contraatacará el próximo golpe.`,'shield');
+    renderBuffIcons(actor);
+
+  } else {
+    // Generic: damage
+    animateAttack('f-'+actor.id, 'f-'+target.id);
+    if (tryDodge(actor, target)) {
+      showDmgFloat('f-'+target.id,'Esquiva!',false,'dodge');
+      logMsg(`💨 ${target.name} esquivó a ${actor.name}.`,'dodge');
+    } else {
       const r = calcDamage(actor, target, mult||1.0);
       const blocked = tryBlock(actor, target, r.dmg);
-      if (!blocked.blocked) {
-        applyDamageWithShield(target, blocked.dmg);
+      if (blocked.blocked) {
+        shakeHit('f-'+target.id,'shield');
+        showDmgFloat('f-'+target.id,'Bloqueado!',false,'block');
+        logMsg(`🛡 ${target.name} bloqueó.`,'block');
+      } else {
+        applyDamageWithShield(target, blocked.dmg, r.isCrit);
         showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
-        logMsg(`${actor.name} usa ${skill.name}: ${blocked.dmg}`, r.isCrit?'crit':'dmg');
+        logMsg(`${actor.name} → ${target.name}: ${blocked.dmg}${r.isCrit?' 💥 CRÍTICO!':''}`, r.isCrit?'crit':'dmg');
+        logAff(actor,target,r.affMult);
+        // Double hit passive
+        if (actor.activePassive === 'double_hit' && Math.random() < 0.30 && target.hp > 0) {
+          const r2 = calcDamage(actor, target, (mult||1)*0.7);
+          const b2 = tryBlock(actor, target, r2.dmg);
+          if (!b2.blocked) {
+            setTimeout(()=>{
+              animateAttack('f-'+actor.id,'f-'+target.id);
+              applyDamageWithShield(target, b2.dmg, r2.isCrit);
+              showDmgFloat('f-'+target.id, b2.dmg, r2.isCrit);
+              logMsg(`⚡ Doble hit: ${b2.dmg}`,'crit');
+            }, 300);
+          }
+        }
+        // Flat dmg passive
+        if (actor.activePassive === 'flat_dmg') {
+          const extra = Math.round(actor.atk * 0.15);
+          applyDamageWithShield(target, extra);
+          showDmgFloat('f-'+target.id, '+'+extra, false, 'dmg');
+        }
+        // Lifesteal passive
+        if (actor.activePassive === 'lifesteal') {
+          const heal = Math.round(blocked.dmg * 0.10);
+          actor.hp = Math.min(actor.maxHp, actor.hp + heal);
+          updateFighterHP(actor);
+          showDmgFloat('f-'+actor.id,'+'+heal+'🩸',false,'heal');
+        }
       }
     }
   }
@@ -1135,9 +1374,12 @@ function executeAction(actor, skillChoice, target) {
 
   selectedFighter = null; selectedSkill = null;
   clearDimming();
+  renderAllBuffIcons();
   currentTurn++;
   setTimeout(() => nextTurn(), 700);
 }
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 /* ── DODGE CHECK ── */
 function tryDodge(attacker, target) {
@@ -1165,20 +1407,81 @@ function tryBlock(attacker, target, dmg) {
 }
 
 /* ── APPLY DAMAGE WITH SHIELD ── */
-function applyDamageWithShield(target, dmg) {
+function applyDamageWithShield(target, dmg, isCrit=false) {
   if (dmg <= 0) return;
   target.hp = Math.max(0, target.hp - dmg);
   updateFighterHP(target);
+  shakeHit('f-'+target.id, isCrit ? 'crit' : 'dmg');
+  if (isCrit) screenFlash('rgba(251,191,36,.3)', 100);
   if (target.hp <= 0) {
     document.getElementById('f-'+target.id)?.classList.add('dead');
     logMsg(`💀 ${target.name} fue derrotado.`, 'sys');
   }
+  renderBuffIcons(target);
 }
 
 /* ── AFFINITY LOG HELPER ── */
 function logAff(actor, target, affMult) {
   if (affMult > 1) logMsg(`✦ ¡${AFF_LABELS[actor.affinity]||actor.affinity} es super efectivo contra ${AFF_LABELS[target.affinity]||target.affinity}!`, 'buff');
   else if (affMult < 1) logMsg(`▼ ${AFF_LABELS[actor.affinity]||actor.affinity} no es muy efectivo.`, 'sys');
+}
+
+/* ── BUFF ICONS ON FIGHTERS ── */
+const BUFF_ICONS_MAP = {
+  atk:'⚔↑', def:'🛡↑', spd:'⚡↑', cr:'✦↑', dodge:'💨',
+  taunt:'🎯', regen:'💚', bleed:'🩸', burn:'🔥', freeze:'❄',
+  stun:'💫', shield:'🛡', dmg_reduce:'🔵'
+};
+const DEBUFF_ICONS_MAP = { atk:'⚔↓', def:'🛡↓', spd:'⚡↓', stun:'💫', bleed:'🩸', burn:'🔥', freeze:'❄' };
+
+function renderBuffIcons(f) {
+  const el = document.getElementById('f-'+f.id);
+  if (!el) return;
+  let row = el.querySelector('.f-buffs');
+  if (!row) { row = document.createElement('div'); row.className='f-buffs'; el.appendChild(row); }
+  row.innerHTML = '';
+  const all = [...(f.buffs||[]).map(b=>({...b,isDebuff:false})), ...(f.debuffs||[]).map(b=>({...b,isDebuff:true}))];
+  if (f.shield > 0) all.unshift({type:'shield',turns:1,isDebuff:false});
+  if (f.bleed > 0)  all.push({type:'bleed',turns:f.bleedTurns||1,isDebuff:true});
+  if (f.frozen)     all.push({type:'freeze',turns:1,isDebuff:true});
+  if (f.burning)    all.push({type:'burn',turns:f.burnTurns||1,isDebuff:true});
+  all.slice(0,5).forEach(b => {
+    const ic = document.createElement('span');
+    ic.className = 'f-buff-icon';
+    const icon = b.isDebuff ? (DEBUFF_ICONS_MAP[b.type]||'▼') : (BUFF_ICONS_MAP[b.type]||'▲');
+    ic.textContent = icon + (b.turns>1?b.turns:'');
+    ic.style.color = b.isDebuff ? '#f97316' : '#4ade80';
+    ic.title = '';
+    row.appendChild(ic);
+  });
+}
+
+function renderAllBuffIcons() {
+  fighters.forEach(f => renderBuffIcons(f));
+}
+
+/* Fighter hover tooltip */
+function showFighterTooltip(f, el) {
+  let tt = el.querySelector('.fighter-tooltip');
+  if (!tt) { tt = document.createElement('div'); tt.className='fighter-tooltip'; el.appendChild(tt); }
+  const lines = [];
+  lines.push(`<div class="ft-title">${f.name}</div>`);
+  // HP, ATK, SPD
+  lines.push(`<div class="ft-row"><span class="ft-stat">HP</span><span>${f.hp}/${f.maxHp}</span></div>`);
+  lines.push(`<div class="ft-row"><span class="ft-stat">ATK</span><span>${f.atk}</span></div>`);
+  lines.push(`<div class="ft-row"><span class="ft-stat">SPD</span><span>${f.spd}</span></div>`);
+  if (f.shield > 0) lines.push(`<div class="ft-row ft-buff"><span>🛡 Escudo</span><span>${f.shield}</span></div>`);
+  if (f.bleed > 0)  lines.push(`<div class="ft-row ft-debuff"><span>🩸 Sangrado</span><span>${f.bleed}/turno (${f.bleedTurns||0}t)</span></div>`);
+  if (f.burning)    lines.push(`<div class="ft-row ft-debuff"><span>🔥 Burn</span><span>${f.burnTurns||0} turnos</span></div>`);
+  if (f.frozen)     lines.push(`<div class="ft-row ft-debuff"><span>❄ Congelado</span><span>−30% SPD</span></div>`);
+  if (f.stunned)    lines.push(`<div class="ft-row ft-debuff"><span>💫 Aturdido</span></div>`);
+  f.buffs?.forEach(b => { lines.push(`<div class="ft-row ft-buff"><span>${BUFF_ICONS_MAP[b.type]||'▲'} ${b.type}</span><span>${b.turns}t</span></div>`); });
+  f.debuffs?.forEach(b => { lines.push(`<div class="ft-row ft-debuff"><span>${DEBUFF_ICONS_MAP[b.type]||'▼'} ${b.type}</span><span>${b.turns}t</span></div>`); });
+  tt.innerHTML = lines.join('');
+}
+
+function hideFighterTooltip(el) {
+  el.querySelector('.fighter-tooltip')?.remove();
 }
 
 /* ── DIMMING ── */
@@ -1231,8 +1534,9 @@ function enemyAI(actor) {
     logMsg(`💨 ${target.name} esquivó el ataque de ${actor.name}.`, 'dodge');
   }
 
-  document.getElementById('f-'+actor.id)?.classList.add('acting');
-  setTimeout(()=>document.getElementById('f-'+actor.id)?.classList.remove('acting'), 400);
+  animateAttack('f-'+actor.id, 'f-'+target?.id);
+  const actorEl = document.getElementById('f-'+actor.id);
+  if (actorEl) { actorEl.classList.add('acting'); setTimeout(()=>actorEl.classList.remove('acting'), 400); }
 
   currentTurn++;
   setTimeout(() => nextTurn(), 700);
@@ -1308,6 +1612,8 @@ function renderBattleField() {
     el.className = `fighter${f.isEnemy?'':' player'}`;
     el.id = 'f-' + f.id;
     el.onclick = () => onFighterClick(f.id);
+    el.addEventListener('mouseenter', () => showFighterTooltip(f, el));
+    el.addEventListener('mouseleave', () => hideFighterTooltip(el));
     const col = RC[f.stars] || '#94a3b8';
     const hpPct = Math.round(f.hp / f.maxHp * 100);
     el.innerHTML = `
@@ -1378,10 +1684,47 @@ function showDmgFloat(elId, dmg, isCrit, type='dmg') {
   const fl = document.createElement('div');
   fl.className = 'dmg-float' + (isCrit?' crit':'') + (type!=='dmg'?' '+type:'');
   fl.textContent = (isCrit ? '💥 ' : '') + dmg;
-  fl.style.cssText = `color:${colors[type]||'#f87171'};top:10%;left:${15+Math.random()*50}%;position:absolute;`;
+  fl.style.cssText = `color:${colors[type]||'#f87171'};top:${5+Math.random()*20}%;left:${10+Math.random()*60}%;position:absolute;font-size:${isCrit?'1.4rem':'1.1rem'};`;
   parent.style.position = 'relative';
   parent.appendChild(fl);
   setTimeout(() => fl.remove(), 950);
+}
+
+function shakeHit(elId, type='dmg') {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const cls = type === 'crit' ? 'crit-hit' : type === 'heal' ? 'absorb-hit' : type === 'shield' ? 'shield-hit' : 'shake-hit';
+  el.classList.remove('shake-hit','crit-hit','absorb-hit','shield-hit');
+  void el.offsetWidth; // reflow
+  el.classList.add(cls);
+  setTimeout(() => el.classList.remove(cls), 600);
+}
+
+function animateAttack(attackerId, targetId) {
+  const attEl = document.getElementById(attackerId);
+  const tarEl = document.getElementById(targetId);
+  if (!attEl || !tarEl) return;
+  const attRect = attEl.getBoundingClientRect();
+  const tarRect = tarEl.getBoundingClientRect();
+  const dx = tarRect.left + tarRect.width/2 - (attRect.left + attRect.width/2);
+  const dy = tarRect.top  + tarRect.height/2 - (attRect.top  + attRect.height/2);
+  const dist = 0.45; // move 45% of the way
+  attEl.style.transition = 'transform .18s cubic-bezier(.2,0,.2,1)';
+  attEl.style.transform  = `translate(${dx*dist}px,${dy*dist}px) scale(1.08)`;
+  attEl.style.zIndex = '20';
+  setTimeout(() => {
+    attEl.style.transition = 'transform .22s ease';
+    attEl.style.transform  = '';
+    attEl.style.zIndex     = '';
+  }, 220);
+}
+
+function screenFlash(color, ms=120) {
+  const fl = document.createElement('div');
+  fl.style.cssText = `position:fixed;inset:0;background:${color};opacity:.18;z-index:5000;pointer-events:none;transition:opacity ${ms}ms;`;
+  document.body.appendChild(fl);
+  requestAnimationFrame(() => { fl.style.opacity = '0'; });
+  setTimeout(() => fl.remove(), ms + 100);
 }
 
 function spawnParticles(color, count) {
