@@ -132,7 +132,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .f-buff-icon{font-size:.55rem;background:rgba(0,0,0,.82);border-radius:3px;padding:0 3px;border:1px solid rgba(255,255,255,.12);white-space:nowrap;cursor:default;line-height:1.4;}
 .f-buffs{position:absolute;top:2px;left:0;right:0;display:flex;gap:2px;z-index:6;flex-wrap:wrap;justify-content:center;padding:0 2px;}
 /* Fighter hover tooltip */
-.fighter-tooltip{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#0d001a;border:1px solid #a78bfa55;border-radius:8px;padding:.4rem .65rem;font-size:.65rem;color:#e9d5ff;min-width:140px;max-width:180px;z-index:100;pointer-events:none;white-space:normal;line-height:1.45;box-shadow:0 4px 20px rgba(0,0,0,.8);}
+.fighter-tooltip{z-index:9999;pointer-events:none;}
 .fighter-tooltip .ft-title{font-family:var(--font-h);font-size:.85rem;color:#c4b5fd;margin-bottom:.25rem;letter-spacing:1px;}
 .fighter-tooltip .ft-row{display:flex;justify-content:space-between;gap:.5rem;}
 .fighter-tooltip .ft-buff{color:#4ade80;} .fighter-tooltip .ft-debuff{color:#f97316;} .fighter-tooltip .ft-stat{color:#94a3b8;}
@@ -1486,27 +1486,55 @@ function renderAllBuffIcons() {
 }
 
 /* Fighter hover tooltip */
+let _globalTooltip = null;
+
 function showFighterTooltip(f, el) {
-  let tt = el.querySelector('.fighter-tooltip');
-  if (!tt) { tt = document.createElement('div'); tt.className='fighter-tooltip'; el.appendChild(tt); }
+  hideFighterTooltip();
+  const tt = document.createElement('div');
+  tt.className = 'fighter-tooltip';
+  tt.id = 'global-fighter-tt';
   const lines = [];
   lines.push(`<div class="ft-title">${f.name}</div>`);
-  // HP, ATK, SPD
   lines.push(`<div class="ft-row"><span class="ft-stat">HP</span><span>${f.hp}/${f.maxHp}</span></div>`);
   lines.push(`<div class="ft-row"><span class="ft-stat">ATK</span><span>${f.atk}</span></div>`);
   lines.push(`<div class="ft-row"><span class="ft-stat">SPD</span><span>${f.spd}</span></div>`);
   if (f.shield > 0) lines.push(`<div class="ft-row ft-buff"><span>🛡 Escudo</span><span>${f.shield}</span></div>`);
   if (f.bleed > 0)  lines.push(`<div class="ft-row ft-debuff"><span>🩸 Sangrado</span><span>${f.bleed}/turno (${f.bleedTurns||0}t)</span></div>`);
-  if (f.burning)    lines.push(`<div class="ft-row ft-debuff"><span>🔥 Burn</span><span>${f.burnTurns||0} turnos</span></div>`);
   if (f.frozen)     lines.push(`<div class="ft-row ft-debuff"><span>❄ Congelado</span><span>−30% SPD</span></div>`);
   if (f.stunned)    lines.push(`<div class="ft-row ft-debuff"><span>💫 Aturdido</span></div>`);
-  f.buffs?.forEach(b => { lines.push(`<div class="ft-row ft-buff"><span>${BUFF_ICONS_MAP[b.type]||'▲'} ${b.type}</span><span>${b.turns}t</span></div>`); });
+  f.buffs?.forEach(b  => { lines.push(`<div class="ft-row ft-buff"><span>${BUFF_ICONS_MAP[b.type]||'▲'} ${b.type}</span><span>${b.turns}t</span></div>`); });
   f.debuffs?.forEach(b => { lines.push(`<div class="ft-row ft-debuff"><span>${DEBUFF_ICONS_MAP[b.type]||'▼'} ${b.type}</span><span>${b.turns}t</span></div>`); });
   tt.innerHTML = lines.join('');
+
+  // Position tooltip at FIXED position relative to element
+  document.body.appendChild(tt);
+  _globalTooltip = tt;
+
+  const rect = el.getBoundingClientRect();
+  tt.style.cssText = `
+    position:fixed;
+    left:${rect.left + rect.width/2}px;
+    top:${rect.bottom + 6}px;
+    transform:translateX(-50%);
+    background:#0d001a;
+    border:1px solid #a78bfa55;
+    border-radius:8px;
+    padding:.4rem .65rem;
+    font-size:.65rem;
+    color:#e9d5ff;
+    min-width:140px;
+    max-width:180px;
+    z-index:9999;
+    pointer-events:none;
+    white-space:normal;
+    line-height:1.45;
+    box-shadow:0 4px 20px rgba(0,0,0,.8);
+  `;
 }
 
-function hideFighterTooltip(el) {
-  el.querySelector('.fighter-tooltip')?.remove();
+function hideFighterTooltip() {
+  if (_globalTooltip) { _globalTooltip.remove(); _globalTooltip = null; }
+  document.getElementById('global-fighter-tt')?.remove();
 }
 
 /* ── DIMMING ── */
@@ -1641,7 +1669,7 @@ function renderBattleField() {
     el.id = 'f-' + f.id;
     el.onclick = () => onFighterClick(f.id);
     el.addEventListener('mouseenter', () => showFighterTooltip(f, el));
-    el.addEventListener('mouseleave', () => hideFighterTooltip(el));
+    el.addEventListener('mouseleave', () => hideFighterTooltip());
     const col = RC[f.stars] || '#94a3b8';
     const hpPct = Math.round(f.hp / f.maxHp * 100);
     el.innerHTML = `
@@ -1706,15 +1734,34 @@ function logMsg(txt, type='') {
 }
 
 function showDmgFloat(elId, dmg, isCrit, type='dmg') {
+  // Append to the arena wrap so floaties appear above cards, not inside them
   const parent = document.getElementById(elId);
   if (!parent) return;
+  const arenaWrap = document.getElementById('arena-wrap') || parent;
   const colors = { dmg:'#f87171', heal:'#4ade80', shield:'#60a5fa', buff:'#c084fc', debuff:'#f97316', dodge:'#a78bfa', block:'#94a3b8' };
   const fl = document.createElement('div');
   fl.className = 'dmg-float' + (isCrit?' crit':'') + (type!=='dmg'?' '+type:'');
   fl.textContent = (isCrit ? '💥 ' : '') + dmg;
-  fl.style.cssText = `color:${colors[type]||'#f87171'};top:${5+Math.random()*20}%;left:${10+Math.random()*60}%;position:absolute;font-size:${isCrit?'1.4rem':'1.1rem'};`;
-  parent.style.position = 'relative';
-  parent.appendChild(fl);
+
+  // Position relative to the card element, but rendered on arena-wrap
+  const rect    = parent.getBoundingClientRect();
+  const wrapRect = arenaWrap.getBoundingClientRect();
+  const x = rect.left - wrapRect.left + rect.width  / 2 + (Math.random() - 0.5) * 30;
+  const y = rect.top  - wrapRect.top  - 10; // start just ABOVE the card top
+
+  fl.style.cssText = `
+    color:${colors[type]||'#f87171'};
+    position:absolute;
+    left:${x}px; top:${y}px;
+    transform:translateX(-50%);
+    font-size:${isCrit?'1.3rem':'1rem'};
+    pointer-events:none;
+    z-index:30;
+    text-shadow:0 2px 8px rgba(0,0,0,.9);
+    white-space:nowrap;
+  `;
+  arenaWrap.style.position = 'relative';
+  arenaWrap.appendChild(fl);
   setTimeout(() => fl.remove(), 950);
 }
 
