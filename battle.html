@@ -40,7 +40,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .fighter.acting{animation:actPulse .4s ease;}
 @keyframes actPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);}}
 
-.f-img{height:90px;position:relative;overflow:hidden;}
+.f-img{height:110px;position:relative;overflow:hidden;border-radius:var(--radius) var(--radius) 0 0;}
 .f-img img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;}
 .f-img-bg{position:absolute;inset:0;}
 .f-img-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 50%);}
@@ -89,7 +89,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 #target-hint{font-size:.75rem;color:var(--rose);margin-top:.5rem;text-align:center;min-height:1.2em;}
 
 /* ── ARENA SIDE-BY-SIDE ── */
-.arena-wrap{position:relative;display:flex;align-items:stretch;gap:0;margin-bottom:.8rem;border-radius:var(--radius);overflow:hidden;min-height:260px;border:1px solid var(--border);}
+.arena-wrap{position:relative;display:flex;align-items:stretch;gap:0;margin-bottom:1.8rem;border-radius:var(--radius);overflow:visible;min-height:260px;border:1px solid var(--border);}
 .arena-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(135deg,#0a0015 0%,#0d0d0d 50%,#001020 100%);transition:background 1s;}
 .arena-bg.scene-forest{background:linear-gradient(135deg,#001a05 0%,#002b08 50%,#000d03 100%);}
 .arena-bg.scene-fire{background:linear-gradient(135deg,#1a0000 0%,#2b0800 50%,#1a0500 100%);}
@@ -97,15 +97,15 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .arena-bg.scene-void{background:linear-gradient(135deg,#0d0014 0%,#14001f 50%,#080008 100%);}
 .arena-center-line{position:absolute;left:50%;top:10%;bottom:10%;width:1px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.08),transparent);z-index:1;}
 .arena-vs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--font-h);font-size:1.6rem;letter-spacing:4px;color:rgba(255,255,255,.12);z-index:1;pointer-events:none;user-select:none;}
-.arena-side{flex:1;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:.8rem .5rem;}
+.arena-side{flex:1;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:.8rem .5rem .8rem;overflow:visible;}
 .ally-side{border-right:1px solid rgba(255,255,255,.04);}
 .side-label{font-family:var(--font-h);font-size:.55rem;letter-spacing:4px;text-transform:uppercase;margin-bottom:.6rem;padding:.15rem .5rem;border-radius:20px;}
 .ally-lbl{color:#4ade80;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);}
 .enemy-lbl{color:#f87171;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);}
-.team-col{display:flex;flex-direction:row;gap:.5rem;flex-wrap:wrap;justify-content:center;align-items:flex-start;}
+.team-col{display:flex;flex-direction:column;gap:.6rem;align-items:center;width:100%;padding-top:.3rem;}
 
 /* ── FIGHTER — updated ── */
-.fighter{width:100px;border-radius:var(--radius);background:var(--surface);border:2px solid var(--border);overflow:visible;cursor:default;transition:transform .25s,border-color .25s,opacity .25s,filter .25s,box-shadow .25s;position:relative;user-select:none;}
+.fighter{width:110px;border-radius:var(--radius);background:var(--surface);border:2px solid var(--border);overflow:visible;cursor:default;transition:transform .25s,border-color .25s,opacity .25s,filter .25s,box-shadow .25s;position:relative;user-select:none;}
 .fighter.mine{cursor:default;}
 .fighter.targeting{cursor:crosshair !important;border-color:#ef4444 !important;box-shadow:0 0 16px rgba(239,68,68,.5) !important;animation:targetPulse .8s ease infinite;}
 @keyframes targetPulse{0%,100%{box-shadow:0 0 16px rgba(239,68,68,.5);}50%{box-shadow:0 0 28px rgba(239,68,68,.8);}}
@@ -130,7 +130,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 /* Buff icon row */
 .f-buffs{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);display:flex;gap:2px;z-index:5;}
 .f-buff-icon{font-size:.65rem;background:rgba(0,0,0,.85);border-radius:4px;padding:1px 4px;border:1px solid rgba(255,255,255,.15);white-space:nowrap;cursor:default;}
-.f-buffs{position:absolute;top:-22px;left:50%;transform:translateX(-50%);display:flex;gap:2px;z-index:6;flex-wrap:nowrap;}
+.f-buffs{position:absolute;top:-20px;left:0;right:0;display:flex;gap:2px;z-index:6;flex-wrap:wrap;justify-content:center;}
 /* Fighter hover tooltip */
 .fighter-tooltip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#0d001a;border:1px solid #a78bfa55;border-radius:8px;padding:.45rem .7rem;font-size:.68rem;color:#e9d5ff;min-width:150px;max-width:200px;z-index:100;pointer-events:none;white-space:normal;line-height:1.5;box-shadow:0 4px 20px rgba(0,0,0,.8);}
 .fighter-tooltip .ft-title{font-family:var(--font-h);font-size:.85rem;color:#c4b5fd;margin-bottom:.25rem;letter-spacing:1px;}
@@ -326,7 +326,9 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 
     <!-- Scenario + side-by-side field -->
     <div class="arena-wrap" id="arena-wrap">
-      <div class="arena-bg" id="arena-bg"></div>
+      <div id="arena-bg-clip" style="position:absolute;inset:0;border-radius:var(--radius);overflow:hidden;z-index:0;">
+        <div class="arena-bg" id="arena-bg"></div>
+      </div>
       <div class="arena-center-line"></div>
 
       <!-- Ally side (left) -->
@@ -428,6 +430,12 @@ function applyScene() {
    TABS
 ══════════════════════════════════════ */
 function showTab(t) {
+  // Block switching to log tab during an active battle
+  if (t === 'log' && phase === 'battle') {
+    document.getElementById('target-hint').textContent = '⚠ No puedes ir al registro durante una batalla.';
+    setTimeout(() => { const el = document.getElementById('target-hint'); if(el) el.textContent=''; }, 2500);
+    return;
+  }
   document.querySelectorAll('.btab').forEach((b,i)=>b.classList.toggle('active',i===(t==='battle'?0:1)));
   document.getElementById('setup-screen').style.display  = t==='battle' ? (phase==='battle'?'none':'block') : 'none';
   document.getElementById('battle-screen').style.display = t==='battle' && phase==='battle' ? 'block' : 'none';
@@ -735,6 +743,10 @@ function startBattle() {
   renderBattleField();
   renderTurnOrder();
   renderAllBuffIcons();
+  // Register battle as ongoing for abandon detection
+  sessionStorage.setItem('battle_ongoing', JSON.stringify({
+    enemyId, enemyName, time: Date.now()
+  }));
   logMsg('⚔ Batalla comenzando — orden por velocidad.', 'sys');
   logMsg(`${turnQueue.map(f=>f.name).join(', ')}`, 'sys');
   nextTurn();
@@ -1547,6 +1559,7 @@ async function endBattle(playerWon) {
   phase = 'done';
   document.getElementById('battle-screen').style.display = 'none';
 
+  sessionStorage.removeItem('battle_ongoing'); // normal end, not an abandon
   const rs = document.getElementById('result-screen');
   rs.style.display = 'flex';
 
@@ -1770,6 +1783,98 @@ async function renderBattleLog() {
 ══════════════════════════════════════ */
 if (window.ReAnimeDB) init();
 else window.addEventListener('reanimdb:ready', init, { once:true });
+
+/* ── ABANDON ON LEAVE ── */
+async function registerAbandon() {
+  if (phase !== 'battle') return;
+  // Mark battle as ongoing in sessionStorage so we can detect reload
+  sessionStorage.removeItem('battle_ongoing');
+  if (window.ReAnimeDB) {
+    await window.ReAnimeDB.addConquestPoints(-5);
+    await window.ReAnimeDB.addBattleLog({
+      type: 'attack', result: 'lose',
+      enemyId: enemyId, enemyName: enemyName + ' (abandono)',
+      pts: -5
+    });
+    if (enemyId) await window.ReAnimeDB.recordDefenseWin(enemyId);
+  }
+}
+
+// Store battle state in sessionStorage when battle starts
+const _origStartBattle = startBattle;
+window.startBattle = function() {
+  _origStartBattle();
+  sessionStorage.setItem('battle_ongoing', JSON.stringify({
+    enemyId, enemyName, time: Date.now()
+  }));
+};
+
+// On page unload during battle → count as abandon
+window.addEventListener('beforeunload', (e) => {
+  if (phase !== 'battle') return;
+  // Synchronous beacon — async won't finish before page closes
+  // Use sendBeacon to fire a "loss" log via Firestore REST
+  const payload = JSON.stringify({
+    writes: [{
+      update: {
+        name: `projects/reanime-1a781/databases/(default)/documents/pvp/abandonLog`,
+        fields: {
+          userId:    { stringValue: JSON.parse(localStorage.getItem('user') || '{}')?.id || '' },
+          enemyId:   { stringValue: enemyId || '' },
+          timestamp: { integerValue: Date.now() }
+        }
+      }
+    }]
+  });
+  navigator.sendBeacon(
+    'https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents:commit?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU',
+    new Blob([payload], { type: 'application/json' })
+  );
+  // Also warn the user
+  e.preventDefault();
+  e.returnValue = '¿Abandonar la batalla? Se contará como derrota.';
+});
+
+// On page visibility hidden (tab switch, mobile minimize) — start abandon timer
+let _abandonTimer = null;
+document.addEventListener('visibilitychange', () => {
+  if (phase !== 'battle') return;
+  if (document.hidden) {
+    _abandonTimer = setTimeout(async () => {
+      await registerAbandon();
+      phase = 'done';
+    }, 30000); // 30s hidden = abandon
+  } else {
+    clearTimeout(_abandonTimer);
+    _abandonTimer = null;
+  }
+});
+
+// Check if we reloaded mid-battle
+const _ongoingBattle = sessionStorage.getItem('battle_ongoing');
+if (_ongoingBattle) {
+  sessionStorage.removeItem('battle_ongoing');
+  // Fire the loss after ReAnimeDB is ready
+  const _doAbandon = async () => {
+    try {
+      const battle = JSON.parse(_ongoingBattle);
+      if (Date.now() - battle.time < 3600000) { // within 1 hour
+        if (window.ReAnimeDB) {
+          await window.ReAnimeDB.addConquestPoints(-5);
+          await window.ReAnimeDB.addBattleLog({
+            type: 'attack', result: 'lose',
+            enemyId: battle.enemyId,
+            enemyName: (battle.enemyName || 'Rival') + ' (recarga)',
+            pts: -5
+          });
+          if (battle.enemyId) await window.ReAnimeDB.recordDefenseWin(battle.enemyId);
+        }
+      }
+    } catch(e) { console.warn('abandon:', e); }
+  };
+  if (window.ReAnimeDB) _doAbandon();
+  else window.addEventListener('reanimdb:ready', _doAbandon, { once: true });
+}
 </script>
 </body>
 </html>
