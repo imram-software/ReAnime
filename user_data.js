@@ -332,7 +332,7 @@ async function upgradeChar(name) {
   if (copies.length < 2) return { ok: false, error: 'Necesitas al menos 1 duplicado para mejorar.' };
 
   const upgrades = { ...(_localData.upgrades || {}) };
-  const cur = upgrades[name] || { level: 1, unlockedSkins: [0], selectedPassive: null, selectedSkin: 0 };
+  const cur = upgrades[name] || { level: 1, unlockedSkins: [], selectedPassive: null, selectedSkin: -1 };
   if (cur.level >= MAX_LEVEL) return { ok: false, error: 'Ya está en nivel máximo (10).' };
 
   // Consume 1 duplicado (mantiene 1 copia base)
@@ -345,10 +345,12 @@ async function upgradeChar(name) {
   }
 
   const newLevel = cur.level + 1;
-  const skins = [...(cur.unlockedSkins || [0])];
-  const newSkinIdx = Math.floor((newLevel - 1) / 2);
-  if (!skins.includes(newSkinIdx)) skins.push(newSkinIdx);
+  const skins = [...(cur.unlockedSkins || [])];
+  // Unlock a skin every 2 levels (level 2 → skin 0, level 4 → skin 1, etc.)
+  const newSkinIdx = Math.floor((newLevel) / 2) - 1; // level 2→0, 4→1, 6→2...
+  if (newSkinIdx >= 0 && !skins.includes(newSkinIdx)) skins.push(newSkinIdx);
 
+  // Keep selectedSkin as-is — don't auto-switch
   upgrades[name] = { ...cur, level: newLevel, unlockedSkins: skins };
   _localData.upgrades   = upgrades;
   _localData.collection = newColl;
@@ -367,7 +369,7 @@ async function upgradeChar(name) {
 async function setActivePassive(name, passiveId) {
   await _readyPromise;
   const upgrades = { ...(_localData.upgrades || {}) };
-  const cur = upgrades[name] || { level: 1, unlockedSkins: [0], selectedPassive: null, selectedSkin: 0 };
+  const cur = upgrades[name] || { level: 1, unlockedSkins: [], selectedPassive: null, selectedSkin: -1 };
   upgrades[name] = { ...cur, selectedPassive: passiveId };
   _localData.upgrades = upgrades;
   if (!discordUser) { localStorage.setItem("user_data", JSON.stringify(_localData)); }
@@ -378,8 +380,9 @@ async function setActivePassive(name, passiveId) {
 async function setActiveSkin(name, skinIdx) {
   await _readyPromise;
   const upgrades = { ...(_localData.upgrades || {}) };
-  const cur = upgrades[name] || { level: 1, unlockedSkins: [0], selectedPassive: null, selectedSkin: 0 };
-  if (!(cur.unlockedSkins || [0]).includes(skinIdx)) return { ok: false, error: 'Skin no desbloqueada.' };
+  const cur = upgrades[name] || { level: 1, unlockedSkins: [], selectedPassive: null, selectedSkin: -1 };
+  // -1 = default (always allowed), otherwise check unlocked
+  if (skinIdx !== -1 && !(cur.unlockedSkins || []).includes(skinIdx)) return { ok: false, error: 'Skin no desbloqueada.' };
   upgrades[name] = { ...cur, selectedSkin: skinIdx };
   _localData.upgrades = upgrades;
   if (!discordUser) { localStorage.setItem("user_data", JSON.stringify(_localData)); }

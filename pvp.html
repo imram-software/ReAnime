@@ -1,433 +1,342 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <title>Re:Anime · PVP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;700&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;700&display=swap" rel="stylesheet"/>
   <style>
-    :root {
-      --bg:#080808;--bg2:#111;--bg3:#1a1a1a;--surface:#161616;--border:#222;
-      --pink:#ff2d78;--pink-dim:#ff2d7822;--pink-glow:#ff2d7855;--rose:#ff6fa8;
-      --text:#e8e8e8;--muted:#555;
-      --r5:#fbbf24;--r4:#c084fc;--r3:#38bdf8;--r2:#86efac;--r1:#94a3b8;
-      --font-h:'Bebas Neue',cursive;--font-b:'DM Sans',sans-serif;--radius:10px;
-    }
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-    ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--pink);border-radius:2px;}
-    body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;}
-    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");background-size:200px;opacity:0.4;transform:translateZ(0);}
+:root{--bg:#080808;--bg2:#111;--bg3:#1a1a1a;--surface:#161616;--border:#222;--pink:#ff2d78;--pink-dim:#ff2d7822;--pink-glow:#ff2d7855;--rose:#ff6fa8;--text:#e8e8e8;--muted:#555;--r5:#fbbf24;--r4:#c084fc;--r3:#38bdf8;--r2:#86efac;--r1:#94a3b8;--font-h:'Bebas Neue',cursive;--font-b:'DM Sans',sans-serif;--radius:10px;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--pink);border-radius:2px;}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");background-size:200px;opacity:.4;}
 
-    header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(8,8,8,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
-    .logo{font-family:var(--font-h);font-size:2rem;letter-spacing:3px;color:var(--pink);text-decoration:none;text-shadow:0 0 20px var(--pink-glow);}
-    .logo span{color:var(--text);}
-    .back-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.4rem .9rem;font-size:.82rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;}
-    .back-btn:hover{border-color:var(--pink);color:var(--pink);}
+header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(8,8,8,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.logo{font-family:var(--font-h);font-size:2rem;letter-spacing:3px;color:var(--pink);text-decoration:none;}
+.logo span{color:var(--text);}
+.hdr-right{display:flex;align-items:center;gap:.75rem;}
+.back-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.4rem .9rem;font-size:.82rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;}
+.back-btn:hover{border-color:var(--pink);color:var(--pink);}
 
-    .page{max-width:1200px;margin:0 auto;padding:80px 2rem 4rem;position:relative;z-index:1;}
+.page{max-width:1200px;margin:0 auto;padding:68px 1rem 3rem;position:relative;z-index:1;}
 
-    /* TABS */
-    .page-tabs{display:flex;gap:0;margin-bottom:2rem;border-bottom:1px solid var(--border);}
-    .page-tab{font-family:var(--font-h);font-size:1.1rem;letter-spacing:2px;padding:.6rem 2rem;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;}
-    .page-tab:hover{color:var(--text);}
-    .page-tab.active{color:var(--pink);border-bottom-color:var(--pink);}
+/* ── TEAMS ROW ── */
+.teams-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+@media(max-width:700px){.teams-row{grid-template-columns:1fr;}}
 
-    #tab-collection{display:none !important;} #tab-pvp{display:block;}
+.team-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;}
+.team-panel-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;}
+.team-panel-title{font-family:var(--font-h);font-size:1.4rem;letter-spacing:2px;}
+.save-btn{background:var(--pink);border:none;color:#fff;border-radius:6px;padding:.35rem .9rem;font-family:var(--font-h);font-size:.85rem;letter-spacing:2px;cursor:pointer;transition:opacity .2s;box-shadow:0 0 12px var(--pink-glow);}
+.save-btn:hover{opacity:.85;}
+.save-btn.def{background:linear-gradient(135deg,#1e3a5f,#2563eb);box-shadow:0 0 12px rgba(37,99,235,.4);}
 
-    .section-title{font-family:var(--font-h);font-size:2rem;letter-spacing:3px;margin-bottom:.4rem;}
-    .section-title em{color:var(--pink);font-style:normal;}
-    .section-sub{color:var(--muted);font-size:.82rem;margin-bottom:1.5rem;}
+/* Slots */
+.team-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;}
+.team-slot{aspect-ratio:2/3;border-radius:8px;border:2px dashed var(--border);background:var(--bg3);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.team-slot:hover:not(.filled){border-color:var(--pink);opacity:.8;}
+.team-slot.filled{border-style:solid;border-color:var(--border);}
+.slot-empty-lbl{font-size:.55rem;color:var(--muted);letter-spacing:1px;margin-top:.3rem;}
+.slot-fill{width:100%;height:100%;position:relative;}
+.slot-bg{position:absolute;inset:0;}
+.slot-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;z-index:1;}
+.slot-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 55%);z-index:2;}
+.slot-aff{position:absolute;top:3px;left:4px;font-size:.7rem;z-index:3;}
+.slot-info{position:absolute;bottom:0;left:0;right:0;padding:.3rem .4rem;z-index:3;}
+.slot-name{font-family:var(--font-h);font-size:.65rem;letter-spacing:1px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.slot-role{font-size:.5rem;color:rgba(255,255,255,.45);}
+.slot-rm{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.75);border:none;color:var(--muted);border-radius:50%;width:16px;height:16px;font-size:.55rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:4;transition:all .2s;}
+.slot-rm:hover{background:var(--pink);color:#fff;}
 
-    /* FILTER */
-    .filter-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center;}
-    .filter-input{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:.45rem .9rem;font-size:.85rem;font-family:var(--font-b);outline:none;min-width:200px;}
-    .filter-input:focus{border-color:var(--pink);}
-    .filter-chip{background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:20px;padding:.3rem .8rem;font-size:.75rem;cursor:pointer;transition:all .2s;}
-    .filter-chip:hover{border-color:var(--rose);color:var(--rose);}
-    .filter-chip.active{background:var(--pink);border-color:var(--pink);color:#fff;}
+/* ── PVP CHARACTER GRID ── */
+.pvp-section-title{font-family:var(--font-h);font-size:1.6rem;letter-spacing:3px;margin-bottom:.3rem;}
+.pvp-section-title em{color:var(--pink);font-style:normal;}
+.pvp-section-sub{color:var(--muted);font-size:.78rem;margin-bottom:1rem;}
+.pvp-filter-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;}
+.pvp-search{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:.4rem .8rem;font-size:.82rem;font-family:var(--font-b);outline:none;min-width:180px;}
+.pvp-search:focus{border-color:var(--pink);}
+.fchip{background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:20px;padding:.28rem .7rem;font-size:.72rem;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.fchip:hover{border-color:var(--rose);color:var(--rose);}
+.fchip.active{background:var(--pink);border-color:var(--pink);color:#fff;}
 
-    /* COLLECTION GRID */
-    .coll-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;}
+.pvp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.75rem;}
 
-    /* CHAR CARD */
-    .char-card{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:2/3;background:var(--surface);border:2px solid var(--border);cursor:pointer;transition:transform .3s,border-color .3s;display:flex;flex-direction:column;}
-    .char-card:hover{transform:translateY(-5px) scale(1.03);border-color:var(--pink);}
-    .char-card.r5{border-color:#fbbf2455;} .char-card.r4{border-color:#c084fc55;} .char-card.r3{border-color:#38bdf855;}
-    .char-card.pvp-ready{box-shadow:0 0 12px var(--pink-glow);}
-    .char-card.pvp-ready::after{content:'⚔';position:absolute;top:6px;right:6px;font-size:.7rem;background:var(--pink);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;z-index:3;}
-    .char-card.not-pvp{opacity:.55;}
-    .card-img-wrap{flex:1;position:relative;min-height:0;overflow:hidden;}
-    .card-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;z-index:2;}
-    .card-gradient{position:absolute;inset:0;z-index:1;}
-    .r5 .card-gradient{background:linear-gradient(160deg,#1a0a00,#3d1900 50%,#7c3300);}
-    .r4 .card-gradient{background:linear-gradient(160deg,#0d001a,#1e003d 50%,#3b0080);}
-    .r3 .card-gradient{background:linear-gradient(160deg,#001220,#002444 50%,#003d6e);}
-    .r2 .card-gradient{background:linear-gradient(160deg,#001a0a,#003018 60%);}
-    .r1 .card-gradient{background:linear-gradient(160deg,#0d0d0d,#181818);}
-    .card-sym{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;font-size:3rem;opacity:.12;pointer-events:none;}
-    .card-info{padding:.5rem .6rem .45rem;background:var(--bg);border-top:1px solid rgba(255,255,255,.05);flex-shrink:0;}
-    .card-stars{font-size:.52rem;margin-bottom:.1rem;}
-    .card-name{font-family:var(--font-h);font-size:.85rem;letter-spacing:1px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .r5 .card-name{color:var(--r5);} .r4 .card-name{color:var(--r4);} .r3 .card-name{color:var(--r3);} .r2 .card-name{color:var(--r2);} .r1 .card-name{color:var(--r1);}
-    .card-meta{font-size:.58rem;color:var(--muted);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .card-dupes{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.75);color:var(--muted);font-size:.65rem;border-radius:4px;padding:.1rem .35rem;z-index:4;}
-    .card-dupes.has-dupes{color:var(--rose);}
+/* PVP char card */
+.pvp-card{border-radius:var(--radius);border:2px solid var(--border);background:var(--bg3);overflow:hidden;transition:border-color .2s;position:relative;}
+.pvp-card.r5{border-color:#fbbf2433;} .pvp-card.r4{border-color:#c084fc33;} .pvp-card.r3{border-color:#38bdf833;}
+.pvp-card.in-atk{border-color:var(--pink) !important;box-shadow:0 0 10px var(--pink-glow);}
+.pvp-card.in-def{border-color:#3b82f6 !important;box-shadow:0 0 10px rgba(59,130,246,.35);}
+.pvp-card.in-both{border-color:#a78bfa !important;box-shadow:0 0 10px rgba(167,139,250,.35);}
+.pvp-face{height:110px;position:relative;overflow:hidden;}
+.pvp-face-bg{position:absolute;inset:0;}
+.pvp-face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;z-index:1;}
+.pvp-face-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 55%);z-index:2;}
+.pvp-face-aff{position:absolute;top:3px;right:4px;font-size:.7rem;z-index:3;}
+.pvp-face-team{position:absolute;top:3px;left:4px;font-size:.65rem;z-index:3;display:flex;gap:2px;}
+.team-badge{border-radius:4px;padding:0 3px;font-weight:700;font-size:.6rem;}
+.badge-atk{background:var(--pink);color:#fff;}
+.badge-def{background:#2563eb;color:#fff;}
+.pvp-info{padding:.4rem .5rem .35rem;}
+.pvp-name{font-family:var(--font-h);font-size:.8rem;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pvp-meta{font-size:.58rem;color:var(--muted);margin-top:.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* Quick-add buttons */
+.pvp-btns{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:0 .4rem .4rem;}
+.qadd{border:none;border-radius:4px;padding:.25rem;font-size:.6rem;cursor:pointer;font-family:var(--font-h);letter-spacing:1px;transition:opacity .2s;}
+.qadd:hover{opacity:.8;}
+.qadd.atk{background:var(--pink);color:#fff;}
+.qadd.def{background:#2563eb;color:#fff;}
+.qadd.rm-atk{background:rgba(255,45,120,.15);color:var(--pink);border:1px solid var(--pink);}
+.qadd.rm-def{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid #3b82f6;}
+.qadd:disabled{opacity:.3;cursor:default;}
 
-    /* EMPTY STATE */
-    .empty-state{text-align:center;padding:4rem 2rem;color:var(--muted);grid-column:1/-1;}
-    .empty-state .ei{font-size:3rem;opacity:.2;margin-bottom:1rem;display:block;}
+/* Not in collection */
+.pvp-card.not-owned{opacity:.45;filter:grayscale(.6);}
+.pvp-card.not-owned .pvp-btns{pointer-events:none;}
+.not-owned-tag{position:absolute;bottom:38px;left:0;right:0;text-align:center;font-size:.55rem;color:var(--muted);letter-spacing:1px;z-index:3;}
 
-    /* PVP LAYOUT */
-    .pvp-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
-    @media(max-width:860px){.pvp-layout{grid-template-columns:1fr;}}
-    .team-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;}
-    .team-panel-title{font-family:var(--font-h);font-size:1.4rem;letter-spacing:2px;margin-bottom:.3rem;}
-    .team-panel-sub{font-size:.75rem;color:var(--muted);margin-bottom:1.2rem;}
+/* Skin indicator */
+.pvp-skin-dot{position:absolute;bottom:3px;right:3px;width:8px;height:8px;background:#a78bfa;border-radius:50%;z-index:3;border:1px solid rgba(255,255,255,.3);}
 
-    /* SLOTS */
-    .team-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-bottom:1rem;}
-    .team-slot{aspect-ratio:2/3;border-radius:8px;border:2px dashed var(--border);background:var(--bg3);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
-    .team-slot:hover{border-color:var(--pink);}
-    .team-slot.filled{border-style:solid;border-color:var(--border);padding:0;}
-    .team-slot.filled:hover{border-color:var(--pink);}
-    .slot-empty-icon{font-size:1.5rem;opacity:.2;margin-bottom:.3rem;}
-    .slot-empty-label{font-size:.6rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
-    .slot-char{width:100%;height:100%;position:relative;}
-    .slot-bg{position:absolute;inset:0;}
-    .slot-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;z-index:1;}
-    .slot-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 55%);z-index:2;}
-    .slot-affinity{position:absolute;top:4px;left:4px;font-size:.75rem;z-index:3;}
-    .slot-info{position:absolute;bottom:0;left:0;right:0;padding:.4rem;z-index:3;}
-    .slot-name{font-family:var(--font-h);font-size:.7rem;letter-spacing:1px;line-height:1;color:#fff;}
-    .slot-role{font-size:.55rem;color:rgba(255,255,255,.5);margin-top:.1rem;}
-    .slot-remove{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;color:var(--muted);border-radius:50%;width:18px;height:18px;font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:4;transition:all .2s;}
-    .slot-remove:hover{background:var(--pink);color:#fff;}
+/* toast */
+#toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#0a1628;border:1px solid var(--pink);border-radius:8px;padding:.65rem 1.4rem;font-size:.82rem;color:var(--rose);z-index:9999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;}
+#toast.show{opacity:1;}
 
-    /* TEAM STATS */
-    .team-stats{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.8rem;}
-    .team-stat{background:var(--bg3);border-radius:6px;padding:.3rem .6rem;font-size:.72rem;}
-    .team-stat span{font-family:var(--font-h);font-size:.9rem;color:var(--text);}
-
-    .save-btn{width:100%;background:var(--pink);border:none;color:#fff;border-radius:6px;padding:.55rem;font-family:var(--font-h);font-size:1.1rem;letter-spacing:2px;cursor:pointer;box-shadow:0 0 16px var(--pink-glow);transition:opacity .2s;}
-    .save-btn:hover{opacity:.85;}
-    .save-btn.def{background:linear-gradient(135deg,#1e3a5f,#2563eb);box-shadow:0 0 16px rgba(37,99,235,.4);}
-
-    /* PVP CHAR LIST */
-    .pvp-available{margin-top:1.5rem;}
-    .pvp-avail-title{font-family:var(--font-h);font-size:1rem;letter-spacing:2px;color:var(--muted);margin-bottom:.8rem;}
-    .pvp-char-list{display:flex;gap:.5rem;flex-wrap:wrap;max-height:280px;overflow-y:auto;padding-right:4px;}
-    .pvp-chip{display:flex;align-items:center;gap:.4rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.35rem .6rem .35rem .4rem;cursor:pointer;transition:all .2s;font-size:.78rem;}
-    .pvp-chip:hover{border-color:var(--pink);color:var(--pink);}
-    .pvp-chip.in-team{opacity:.35;pointer-events:none;}
-    .pvp-chip img{width:28px;height:28px;border-radius:4px;object-fit:cover;object-position:top;background:var(--bg2);}
-    .pvp-chip .cname{font-family:var(--font-h);letter-spacing:1px;font-size:.82rem;}
-    .pvp-chip .cmeta{font-size:.62rem;color:var(--muted);}
-
-    /* MODAL */
-    #char-modal{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .25s;}
-    #char-modal.open{opacity:1;pointer-events:auto;}
-    .cm-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);max-width:520px;width:100%;display:flex;overflow:hidden;max-height:90vh;}
-    .cm-imgcol{width:180px;flex-shrink:0;position:relative;}
-    .cm-imgcol img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;z-index:1;}
-    .cm-imgcol-bg{position:absolute;inset:0;z-index:0;}
-    .cm-body{flex:1;padding:1.5rem;overflow-y:auto;}
-    .cm-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--pink);border:1px solid var(--pink-dim);border-radius:20px;padding:.2rem .7rem;margin-bottom:.8rem;}
-    .cm-name{font-family:var(--font-h);font-size:2rem;letter-spacing:2px;line-height:1;margin-bottom:.2rem;}
-    .cm-series{font-size:.8rem;color:var(--muted);margin-bottom:1rem;}
-    .cm-status{font-size:.78rem;padding:.5rem .8rem;border-radius:6px;margin-bottom:1rem;}
-    .cm-status.ok{background:#14532d22;border:1px solid #16a34a44;color:#4ade80;}
-    .cm-status.locked{background:#1a1a1a;border:1px solid var(--border);color:var(--muted);}
-    .cm-stats{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:1rem;}
-    .cm-stat{background:var(--bg3);border-radius:6px;padding:.4rem .6rem;}
-    .cm-stat-lbl{font-size:.6rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
-    .cm-stat-val{font-family:var(--font-h);font-size:1.1rem;letter-spacing:1px;}
-    .cm-skills-hd{font-family:var(--font-h);font-size:.9rem;letter-spacing:2px;color:var(--muted);margin-bottom:.5rem;}
-    .cm-skill{background:var(--bg3);border-radius:6px;padding:.6rem .8rem;margin-bottom:.4rem;}
-    .cm-skill-name{font-weight:700;font-size:.82rem;margin-bottom:.2rem;}
-    .cm-skill-desc{font-size:.75rem;color:var(--muted);line-height:1.5;}
-    .cm-skill-meta{font-size:.65rem;color:var(--pink);margin-top:.2rem;}
-    .cm-actions{display:flex;gap:.5rem;margin-top:1rem;}
-    .cm-btn{flex:1;background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.5rem;font-size:.8rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;}
-    .cm-btn:hover:not(:disabled){border-color:var(--pink);color:var(--pink);}
-    .cm-btn.primary{background:var(--pink);border-color:var(--pink);color:#fff;}
-    .cm-btn.primary:hover{opacity:.85;}
-    .cm-btn:disabled{opacity:.3;cursor:default;}
-
-    #toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#0a1628;border:1px solid var(--pink);border-radius:8px;padding:.7rem 1.4rem;font-size:.85rem;color:var(--rose);z-index:9999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;}
-    #toast.show{opacity:1;}
+/* battle link */
+.battle-link{display:block;margin-top:.6rem;background:none;border:1px solid var(--pink);color:var(--pink);border-radius:6px;padding:.5rem;text-align:center;font-family:var(--font-h);font-size:1rem;letter-spacing:2px;text-decoration:none;transition:all .2s;}
+.battle-link:hover{background:var(--pink-dim);}
   </style>
 </head>
 <body>
-  <script type="module" src="user_data.js"></script>
-
-  <header>
-    <a class="logo" href="index.html">Re<span>:</span>Anime</a>
+<script type="module" src="user_data.js"></script>
+<header>
+  <a class="logo" href="index.html">Re<span>:</span>Anime</a>
+  <div class="hdr-right">
+    <a href="battle.html" class="battle-link" style="padding:.3rem .9rem;margin:0;font-size:.8rem;">⚔ Batalla</a>
     <button class="back-btn" onclick="history.length>1?history.back():location.href='index.html'">← Volver</button>
-  </header>
+  </div>
+</header>
 
-  <div class="page">
-    <div class="page-tabs">
-      
-      <button class="page-tab active" onclick="switchTab('pvp')">Constructor de Equipos</button>
+<div class="page">
+  <!-- TEAMS -->
+  <div class="teams-row">
+    <div class="team-panel">
+      <div class="team-panel-hd">
+        <div class="team-panel-title">⚔ <em style="color:var(--pink)">Ataque</em></div>
+        <button class="save-btn" onclick="saveTeam('atk')">Guardar</button>
+      </div>
+      <div class="team-slots" id="atk-slots"></div>
+      <a href="battle.html" class="battle-link">Ir a Batalla →</a>
     </div>
-
-    <!-- COLLECTION -->
-    <div id="tab-collection">
-      <div class="section-title">Mi <em>Coleccion</em></div>
-      <div class="section-sub" id="coll-sub">Cargando...</div>
-      <div class="filter-row">
-        <input class="filter-input" id="coll-search" placeholder="Buscar..." oninput="renderCollection()"/>
-        <button class="filter-chip active" onclick="setFilter(this,'all')">Todos</button>
-        <button class="filter-chip" onclick="setFilter(this,'pvp')">⚔ PVP</button>
-        <button class="filter-chip" onclick="setFilter(this,'5')">★★★★★</button>
-        <button class="filter-chip" onclick="setFilter(this,'4')">★★★★</button>
+    <div class="team-panel">
+      <div class="team-panel-hd">
+        <div class="team-panel-title">🛡 <em style="color:#60a5fa">Defensa</em></div>
+        <button class="save-btn def" onclick="saveTeam('def')">Guardar</button>
       </div>
-      <div class="coll-grid" id="coll-grid">
-        <div class="empty-state"><span class="ei">📦</span><p>Cargando...</p></div>
-      </div>
-    </div>
-
-    <!-- PVP BUILDER -->
-    <div id="tab-pvp">
-      <div class="section-title">Constructor <em>PVP</em></div>
-      <div class="section-sub">Solo personajes de tu coleccion disponibles para PVP. Click en un chip para añadirlo al equipo.</div>
-      <div class="pvp-layout">
-        <div class="team-panel">
-          <div class="team-panel-title">Equipo <em style="color:var(--pink)">Ataque</em></div>
-          <div class="team-panel-sub">El equipo con el que atacas.</div>
-          <div class="team-slots" id="atk-slots"></div>
-          <div class="team-stats" id="atk-stats"></div>
-          <button class="save-btn" onclick="saveTeam('atk')">Guardar Ataque ⚔</button>
-        <a href="battle.html" style="display:block;margin-top:.6rem;background:none;border:1px solid var(--pink);color:var(--pink);border-radius:6px;padding:.5rem;text-align:center;font-family:var(--font-h);font-size:1rem;letter-spacing:2px;text-decoration:none;transition:all .2s;" onmouseover="this.style.background='var(--pink-dim)'" onmouseout="this.style.background='none'">Ir a Batalla →</a>
-        </div>
-        <div class="team-panel">
-          <div class="team-panel-title">Equipo <em style="color:#3b82f6">Defensa</em></div>
-          <div class="team-panel-sub">El equipo que otros atacan.</div>
-          <div class="team-slots" id="def-slots"></div>
-          <div class="team-stats" id="def-stats"></div>
-          <button class="save-btn def" onclick="saveTeam('def')">Guardar Defensa 🛡</button>
-        </div>
-      </div>
-      <div class="pvp-available">
-        <div class="pvp-avail-title">Personajes disponibles — click para agregar al equipo</div>
-        <div class="pvp-char-list" id="pvp-char-list"></div>
-      </div>
+      <div class="team-slots" id="def-slots"></div>
     </div>
   </div>
 
-  <!-- MODAL -->
-  <div id="char-modal" onclick="closeModal()">
-    <div class="cm-box" onclick="event.stopPropagation()">
-      <div class="cm-imgcol">
-        <div class="cm-imgcol-bg" id="cm-bg"></div>
-        <img id="cm-img" src="" alt="" onerror="this.style.display='none'"/>
-      </div>
-      <div class="cm-body">
-        <div class="cm-badge" id="cm-badge"></div>
-        <div class="cm-name" id="cm-name"></div>
-        <div class="cm-series" id="cm-series"></div>
-        <div class="cm-status" id="cm-status"></div>
-        <div class="cm-stats" id="cm-stats"></div>
-        <div id="cm-skills"></div>
-        <div class="cm-actions" style="flex-wrap:wrap;">
-          <button class="cm-btn" onclick="closeModal()">Cerrar</button>
-          <button class="cm-btn primary" id="cm-atk" onclick="addModal('atk')">+ Ataque</button>
-          <button class="cm-btn primary" id="cm-def" onclick="addModal('def')" style="background:#2563eb;border-color:#2563eb;">+ Defensa</button>
-          <button class="cm-btn" id="cm-feat" onclick="setFeaturedFromModal()" style="border-color:#a78bfa;color:#a78bfa;grid-column:1/-1;margin-top:.2rem;">✦ Destacar en Perfil</button>
-        </div>
-      </div>
-    </div>
+  <!-- PVP CHARS -->
+  <div class="pvp-section-title">Personajes <em>PVP</em></div>
+  <div class="pvp-section-sub" id="pvp-sub">Cargando...</div>
+  <div class="pvp-filter-row">
+    <input class="pvp-search" id="pvp-search" placeholder="Buscar..." oninput="renderGrid()"/>
+    <button class="fchip active" onclick="setF(this,'all')">Todos</button>
+    <button class="fchip" onclick="setF(this,'owned')">Solo mi colección</button>
+    <button class="fchip" onclick="setF(this,'atk')">En ataque</button>
+    <button class="fchip" onclick="setF(this,'def')">En defensa</button>
+    <button class="fchip" onclick="setF(this,'5')">★★★★★</button>
+    <button class="fchip" onclick="setF(this,'4')">★★★★</button>
   </div>
-  <div id="toast"></div>
+  <div class="pvp-grid" id="pvp-grid"></div>
+</div>
 
-  <script>
-  const RC={5:'#fbbf24',4:'#c084fc',3:'#38bdf8',2:'#86efac',1:'#94a3b8'};
-  const RG={5:'linear-gradient(160deg,#1a0a00,#3d1900 50%,#7c3300)',4:'linear-gradient(160deg,#0d001a,#1e003d 50%,#3b0080)',3:'linear-gradient(160deg,#001220,#002444 50%,#003d6e)',2:'linear-gradient(160deg,#001a0a,#003018 60%)',1:'linear-gradient(160deg,#0d0d0d,#181818)'};
-  const RS={5:'★',4:'◆',3:'▲',2:'●',1:'─'};
-  const SL={hp:'❤ HP',atk:'⚔ ATK',def:'🛡 DEF',spd:'⚡ SPD',cr:'💥 CR%',cd:'🔺 CD%'};
+<div id="toast"></div>
 
-  let pvpData=null, myCol=[], dedupe=[], pvpAvail=[];
-  let atkTeam=[null,null,null,null], defTeam=[null,null,null,null];
-  let collFilter='all', _modal=null, _pickTeam=null;
+<script>
+const RC={5:'#fbbf24',4:'#c084fc',3:'#38bdf8',2:'#86efac',1:'#94a3b8'};
+const RG={5:'linear-gradient(160deg,#1a0a00,#3d1900 50%)',4:'linear-gradient(160deg,#0d001a,#1e003d 50%)',3:'linear-gradient(160deg,#001220,#002444 50%)',2:'linear-gradient(160deg,#001a0a,#003018 60%)',1:'linear-gradient(160deg,#0d0d0d,#181818)'};
+const AFF={fuego:'🔥',agua:'💧',tierra:'🌿',rayo:'⚡',luz:'✦',oscuridad:'🌑'};
 
-  async function init(){
-    try{ const r=await fetch('pvp_chars.json'); pvpData=await r.json(); }catch{ pvpData={characters:[],affinities:{}}; }
-    if(window.ReAnimeDB){ myCol=await window.ReAnimeDB.getCollection(); }
-    else{ await new Promise(r=>window.addEventListener('reanimdb:ready',r,{once:true})); myCol=await window.ReAnimeDB.getCollection(); }
-    const ud=await window.ReAnimeDB.loadUserData();
-    if(ud.atkTeam) atkTeam=ud.atkTeam.concat([null,null,null,null]).slice(0,4);
-    if(ud.defTeam) defTeam=ud.defTeam.concat([null,null,null,null]).slice(0,4);
-    buildDedupe(); buildPvpAvail(); renderCollection(); renderSlots(); renderChips();
+let pvpData=null, myCol=[], colDedupe=new Map();
+let atkTeam=[null,null,null,null], defTeam=[null,null,null,null];
+let filt='all', upgrades={};  // name→{selectedSkin, selectedPassive, ...}
+
+async function init(){
+  try{const r=await fetch('pvp_chars.json');pvpData=await r.json();}catch{pvpData={characters:[]};}
+  if(window.ReAnimeDB)myCol=await window.ReAnimeDB.getCollection();
+  else{await new Promise(r=>window.addEventListener('reanimdb:ready',r,{once:true}));myCol=await window.ReAnimeDB.getCollection();}
+  // Build dedupe map
+  for(const c of myCol){const k=c.name.toLowerCase().trim();if(!colDedupe.has(k))colDedupe.set(k,{...c,count:1});else colDedupe.get(k).count++;}
+  // Load saved teams
+  const ud=await window.ReAnimeDB.loadUserData();
+  if(ud.atkTeam?.length)atkTeam=ud.atkTeam.concat([null,null,null,null]).slice(0,4);
+  if(ud.defTeam?.length)defTeam=ud.defTeam.concat([null,null,null,null]).slice(0,4);
+  // Load upgrades for all owned pvp chars
+  const pvpNames=(pvpData.characters||[]).map(c=>c.name);
+  await Promise.all(pvpNames.filter(n=>colDedupe.has(n.toLowerCase().trim())).map(async n=>{
+    try{upgrades[n]=await window.ReAnimeDB.getCharUpgrade(n);}catch{}
+  }));
+  renderSlots();renderGrid();
+  document.getElementById('pvp-sub').textContent=`${pvpData.characters?.length||0} personajes disponibles · ${colDedupe.size} en tu colección`;
+}
+
+/* ── Get active image for a pvp char ── */
+function getCharImage(pvpChar, collChar){
+  const up = upgrades[pvpChar.name];
+  // selectedSkin null/undefined = use default (collection image)
+  if(up?.selectedSkin != null && pvpChar.skins?.[up.selectedSkin]){
+    return pvpChar.skins[up.selectedSkin];
   }
+  // Default: use collection image
+  return collChar?.image || pvpChar.skins?.[0] || '';
+}
 
-  function buildDedupe(){
-    const m=new Map();
-    for(const c of myCol){ const k=c.name.toLowerCase().trim(); if(m.has(k)){m.get(k).count++;}else{m.set(k,{...c,count:1});} }
-    dedupe=Array.from(m.values()).sort((a,b)=>b.stars-a.stars||a.name.localeCompare(b.name));
-  }
-  function findPvp(name){ return pvpData.characters.find(c=>c.name.toLowerCase().trim()===name.toLowerCase().trim())||null; }
-  function buildPvpAvail(){ pvpAvail=dedupe.filter(c=>!!findPvp(c.name)); }
+/* ── SLOTS ── */
+function renderSlots(){
+  buildSlots('atk',atkTeam);
+  buildSlots('def',defTeam);
+}
 
-  function switchTab(t){
-    document.querySelectorAll('.page-tab').forEach((b,i)=>b.classList.toggle('active',i===(t==='collection'?0:1)));
-    // collection tab removed
-    document.getElementById('tab-pvp').style.display='block';
-  }
-
-  function setFilter(el,v){ document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); collFilter=v; renderCollection(); }
-
-  function stars(n,col){ return `<span style="color:${col||'#94a3b8'}">${'★'.repeat(n)}${'☆'.repeat(5-n)}</span>`; }
-
-  function renderCollection(){
-    const grid=document.getElementById('coll-grid');
-    const q=document.getElementById('coll-search').value.toLowerCase();
-    let list=dedupe.filter(c=>{
-      if(q&&!c.name.toLowerCase().includes(q)&&!c.anime.toLowerCase().includes(q)) return false;
-      const p=findPvp(c.name);
-      if(collFilter==='pvp'&&!p) return false;
-      if(collFilter==='5'&&c.stars!==5) return false;
-      if(collFilter==='4'&&c.stars!==4) return false;
-      return true;
-    });
-    document.getElementById('coll-sub').textContent=`${dedupe.length} únicos · ${pvpAvail.length} habilitados para PVP`;
-    if(!list.length){ grid.innerHTML=myCol.length===0?`<div class="empty-state"><span class="ei">🎴</span><p>Coleccion vacia. Ve al Gacha para obtener personajes.</p></div>`:`<div class="empty-state"><span class="ei">🔍</span><p>Sin resultados.</p></div>`; return; }
-    grid.innerHTML='';
-    list.forEach(c=>{
-      const p=findPvp(c.name); const col=RC[c.stars]||'#94a3b8';
-      const el=document.createElement('div');
-      el.className=`char-card r${c.stars}${p?' pvp-ready':' not-pvp'}`;
-      el.onclick=()=>openModal(c,p);
-      el.innerHTML=`<div class="card-img-wrap"><div class="card-gradient"></div><div class="card-sym">${RS[c.stars]||'─'}</div>${c.image?`<img src="${c.image}" loading="lazy" onerror="this.style.display='none'"/>`:''}${c.count>1?`<div class="card-dupes has-dupes">×${c.count}</div>`:''}</div><div class="card-info"><div class="card-stars">${stars(c.stars,col)}</div><div class="card-name">${c.name}</div><div class="card-meta">${c.anime}${p?` · ${pvpData.affinities[p.affinity]?.icon||''} ${p.role}`:''}</div></div>`;
-      grid.appendChild(el);
-    });
-  }
-
-  function openModal(coll,pvp){
-    _modal={coll,pvp};
-    const col=RC[coll.stars]||'#94a3b8';
-    document.getElementById('cm-img').src=coll.image||'';
-    document.getElementById('cm-img').style.display=coll.image?'block':'none';
-    document.getElementById('cm-bg').style.background=RG[coll.stars]||RG[1];
-    document.getElementById('cm-badge').innerHTML=stars(coll.stars,col)+(pvp?` ${pvpData.affinities[pvp.affinity]?.icon||''} ${pvp.affinity}`:'');
-    document.getElementById('cm-name').textContent=coll.name;
-    document.getElementById('cm-name').style.color=col;
-    document.getElementById('cm-series').textContent=(pvp?.series||coll.anime)+(pvp?` · ${pvp.role}`:'');
-    const st=document.getElementById('cm-status');
-    if(pvp){st.className='cm-status ok';st.textContent='⚔ Habilitado para PVP';}
-    else{st.className='cm-status locked';st.textContent='🔒 Este personaje no está disponible para PVP aún.';}
-    document.getElementById('cm-stats').innerHTML=pvp?.stats?Object.entries(pvp.stats).map(([k,v])=>`<div class="cm-stat"><div class="cm-stat-lbl">${SL[k]||k}</div><div class="cm-stat-val" style="color:${col}">${v}${k==='cr'||k==='cd'?'%':''}</div></div>`).join(''):`<div style="color:var(--muted);font-size:.8rem;grid-column:1/-1">Sin stats PVP.</div>`;
-    document.getElementById('cm-skills').innerHTML=pvp?.skills?.length?`<div class="cm-skills-hd">Habilidades</div>`+pvp.skills.map(s=>`<div class="cm-skill"><div class="cm-skill-name">${s.name}</div><div class="cm-skill-desc">${s.desc}</div><div class="cm-skill-meta">${s.type==='pasiva'?'Pasiva':`Activa · CD: ${s.cooldown===0?'Básico':s.cooldown+' turnos'}`}</div></div>`).join(''):'';
-    ['cm-atk','cm-def'].forEach(id=>{document.getElementById(id).disabled=!pvp;document.getElementById(id).style.opacity=pvp?'1':'.3';});
-    document.getElementById('char-modal').classList.add('open');
-  }
-  function closeModal(){ document.getElementById('char-modal').classList.remove('open'); _modal=null; }
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
-
-  function addModal(type){
-    if(!_modal?.pvp) return;
-    const team=type==='atk'?atkTeam:defTeam;
-    const slot=team.findIndex(s=>s===null);
-    if(slot===-1){showToast('Equipo lleno.');return;}
-    team[slot]=merge(_modal.coll,_modal.pvp);
-    renderSlots(); renderChips(); closeModal();
-    showToast(`${team[slot].name} → equipo de ${type==='atk'?'ataque':'defensa'}`);
-  }
-
-  function merge(coll,pvp){ return{name:coll.name,anime:pvp?.series||coll.anime,image:coll.image||'',stars:coll.stars,affinity:pvp?.affinity||'',role:pvp?.role||'',stats:pvp?.stats||{},skills:pvp?.skills||[]}; }
-
-  function renderSlots(){ ['atk','def'].forEach(t=>{ buildSlots(t,t==='atk'?atkTeam:defTeam); buildStats(t,t==='atk'?atkTeam:defTeam); }); }
-
-  function buildSlots(type,team){
-    const c=document.getElementById(type+'-slots'); c.innerHTML='';
-    team.forEach((ch,i)=>{
-      const el=document.createElement('div');
-      el.className='team-slot'+(ch?' filled':'');
-      if(ch){
-        const col=RC[ch.stars]||'#94a3b8';
-        const aff=pvpData?.affinities?.[ch.affinity];
-        el.innerHTML=`<div class="slot-char"><div class="slot-bg" style="background:${RG[ch.stars]||RG[1]}"></div>${ch.image?`<img class="slot-img" src="${ch.image}" onerror="this.style.display='none'"/>`:''}<div class="slot-overlay"></div><div class="slot-affinity">${aff?.icon||''}</div><div class="slot-info"><div class="slot-name" style="color:${col}">${ch.name}</div><div class="slot-role">${ch.role||''}</div></div><button class="slot-remove" onclick="removeSlot('${type}',${i})">✕</button></div>`;
-      } else {
-        el.innerHTML=`<div class="slot-empty-icon">+</div><div class="slot-empty-label">Slot ${i+1}</div>`;
-        el.onclick=()=>{ _pickTeam=type; showToast('Selecciona un personaje de la lista.'); };
-      }
-      c.appendChild(el);
-    });
-  }
-
-  function buildStats(type,team){
-    const el=document.getElementById(type+'-stats');
-    const f=team.filter(Boolean);
-    if(!f.length){el.innerHTML='';return;}
-    const t={hp:0,atk:0,def:0,spd:0};
-    f.forEach(c=>{for(const k in t) t[k]+=(c.stats?.[k]||0);});
-    el.innerHTML=Object.entries(t).map(([k,v])=>`<div class="team-stat"><div style="font-size:.6rem;color:var(--muted);letter-spacing:1px">${SL[k]}</div><span>${v.toLocaleString()}</span></div>`).join('');
-  }
-
-  function removeSlot(type,i){ (type==='atk'?atkTeam:defTeam)[i]=null; renderSlots(); renderChips(); }
-
-  function renderChips(){
-    const list=document.getElementById('pvp-char-list');
-    if(!pvpAvail.length){list.innerHTML='<div style="color:var(--muted);font-size:.82rem;padding:1rem;">Ningún personaje de tu colección está habilitado para PVP.</div>';return;}
-    list.innerHTML='';
-    pvpAvail.forEach(c=>{
-      const pvp=findPvp(c.name);
-      const aff=pvpData?.affinities?.[pvp?.affinity];
-      const inA=atkTeam.some(t=>t?.name===c.name);
-      const inD=defTeam.some(t=>t?.name===c.name);
-      const col=RC[c.stars]||'#94a3b8';
-      const chip=document.createElement('div');
-      chip.className='pvp-chip'+(inA&&inD?' in-team':'');
-      chip.onclick=()=>{
-        if(_pickTeam){ addToTeam(_pickTeam,c,pvp); _pickTeam=null; }
-        else openModal(c,pvp);
-      };
-      chip.innerHTML=`${c.image?`<img src="${c.image}" onerror="this.style.display='none'">`:`<div style="width:28px;height:28px;background:var(--bg3);border-radius:4px;display:flex;align-items:center;justify-content:center">${RS[c.stars]}</div>`}<div><div class="cname" style="color:${col}">${c.name}</div><div class="cmeta">${aff?.icon||''} ${pvp?.affinity||''} · ${pvp?.role||''}</div></div><div style="margin-left:auto;font-size:.65rem;color:var(--muted)">${inA?'⚔':''}${inD?'🛡':''}</div>`;
-      list.appendChild(chip);
-    });
-  }
-
-  function addToTeam(type,coll,pvp){
-    const team=type==='atk'?atkTeam:defTeam;
-    const slot=team.findIndex(s=>s===null);
-    if(slot===-1){showToast('Equipo lleno.');return;}
-    team[slot]=merge(coll,pvp);
-    renderSlots(); renderChips();
-    showToast(`${coll.name} → ${type==='atk'?'Ataque':'Defensa'}`);
-  }
-
-  async function saveTeam(type){
-    const team=type==='atk'?atkTeam:defTeam;
-    const field=type==='atk'?'atkTeam':'defTeam';
-    if(!team.filter(Boolean).length){showToast('Equipo vacío.');return;}
-    const user=JSON.parse(localStorage.getItem('user'));
-    if(user){
-      try{
-        const toStore=team.map(c=>c?{name:c.name,anime:c.anime,image:c.image||'',stars:c.stars,affinity:c.affinity||'',role:c.role||''}:null);
-        const url=`https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/users/${user.id}?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU&updateMask.fieldPaths=${field}`;
-        await fetch(url,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:{[field]:{arrayValue:{values:toStore.map(c=>c?{mapValue:{fields:{name:{stringValue:c.name},anime:{stringValue:c.anime},image:{stringValue:c.image},stars:{integerValue:c.stars},affinity:{stringValue:c.affinity},role:{stringValue:c.role}}}}:{nullValue:null})}}}})});
-      }catch(e){console.warn('saveTeam:',e);}
+function buildSlots(type,team){
+  const c=document.getElementById(type+'-slots');c.innerHTML='';
+  team.forEach((ch,i)=>{
+    const el=document.createElement('div');
+    el.className='team-slot'+(ch?' filled':'');
+    if(ch){
+      el.innerHTML=`<div class="slot-fill">
+        <div class="slot-bg" style="background:${RG[ch.stars]||RG[1]}"></div>
+        ${ch.image?`<img class="slot-img" src="${ch.image}" onerror="this.style.display='none'">`:''}
+        <div class="slot-overlay"></div>
+        <div class="slot-aff">${AFF[ch.affinity]||''}</div>
+        <div class="slot-info">
+          <div class="slot-name" style="color:${RC[ch.stars]||'#fff'}">${ch.name}</div>
+          <div class="slot-role">${ch.role||''}</div>
+        </div>
+        <button class="slot-rm" onclick="removeSlot('${type}',${i},event)">✕</button>
+      </div>`;
+    } else {
+      el.innerHTML=`<span style="font-size:1.3rem;opacity:.2">+</span><span class="slot-empty-lbl">SLOT ${i+1}</span>`;
     }
-    localStorage.setItem('reanime_'+type+'team',JSON.stringify(team));
-    showToast(`✓ Equipo de ${type==='atk'?'ataque':'defensa'} guardado`);
+    c.appendChild(el);
+  });
+}
+
+function removeSlot(type,i,e){
+  e.stopPropagation();
+  (type==='atk'?atkTeam:defTeam)[i]=null;
+  renderSlots();renderGrid();
+}
+
+/* ── GRID ── */
+function setF(el,v){
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');filt=v;renderGrid();
+}
+
+function renderGrid(){
+  const grid=document.getElementById('pvp-grid');
+  const q=(document.getElementById('pvp-search')?.value||'').toLowerCase();
+  const chars=pvpData?.characters||[];
+  const list=chars.filter(p=>{
+    if(q&&!p.name.toLowerCase().includes(q)&&!p.series.toLowerCase().includes(q))return false;
+    const owned=colDedupe.has(p.name.toLowerCase().trim());
+    if(filt==='owned'&&!owned)return false;
+    if(filt==='atk'&&!atkTeam.some(t=>t?.name===p.name))return false;
+    if(filt==='def'&&!defTeam.some(t=>t?.name===p.name))return false;
+    if(filt==='5'&&p.rarity!==5)return false;
+    if(filt==='4'&&p.rarity!==4)return false;
+    return true;
+  });
+
+  grid.innerHTML='';
+  for(const p of list){
+    const owned=colDedupe.has(p.name.toLowerCase().trim());
+    const collChar=colDedupe.get(p.name.toLowerCase().trim());
+    const inA=atkTeam.some(t=>t?.name===p.name);
+    const inD=defTeam.some(t=>t?.name===p.name);
+    const up=upgrades[p.name];
+    const hasSkin=up?.selectedSkin!=null && p.skins?.[up.selectedSkin];
+    const img=getCharImage(p, collChar);
+    const col=RC[p.rarity]||'#94a3b8';
+    const aff=AFF[p.affinity]||'';
+
+    const el=document.createElement('div');
+    let borderCls=`r${p.rarity}`;
+    if(inA&&inD)borderCls+=' in-both';
+    else if(inA)borderCls+=' in-atk';
+    else if(inD)borderCls+=' in-def';
+    if(!owned)borderCls+=' not-owned';
+    el.className=`pvp-card ${borderCls}`;
+
+    // Team badges
+    const badges=(inA?'<span class="team-badge badge-atk">⚔</span>':'')+(inD?'<span class="team-badge badge-def">🛡</span>':'');
+
+    el.innerHTML=`
+      <div class="pvp-face">
+        <div class="pvp-face-bg" style="background:${RG[p.rarity]||RG[1]}"></div>
+        ${img?`<img src="${img}" onerror="this.style.display='none'">`:''}
+        <div class="pvp-face-overlay"></div>
+        <div class="pvp-face-aff">${aff}</div>
+        ${badges?`<div class="pvp-face-team">${badges}</div>`:''}
+        ${hasSkin?'<div class="pvp-skin-dot" title="Skin equipada"></div>':''}
+        ${!owned?'<div class="not-owned-tag">NO TIENES</div>':''}
+      </div>
+      <div class="pvp-info">
+        <div class="pvp-name" style="color:${col}">${p.name}</div>
+        <div class="pvp-meta">${p.series} · ${p.role||''}</div>
+      </div>
+      <div class="pvp-btns">
+        <button class="qadd ${inA?'rm-atk':'atk'}" onclick="toggleTeam('atk','${p.name}')" ${!owned&&!inA?'disabled':''}>
+          ${inA?'✕ ATK':'+ATK'}
+        </button>
+        <button class="qadd ${inD?'rm-def':'def'}" onclick="toggleTeam('def','${p.name}')" ${!owned&&!inD?'disabled':''}>
+          ${inD?'✕ DEF':'+DEF'}
+        </button>
+      </div>
+    `;
+    grid.appendChild(el);
   }
+}
 
-  function showToast(msg,ms=2500){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),ms); }
-
-  function setFeaturedFromModal(){
-    if(!_modal?.coll) return;
-    const c=_modal.coll, p=_modal.pvp;
-    const data={id:c.id||c.name,name:c.name,anime:p?.series||c.anime,image:c.image||'',stars:c.stars,description:''};
-    localStorage.setItem('gacha_featured',JSON.stringify(data));
-    if(window.ReAnimeDB) window.ReAnimeDB.setFeatured(data).catch(()=>{});
-    const btn=document.getElementById('cm-feat');
-    if(btn){btn.textContent='✦ Destacado!';btn.style.background='#a78bfa';btn.style.color='#fff';}
-    showToast('✦ '+c.name+' destacado en tu perfil');
+function toggleTeam(type,name){
+  const team=type==='atk'?atkTeam:defTeam;
+  const idx=team.findIndex(t=>t?.name===name);
+  if(idx>=0){
+    team[idx]=null;
+  } else {
+    const slot=team.findIndex(t=>t===null);
+    if(slot===-1){showToast('Equipo lleno (máx 4).');return;}
+    const p=pvpData.characters.find(c=>c.name===name);
+    if(!p)return;
+    const collChar=colDedupe.get(name.toLowerCase().trim());
+    const img=getCharImage(p,collChar);
+    team[slot]={name:p.name,anime:p.series,image:img,stars:p.rarity,affinity:p.affinity,role:p.role||''};
   }
+  renderSlots();renderGrid();
+}
 
-  window.addEventListener('reanimdb:update',async()=>{ if(!window.ReAnimeDB)return; myCol=await window.ReAnimeDB.getCollection(); buildDedupe(); buildPvpAvail(); renderCollection(); renderChips(); });
+async function saveTeam(type){
+  const team=type==='atk'?atkTeam:defTeam;
+  const valid=team.filter(Boolean);
+  if(!valid.length){showToast('El equipo está vacío.');return;}
+  const field=type==='atk'?'atkTeam':'defTeam';
+  const toStore=team.map(c=>c?{name:c.name,anime:c.anime,image:c.image||'',stars:c.stars,affinity:c.affinity||'',role:c.role||''}:null);
+  const user=JSON.parse(localStorage.getItem('user'));
+  if(user){
+    try{
+      const url=`https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents/users/${user.id}?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU&updateMask.fieldPaths=${field}`;
+      await fetch(url,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:{[field]:{arrayValue:{values:toStore.map(c=>c?{mapValue:{fields:{name:{stringValue:c.name},anime:{stringValue:c.anime},image:{stringValue:c.image||''},stars:{integerValue:c.stars},affinity:{stringValue:c.affinity||''},role:{stringValue:c.role||''}}}}:{nullValue:null})}}}})});
+    }catch(e){console.warn('saveTeam:',e);}
+  }
+  showToast(`✓ Equipo de ${type==='atk'?'ataque':'defensa'} guardado`);
+}
 
-  if(window.ReAnimeDB) init();
-  else window.addEventListener('reanimdb:ready',init,{once:true});
-  </script>
+function showToast(msg,ms=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),ms);}
+
+if(window.ReAnimeDB)init();
+else window.addEventListener('reanimdb:ready',init,{once:true});
+</script>
 </body>
 </html>
