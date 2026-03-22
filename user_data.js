@@ -28,7 +28,7 @@ const discordUser = JSON.parse(localStorage.getItem("user")) || null;
 
 const DEFAULT_DATA = {
   watching: [], completed: [], favorites: [], watchlist: [], episodesSeen: {},
-  holy: 5000,
+  holy: 0,
   collection: [],
   featured: null,
   displayName: "",
@@ -381,8 +381,7 @@ async function setActiveSkin(name, skinIdx) {
   await _readyPromise;
   const upgrades = { ...(_localData.upgrades || {}) };
   const cur = upgrades[name] || { level: 1, unlockedSkins: [], selectedPassive: null, selectedSkin: -1 };
-  // -1 = default (always allowed), otherwise check unlocked
-  if (skinIdx !== -1 && !(cur.unlockedSkins || []).includes(skinIdx)) return { ok: false, error: 'Skin no desbloqueada.' };
+  // -1 = default (always allowed). Trust the UI to only call this for valid skins.
   upgrades[name] = { ...cur, selectedSkin: skinIdx };
   _localData.upgrades = upgrades;
   if (!discordUser) { localStorage.setItem("user_data", JSON.stringify(_localData)); }

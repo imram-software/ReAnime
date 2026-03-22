@@ -1648,11 +1648,11 @@
           // If pvp has only 1 skin, that IS the default — selectedSkin 0 = same as -1
           const pvpSkins = _pvpChar?.skins || [];
           const si = up.selectedSkin ?? -1;
-          if (si >= 0 && pvpSkins.length > 1 && pvpSkins[si]) {
+          // Apply skin if explicitly selected (si >= 0) and the URL exists
+          if (si >= 0 && pvpSkins[si]) {
             _imgEl.src = pvpSkins[si];
-          } else if (si >= 0 && pvpSkins.length === 1 && si === 0) {
-            // skin[0] when only 1 skin = the default, keep ch.image
           }
+          // si === -1 → keep ch.image (default gacha image)
           // else keep ch.image (default)
         });
       }
@@ -1775,7 +1775,8 @@ async function openUpgradeModal(ch) {
   // Unlockable skins from pvp_chars
   const pvpSkins = _umPvpChar?.skins || [];
   pvpSkins.forEach((skinUrl, i) => {
-    const unlocked = (up.unlockedSkins || []).includes(i);
+    // Single-skin chars: skin is always available (it's their pvp default, not a reward)
+    const unlocked = pvpSkins.length === 1 ? true : (up.unlockedSkins || []).includes(i);
     const isActive = activeSkin === i;
     const wrap = document.createElement('div');
     wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;';
@@ -1787,10 +1788,11 @@ async function openUpgradeModal(ch) {
     if (unlocked) {
       img.onclick = async () => {
         if (!window.ReAnimeDB) return;
-        await window.ReAnimeDB.setActiveSkin(ch.name, i);
+        const res = await window.ReAnimeDB.setActiveSkin(ch.name, i);
+        if (res?.ok === false) { showToast('Error: ' + (res.error||'no guardado')); return; }
         openUpgradeModal(ch);
-        const pvpSkins = _umPvpChar?.skins;
-        refreshCollectionCard(ch.name, i, pvpSkins?.[i] || ch.image || '');
+        refreshCollectionCard(ch.name, i, skinUrl);
+        showToast('✦ Skin equipada');
       };
     }
     const lbl = document.createElement('span');
