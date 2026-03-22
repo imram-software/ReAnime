@@ -698,6 +698,47 @@
     @media (max-width: 600px) {
       header { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(8,8,8,0.98); }
     }
+
+    /* ── PLUGIN BANNER ── */
+    #plugin-banner {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 8000;
+      background: linear-gradient(135deg, #0d0d1a, #1a0030);
+      border-top: 1px solid #a78bfa44;
+      padding: .65rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap;
+      box-shadow: 0 -4px 24px rgba(167,139,250,.12);
+      transform: translateY(100%);
+      transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    #plugin-banner.show { transform: translateY(0); }
+    .pb-left { display: flex; align-items: center; gap: .75rem; flex: 1; min-width: 0; }
+    .pb-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .pb-text { font-size: .78rem; color: #c4b5fd; line-height: 1.45; }
+    .pb-text strong { color: #e9d5ff; font-weight: 700; }
+    .pb-text span { color: #7c6a9a; font-size: .7rem; }
+    .pb-actions { display: flex; align-items: center; gap: .5rem; flex-shrink: 0; }
+    .pb-install {
+      background: #7c3aed; border: none; color: #fff;
+      border-radius: 6px; padding: .4rem 1rem;
+      font-size: .78rem; font-weight: 700; cursor: pointer;
+      font-family: var(--font-body); letter-spacing: .3px;
+      transition: background .2s; text-decoration: none;
+      display: inline-flex; align-items: center; gap: .3rem;
+      white-space: nowrap;
+    }
+    .pb-install:hover { background: #6d28d9; }
+    .pb-dismiss {
+      background: none; border: 1px solid #ffffff18; color: #7c6a9a;
+      border-radius: 6px; padding: .4rem .6rem; font-size: .72rem;
+      cursor: pointer; font-family: var(--font-body); transition: all .2s;
+      white-space: nowrap;
+    }
+    .pb-dismiss:hover { border-color: #a78bfa44; color: #a78bfa; }
+    @media (max-width: 600px) {
+      #plugin-banner { padding: .65rem 1rem; }
+      .pb-text span { display: none; }
+    }
   </style>
 </head>
 
@@ -1245,5 +1286,37 @@
   }
   </script>
   <script src="ram-assistent.js"></script>
+
+  <!-- ─── PLUGIN BANNER ─── -->
+  <div id="plugin-banner">
+    <div class="pb-left">
+      <div class="pb-icon">🛡️</div>
+      <div class="pb-text">
+        <strong>Evitá anuncios y páginas no deseadas</strong><br>
+        <span>Instalá este plugin de Chrome para una mejor experiencia en Re:Anime</span>
+      </div>
+    </div>
+    <div class="pb-actions">
+      <a class="pb-install" href="https://chromewebstore.google.com/detail/ddmhlmdockeihjdpbkcnnfnlcgjhccgk?utm_source=item-share-cb" target="_blank" rel="noopener">
+        ⬇ Instalar plugin
+      </a>
+      <button class="pb-dismiss" onclick="dismissBanner()">Ya lo tengo</button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const KEY = 'reanime_plugin_dismissed';
+      if (!localStorage.getItem(KEY)) {
+        setTimeout(() => document.getElementById('plugin-banner')?.classList.add('show'), 1800);
+      }
+    })();
+    function dismissBanner() {
+      localStorage.setItem('reanime_plugin_dismissed', '1');
+      const b = document.getElementById('plugin-banner');
+      b.style.transition = 'transform .3s ease';
+      b.style.transform = 'translateY(100%)';
+    }
+  </script>
 </body>
 </html>
