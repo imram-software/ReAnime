@@ -259,7 +259,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
   <!-- TABS -->
   <div class="btabs">
     <button class="btab active" onclick="showTab('battle')">Batalla</button>
-    <button class="btab" onclick="showTab('log')">Registro</button>
+    <button class="btab" id="log-tab-btn" onclick="showTab('log')">Registro</button>
   </div>
 
   <!-- SETUP SCREEN -->
@@ -430,17 +430,29 @@ function applyScene() {
    TABS
 ══════════════════════════════════════ */
 function showTab(t) {
-  // Block switching to log tab during an active battle
-  if (t === 'log' && phase === 'battle') {
-    document.getElementById('target-hint').textContent = '⚠ No puedes ir al registro durante una batalla.';
-    setTimeout(() => { const el = document.getElementById('target-hint'); if(el) el.textContent=''; }, 2500);
-    return;
+  document.querySelectorAll('.btab').forEach(b => b.classList.remove('active'));
+  if (t === 'battle') {
+    document.querySelectorAll('.btab')[0].classList.add('active');
+    document.getElementById('setup-screen').style.display  = phase === 'battle' ? 'none' : 'block';
+    document.getElementById('battle-screen').style.display = phase === 'battle' ? 'block' : 'none';
+    document.getElementById('log-screen').style.display    = 'none';
+  } else if (t === 'log') {
+    document.querySelectorAll('.btab')[1]?.classList.add('active');
+    document.getElementById('setup-screen').style.display  = 'none';
+    document.getElementById('battle-screen').style.display = 'none';
+    document.getElementById('log-screen').style.display    = 'block';
+    renderBattleLog();
   }
-  document.querySelectorAll('.btab').forEach((b,i)=>b.classList.toggle('active',i===(t==='battle'?0:1)));
-  document.getElementById('setup-screen').style.display  = t==='battle' ? (phase==='battle'?'none':'block') : 'none';
-  document.getElementById('battle-screen').style.display = t==='battle' && phase==='battle' ? 'block' : 'none';
-  document.getElementById('log-screen').style.display    = t==='log' ? 'block' : 'none';
-  if(t==='log') renderBattleLog();
+}
+
+function updateTabVisibility() {
+  const logBtn = document.getElementById('log-tab-btn');
+  if (!logBtn) return;
+  if (phase === 'battle') {
+    logBtn.style.display = 'none';
+  } else {
+    logBtn.style.display = '';
+  }
 }
 
 /* ══════════════════════════════════════
@@ -739,6 +751,7 @@ function startBattle() {
 
   document.getElementById('setup-screen').style.display  = 'none';
   document.getElementById('battle-screen').style.display = 'block';
+  updateTabVisibility();
 
   renderBattleField();
   renderTurnOrder();
@@ -1558,6 +1571,7 @@ function enemyAI(actor) {
 async function endBattle(playerWon) {
   phase = 'done';
   document.getElementById('battle-screen').style.display = 'none';
+  updateTabVisibility();
 
   sessionStorage.removeItem('battle_ongoing'); // normal end, not an abandon
   const rs = document.getElementById('result-screen');
@@ -1604,6 +1618,7 @@ async function endBattle(playerWon) {
 function resetBattle() {
   document.getElementById('result-screen').style.display = 'none';
   phase = 'setup';
+  updateTabVisibility();
   fighters = []; turnQueue = []; currentTurn = 0;
   selectedFighter = null; selectedSkill = null;
   document.getElementById('battle-log').innerHTML = '';
