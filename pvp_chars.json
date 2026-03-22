@@ -1,65 +1,38 @@
 {
-  "_readme": "Agrega personajes aqui para habilitarlos en PVP. El campo 'name' debe coincidir con el nombre en la coleccion del jugador. Los jugadores que ya tengan ese personaje en su coleccion podran usarlo.",
+  "_readme": "Sistema PVP completo. name debe coincidir con la coleccion. skins = array de imagenes. passive_pool = pasivas intercambiables. level escala stats.",
+
   "affinities": {
-    "fuego": {
-      "color": "#ef4444",
-      "icon": "🔥",
-      "strong_vs": "tierra",
-      "weak_vs": "agua"
-    },
-    "agua": {
-      "color": "#3b82f6",
-      "icon": "💧",
-      "strong_vs": "fuego",
-      "weak_vs": "rayo"
-    },
-    "tierra": {
-      "color": "#84cc16",
-      "icon": "🌿",
-      "strong_vs": "rayo",
-      "weak_vs": "fuego"
-    },
-    "rayo": {
-      "color": "#eab308",
-      "icon": "⚡",
-      "strong_vs": "agua",
-      "weak_vs": "tierra"
-    },
-    "luz": {
-      "color": "#f5f5f5",
-      "icon": "✦",
-      "strong_vs": "oscuridad",
-      "weak_vs": "oscuridad"
-    },
-    "oscuridad": {
-      "color": "#a78bfa",
-      "icon": "🌑",
-      "strong_vs": "luz",
-      "weak_vs": "luz"
-    }
+    "tierra":    { "color":"#86efac", "icon":"🌿", "strong_vs":"agua",      "weak_vs":"oscuridad", "label":"Verde" },
+    "agua":      { "color":"#38bdf8", "icon":"💧", "strong_vs":"fuego",     "weak_vs":"tierra",    "label":"Azul"  },
+    "fuego":     { "color":"#ef4444", "icon":"🔥", "strong_vs":"rayo",      "weak_vs":"agua",      "label":"Rojo"  },
+    "rayo":      { "color":"#fbbf24", "icon":"⚡", "strong_vs":"oscuridad", "weak_vs":"fuego",     "label":"Amarillo" },
+    "oscuridad": { "color":"#a78bfa", "icon":"🌑", "strong_vs":"tierra",    "weak_vs":"rayo",      "label":"Morado" },
+    "luz":       { "color":"#fef9c3", "icon":"✦",  "strong_vs":"oscuridad", "weak_vs":"oscuridad", "label":"Luz"   }
   },
+
   "roles": {
-    "guerrero": {
-      "icon": "⚔",
-      "desc": "Alto daño fisico, stats balanceadas"
-    },
-    "mago": {
-      "icon": "🔮",
-      "desc": "Alto daño magico, baja defensa"
-    },
-    "tanque": {
-      "icon": "🛡",
-      "desc": "Alta vida y defensa"
-    },
-    "sanador": {
-      "icon": "💚",
-      "desc": "Restaura HP del equipo"
-    },
-    "soporte": {
-      "icon": "⭐",
-      "desc": "Buffs y debuffs"
-    }
+    "guerrero": { "icon":"⚔",  "desc":"Alto daño fisico, stats balanceadas" },
+    "mago":     { "icon":"🔮", "desc":"Alto daño magico, baja defensa" },
+    "tanque":   { "icon":"🛡",  "desc":"Alta vida y defensa" },
+    "sanador":  { "icon":"💚", "desc":"Restaura HP del equipo" },
+    "soporte":  { "icon":"⭐", "desc":"Buffs y debuffs al equipo" }
   },
+
+  "synergies": [
+    { "series":"Re:Zero",   "bonus":"atk", "value":0.08, "desc":"+8% ATK al equipo Re:Zero" },
+    { "series":"KonoSuba",  "bonus":"spd", "value":0.10, "desc":"+10% SPD al equipo KonoSuba" },
+    { "series":"Angel Beats","bonus":"cr", "value":5,    "desc":"+5% Crit al equipo Angel Beats" }
+  ],
+
+  "level_scaling": {
+    "hp_per_level":  120,
+    "atk_per_level":  35,
+    "def_per_level":  20,
+    "spd_per_level":   1,
+    "max_level": 10,
+    "dupes_per_level": 1
+  },
+
   "characters": [
     {
       "name": "Subaru Natsuki",
@@ -67,33 +40,21 @@
       "affinity": "oscuridad",
       "role": "soporte",
       "rarity": 3,
-      "image": "",
-      "stats": {
-        "hp": 4200,
-        "atk": 820,
-        "def": 960,
-        "spd": 98,
-        "cr": 12,
-        "cd": 140
-      },
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/15/271553.jpg",
+        "https://cdn.myanimelist.net/images/characters/9/276232.jpg"
+      ],
+      "stats": { "hp":4200, "atk":820,  "def":960,  "spd":98,  "cr":12, "cd":140, "dodge":8  },
       "skills": [
-        {
-          "name": "Vuelta a la vida",
-          "desc": "Revive con 30% HP al ser derrotado una vez por batalla.",
-          "type": "pasiva"
-        },
-        {
-          "name": "Llamada de auxilio",
-          "desc": "Aumenta la velocidad de todos los aliados en 15% por 2 turnos.",
-          "type": "activa",
-          "cooldown": 3
-        },
-        {
-          "name": "Resistencia",
-          "desc": "Ataca y tiene 50% de chance de reducir el ATK enemigo.",
-          "type": "activa",
-          "cooldown": 0
-        }
+        { "name":"Resistencia",       "desc":"Ataque básico. 30% chance de reducir ATK del objetivo 1 turno.",  "type":"activa", "cooldown":0, "effect":"debuff_atk",  "mult":1.0 },
+        { "name":"Llamada de auxilio","desc":"Aumenta SPD de todos los aliados 20% por 2 turnos.",              "type":"activa", "cooldown":3, "effect":"buff_spd_team","mult":0   },
+        { "name":"Escudo de voluntad","desc":"Otorga escudo equivalente a 15% HP max al aliado con menos HP.",  "type":"activa", "cooldown":4, "effect":"shield",       "mult":0   }
+      ],
+      "passive_pool": [
+        { "name":"Vuelta a la vida",  "desc":"Revive una vez con 30% HP al ser derrotado en la batalla.",           "id":"revive"     },
+        { "name":"Instinto de escape","desc":"+12% probabilidad de esquivar ataques.",                               "id":"dodge_up"   },
+        { "name":"Lazos del pasado",  "desc":"Al inicio de la batalla, reduce CD de todas las skills en 1.",         "id":"cd_start"   },
+        { "name":"Aura de apoyo",     "desc":"Aliados adyacentes reciben +5% DEF pasivamente.",                      "id":"def_aura"   }
       ]
     },
     {
@@ -102,33 +63,22 @@
       "affinity": "agua",
       "role": "guerrero",
       "rarity": 5,
-      "image": "",
-      "stats": {
-        "hp": 5100,
-        "atk": 1620,
-        "def": 980,
-        "spd": 108,
-        "cr": 20,
-        "cd": 160
-      },
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/15/266065.jpg",
+        "https://cdn.myanimelist.net/images/characters/14/280396.jpg",
+        "https://cdn.myanimelist.net/images/characters/11/309076.jpg"
+      ],
+      "stats": { "hp":5100, "atk":1620, "def":980,  "spd":108, "cr":20, "cd":160, "dodge":5  },
       "skills": [
-        {
-          "name": "Oni Awakening",
-          "desc": "Ignora 25% DEF del objetivo al atacar.",
-          "type": "pasiva"
-        },
-        {
-          "name": "Maza de Hierro",
-          "desc": "Ataque fuerte con 40% de chance de aturdir 1 turno.",
-          "type": "activa",
-          "cooldown": 3
-        },
-        {
-          "name": "Lluvia de Golpes",
-          "desc": "Golpea al objetivo 3 veces seguidas.",
-          "type": "activa",
-          "cooldown": 0
-        }
+        { "name":"Lluvia de Golpes",  "desc":"Golpea al objetivo 3 veces seguidas (cada golpe hace 40% daño).",    "type":"activa", "cooldown":0, "effect":"multihit3",  "mult":0.4 },
+        { "name":"Maza de Hierro",    "desc":"Ataque fuerte (180% ATK). 50% chance de aturdir 1 turno.",           "type":"activa", "cooldown":3, "effect":"stun",       "mult":1.8 },
+        { "name":"Furia Oni",         "desc":"Duplica su ATK por 2 turnos. Pierde 8% HP al activar.",              "type":"activa", "cooldown":5, "effect":"double_atk",  "mult":0   }
+      ],
+      "passive_pool": [
+        { "name":"Despertar Oni",     "desc":"Ignora 25% de la DEF del objetivo en cada ataque.",                   "id":"def_pen"    },
+        { "name":"Amor incondicional","desc":"Si un aliado cae, gana +30% ATK por el resto de la batalla.",         "id":"revenge"    },
+        { "name":"Resiliencia",       "desc":"Cuando HP baja de 40%, regenera 5% HP por turno.",                    "id":"regen_low"  },
+        { "name":"Protectora",        "desc":"20% de chance de interceptar ataques dirigidos a aliados.",           "id":"intercept"  }
       ]
     },
     {
@@ -137,33 +87,132 @@
       "affinity": "rayo",
       "role": "mago",
       "rarity": 4,
-      "image": "",
-      "stats": {
-        "hp": 3800,
-        "atk": 1480,
-        "def": 720,
-        "spd": 112,
-        "cr": 18,
-        "cd": 175
-      },
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/15/266067.jpg",
+        "https://cdn.myanimelist.net/images/characters/10/271555.jpg"
+      ],
+      "stats": { "hp":3800, "atk":1480, "def":720,  "spd":112, "cr":22, "cd":175, "dodge":10 },
       "skills": [
-        {
-          "name": "Clarividencia",
-          "desc": "Tiene 30% de chance de atacar dos veces.",
-          "type": "pasiva"
-        },
-        {
-          "name": "Viento Cortante",
-          "desc": "Daño magico a todo el equipo enemigo.",
-          "type": "activa",
-          "cooldown": 4
-        },
-        {
-          "name": "Dardo Magico",
-          "desc": "Ataque basico con elemento rayo.",
-          "type": "activa",
-          "cooldown": 0
-        }
+        { "name":"Dardo Mágico",      "desc":"Ataque mágico básico con elemento rayo.",                             "type":"activa", "cooldown":0, "effect":"damage",      "mult":1.1 },
+        { "name":"Viento Cortante",   "desc":"Daño mágico a todos los enemigos (80% ATK cada uno).",               "type":"activa", "cooldown":4, "effect":"aoe",         "mult":0.8 },
+        { "name":"Clairvoyance",      "desc":"Revela la pasiva activa del enemigo objetivo y reduce su DEF 20%.",  "type":"activa", "cooldown":3, "effect":"debuff_def",  "mult":0   }
+      ],
+      "passive_pool": [
+        { "name":"Doble ataque",      "desc":"30% de chance de atacar dos veces consecutivas.",                     "id":"double_hit" },
+        { "name":"Ojo de maga",       "desc":"+8% probabilidad de crítico extra.",                                  "id":"crit_up"    },
+        { "name":"Fría eficiencia",   "desc":"Reduce el CD de Viento Cortante en 1 al hacer un crítico.",          "id":"cd_on_crit" },
+        { "name":"Orgullo de Oni",    "desc":"Daño +15% cuando el objetivo tiene debuffs activos.",                 "id":"debuff_amp" }
+      ]
+    },
+    {
+      "name": "Emilia",
+      "series": "Re:Zero",
+      "affinity": "luz",
+      "role": "sanador",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/10/265177.jpg",
+        "https://cdn.myanimelist.net/images/characters/9/289519.jpg"
+      ],
+      "stats": { "hp":4600, "atk":1050, "def":860,  "spd":102, "cr":14, "cd":150, "dodge":8  },
+      "skills": [
+        { "name":"Curación de hielo", "desc":"Cura al aliado con menos HP por 20% de su HP máximo.",               "type":"activa", "cooldown":0, "effect":"heal",        "mult":0.20 },
+        { "name":"Barrera de hielo",  "desc":"Otorga escudo a todo el equipo equivalente a 12% HP max cada uno.",  "type":"activa", "cooldown":4, "effect":"shield_team", "mult":0.12 },
+        { "name":"Tormenta ártica",   "desc":"Congela al objetivo: -30% SPD y no puede atacar el siguiente turno.","type":"activa", "cooldown":5, "effect":"freeze",      "mult":0.9  }
+      ],
+      "passive_pool": [
+        { "name":"Espíritu de apoyo", "desc":"Cada cura otorga +5% DEF al objetivo curado por 2 turnos.",          "id":"heal_def"   },
+        { "name":"Aura de luz",       "desc":"Aumenta resistencia a debuffs del equipo en 25%.",                   "id":"debuff_res" },
+        { "name":"Voluntad de reina", "desc":"Al quedar con HP < 30%, activa cura automática de 15% HP.",          "id":"auto_heal"  },
+        { "name":"Juramento eterno",  "desc":"Sinergia con Subaru: ambos ganan +10% de todas las stats.",          "id":"emilia_sub" }
+      ]
+    },
+    {
+      "name": "Aqua",
+      "series": "KonoSuba",
+      "affinity": "agua",
+      "role": "sanador",
+      "rarity": 4,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/7/289130.jpg"
+      ],
+      "stats": { "hp":4200, "atk":780,  "def":650,  "spd":115, "cr":10, "cd":130, "dodge":12 },
+      "skills": [
+        { "name":"Agua Sagrada",      "desc":"Cura a todo el equipo por 12% HP max. Daño extra vs oscuridad.",     "type":"activa", "cooldown":0, "effect":"heal_team",   "mult":0.12 },
+        { "name":"Purificación",      "desc":"Elimina todos los debuffs del aliado objetivo y lo cura 10% HP.",    "type":"activa", "cooldown":3, "effect":"cleanse",     "mult":0.10 },
+        { "name":"Tormenta sagrada",  "desc":"Daño luz masivo a un enemigo. Extra daño si es oscuridad.",          "type":"activa", "cooldown":5, "effect":"damage_light","mult":2.2  }
+      ],
+      "passive_pool": [
+        { "name":"Diosa inútil",      "desc":"20% de chance de fallar el ataque pero curar al aliado más débil.",  "id":"goddess"    },
+        { "name":"Resurrección",      "desc":"Una vez por batalla puede resucitar a un aliado caído con 25% HP.",  "id":"revive_ally"},
+        { "name":"Bendición divina",  "desc":"Aliados ganan +8% CR al inicio de la batalla.",                      "id":"divine_bless"},
+        { "name":"Capricho divino",   "desc":"Al usar Agua Sagrada, 25% de chance de curar el doble.",             "id":"double_heal" }
+      ]
+    },
+    {
+      "name": "Megumin",
+      "series": "KonoSuba",
+      "affinity": "fuego",
+      "role": "mago",
+      "rarity": 5,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/9/289128.jpg"
+      ],
+      "stats": { "hp":2900, "atk":2100, "def":450,  "spd":105, "cr":28, "cd":200, "dodge":14 },
+      "skills": [
+        { "name":"Explosión",         "desc":"Daño masivo a un enemigo (250% ATK). Queda en CD 3 turnos. Insustituible.", "type":"activa", "cooldown":3, "effect":"damage","mult":2.5 },
+        { "name":"Chispa de magia",   "desc":"Ataque mágico básico mientras Explosión está en cooldown.",           "type":"activa", "cooldown":0, "effect":"damage",      "mult":0.7  },
+        { "name":"Magia en cadena",   "desc":"La siguiente Explosión afecta a todos los enemigos (CD +1).",         "type":"activa", "cooldown":4, "effect":"next_aoe",    "mult":0    }
+      ],
+      "passive_pool": [
+        { "name":"Magia de explosión","desc":"Explosión ignora 30% de la DEF del objetivo.",                        "id":"explo_pen"  },
+        { "name":"Chunibyo",          "desc":"Al hacer un crítico, recarga 1 turno de CD de Explosión.",            "id":"crit_reload" },
+        { "name":"Entusiasmo",        "desc":"+15% daño cuando Explosión está disponible.",                         "id":"ready_boost" },
+        { "name":"Sacrificio mágico", "desc":"Puede usar Explosión sin CD pero pierde 20% HP al hacerlo.",          "id":"sacrifice"  }
+      ]
+    },
+    {
+      "name": "Kazuma Satou",
+      "series": "KonoSuba",
+      "affinity": "tierra",
+      "role": "soporte",
+      "rarity": 3,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/7/289131.jpg"
+      ],
+      "stats": { "hp":4100, "atk":950,  "def":880,  "spd":120, "cr":16, "cd":145, "dodge":20 },
+      "skills": [
+        { "name":"Robar",             "desc":"Roba 1 buff activo del objetivo y lo aplica a sí mismo.",             "type":"activa", "cooldown":0, "effect":"steal_buff",  "mult":0.8  },
+        { "name":"Drenaje",           "desc":"Inflige 100% ATK de daño y roba 15% HP del daño infligido.",         "type":"activa", "cooldown":3, "effect":"lifesteal",   "mult":1.0  },
+        { "name":"Suerte extrema",    "desc":"Aumenta Dodge y CR de todo el equipo en 15% por 3 turnos.",          "type":"activa", "cooldown":5, "effect":"buff_luck",   "mult":0    }
+      ],
+      "passive_pool": [
+        { "name":"Afortunado",        "desc":"+15% probabilidad de esquivar todos los ataques.",                    "id":"lucky"      },
+        { "name":"Líder casual",      "desc":"El equipo KonoSuba gana +12% SPD si hay 2+ miembros.",               "id":"konosuba_spd"},
+        { "name":"Multirol",          "desc":"Puede usar habilidades de cualquier rol sin penalización.",           "id":"multirole"  },
+        { "name":"Táctico",           "desc":"Al inicio de la batalla, reduce el CD de un aliado aleatorio en 2.", "id":"tactician"  }
+      ]
+    },
+    {
+      "name": "Otonashi",
+      "series": "Angel Beats",
+      "affinity": "luz",
+      "role": "tanque",
+      "rarity": 4,
+      "skins": [
+        "https://cdn.myanimelist.net/images/characters/14/66484.jpg"
+      ],
+      "stats": { "hp":6200, "atk":980,  "def":1400, "spd":88,  "cr":10, "cd":130, "dodge":5  },
+      "skills": [
+        { "name":"Proteger",          "desc":"Intercepta el siguiente ataque dirigido a cualquier aliado (0 daño).", "type":"activa", "cooldown":0, "effect":"taunt",       "mult":0    },
+        { "name":"Contraataque",      "desc":"Bloquea el ataque y responde con 80% ATK al atacante.",               "type":"activa", "cooldown":3, "effect":"counter",     "mult":0.8  },
+        { "name":"Aura de recuerdo",  "desc":"Reduce 25% ATK de todos los enemigos por 2 turnos.",                  "type":"activa", "cooldown":5, "effect":"debuff_aoe",   "mult":0    }
+      ],
+      "passive_pool": [
+        { "name":"Voluntad de vivir", "desc":"Sobrevive 1 golpe mortal con 1 HP (1 vez por batalla).",              "id":"survive"    },
+        { "name":"Muro inquebrantable","desc":"Bloquea hasta 400 de daño de cualquier golpe.",                      "id":"flat_block" },
+        { "name":"Espíritu eterno",   "desc":"Al recibir crítico, contraataca automáticamente con 50% ATK.",        "id":"auto_counter"},
+        { "name":"Nexo",              "desc":"Aliados Angel Beats ganan +10% DEF si hay 2+ miembros en el equipo.", "id":"ab_def"     }
       ]
     }
   ]

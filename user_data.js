@@ -41,7 +41,8 @@ const DEFAULT_DATA = {
   likesGiven: {},    // { userId: "YYYY-MM-DD" } — rastreo de likes dados hoy
   pvpAttack: [],     // equipo de ataque [{ charId, charName }]
   pvpDefense: []     // equipo de defensa [{ charId, charName }]
-};
+  pvpDefense: [],     // equipo de defensa [{ charId, charName }]
+  upgrades: {}         // mejoras por personaje
 
 /* ─────────────────────────────────────────────────────────────
    ESTADO LOCAL
@@ -260,6 +261,87 @@ async function getCollection() {
 }
 
 /* ─────────────────────────────────────────────────────────────
+   MEJORA DE PERSONAJES (duplicados → nivel + skins)
+─────────────────────────────────────────────────────────────── */
+
+  /* Retorna el mapa de mejoras: { "Rem": { level:3, unlockedSkins:[0,1,2], selectedPassive:"def_pen", selectedSkin:1 } } */
+  async getUpgrades() {
+    await _readyPromise;
+    return _localData.upgrades || {};
+  },
+
+  /* Retorna la mejora de un personaje específico */
+  async getCharUpgrade(name) {
+    await _readyPromise;
+    const up = (_localData.upgrades || {})[name];
+    return up || { level: 1, unlockedSkins: [0], selectedPassive: null, selectedSkin: 0 };
+  },
+
+  /* Sube el nivel de un personaje usando duplicados de la colección.
+     Requiere DUPE_PER_LEVEL duplicados (default 1) por nivel.
+     Retorna { ok, newLevel, error } */
+  async upgradeChar(name) {
+    await _readyPromise;
+    const MAX_LEVEL = 10;
+    const DUPE_PER_LEVEL = 1;
+
+    const coll = _localData.collection || [];
+    const copies = coll.filter(c => c.name === name);
+    if (copies.length < 2) return { ok: false, error: 'Necesitas al menos 1 duplicado para mejorar.' };
+
+    const upgrades = _localData.upgrades || {};
+    const cur = upgrades[name] || { level: 1, unlockedSkins: [0], selectedPassive: null, selectedSkin: 0 };
+    if (cur.level >= MAX_LEVEL) return { ok: false, error: 'Ya está en nivel máximo (10).' };
+
+    // Consume 1 duplicado (deja 1 copia base)
+    const idx = coll.findIndex(c => c.name === name && coll.indexOf(c) !== coll.findIndex(x => x.name === name));
+    if (idx === -1) {
+      // fallback: remove last copy
+      const lastIdx = [...coll].reverse().findIndex(c => c.name === name);
+      if (lastIdx === -1) return { ok: false, error: 'No hay duplicados disponibles.' };
+      coll.splice(coll.length - 1 - lastIdx, 1);
+    } else {
+      coll.splice(idx, 1);
+    }
+
+    const newLevel = cur.level + 1;
+    // Unlock skin if available (cada 2 niveles)
+    const skins = cur.unlockedSkins || [0];
+    const newSkinIdx = Math.floor((newLevel - 1) / 2);
+    if (!skins.includes(newSkinIdx)) skins.push(newSkinIdx);
+
+    upgrades[name] = { ...cur, level: newLevel, unlockedSkins: skins };
+    _localData.upgrades = upgrades;
+    _localData.collection = coll;
+    window.dispatchEvent(new CustomEvent('reanimdb:update', { detail: _localData }));
+    await _save();
+    return { ok: true, newLevel, unlockedSkins: skins };
+  },
+
+  /* Cambia la pasiva activa de un personaje (solo pasivas desbloqueadas) */
+  async setActivePassive(name, passiveId) {
+    await _readyPromise;
+    const upgrades = _localData.upgrades || {};
+    const cur = upgrades[name] || { level: 1, unlockedSkins: [0], selectedPassive: null, selectedSkin: 0 };
+    upgrades[name] = { ...cur, selectedPassive: passiveId };
+    _localData.upgrades = upgrades;
+    await _save();
+    return { ok: true };
+  },
+
+  /* Cambia la skin activa de un personaje */
+  async setActiveSkin(name, skinIdx) {
+    await _readyPromise;
+    const upgrades = _localData.upgrades || {};
+    const cur = upgrades[name] || { level: 1, unlockedSkins: [0], selectedPassive: null, selectedSkin: 0 };
+    if (!(cur.unlockedSkins || [0]).includes(skinIdx)) return { ok: false, error: 'Skin no desbloqueada.' };
+    upgrades[name] = { ...cur, selectedSkin: skinIdx };
+    _localData.upgrades = upgrades;
+    await _save();
+    return { ok: true };
+  },
+
+/* ─────────────────────────────────────────────────────────────
    EXPONER
 ───────────────────────────────────────────────────────────── */
 async function setFeatured(charData) {
@@ -415,7 +497,12 @@ async function addBattleLog(entry) {
 }
 async function getBattleLog() { await _readyPromise; return _localData.battleLog || []; }
 
-async function recordDefenseWin(targetUserId) {
+  recordDefenseWin,
+  getUpgrades,
+  getCharUpgrade,
+  upgradeChar,
+  setActivePassive,
+  setActiveSkin
   try {
     const commitUrl = `https://firestore.googleapis.com/v1/projects/reanime-1a781/databases/(default)/documents:commit?key=AIzaSyDjVVsA-22tvlsUbbDenoS_vWlWLNY-HsU`;
     await fetch(commitUrl, { method:'POST', headers:{'Content-Type':'application/json'},

@@ -613,6 +613,7 @@
     .coll-name { font-family:var(--font-h); font-size:.82rem; letter-spacing:1px; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .r5 .coll-name{color:var(--r5);} .r4 .coll-name{color:var(--r4);} .r3 .coll-name{color:var(--r3);} .r2 .coll-name{color:var(--r2);} .r1 .coll-name{color:var(--muted);}
     .coll-meta { font-size:.58rem; color:var(--muted); margin-top:.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .coll-lv-badge{position:absolute;bottom:5px;left:5px;z-index:4;}
     .coll-filter-row { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; align-items:center; }
     .coll-search-g { background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:.4rem .8rem; font-size:.82rem; font-family:var(--font-b); outline:none; min-width:180px; }
     .coll-search-g:focus { border-color:var(--pink); }
@@ -638,6 +639,45 @@
     }
     .history-chip:hover { transform:scale(1.1); }
     .history-chip img { width:100%; height:100%; object-fit:cover; object-position:top; display:block; }
+
+    /* ── UPGRADE MODAL ── */
+    #upgrade-modal{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .25s;}
+    #upgrade-modal.open{opacity:1;pointer-events:auto;}
+    .umodal-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-width:440px;width:100%;animation:modalIn .3s cubic-bezier(.34,1.56,.64,1);}
+    .umodal-header{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;border-bottom:1px solid var(--border);}
+    .umodal-cover{width:64px;height:90px;border-radius:6px;object-fit:cover;object-position:top;border:2px solid var(--border);}
+    .umodal-name{font-family:var(--font-h);font-size:1.5rem;letter-spacing:2px;}
+    .umodal-level{display:inline-flex;align-items:center;gap:.3rem;background:var(--pink-dim);border:1px solid var(--pink);border-radius:20px;padding:.15rem .6rem;font-size:.72rem;font-weight:700;color:var(--pink);margin-top:.2rem;}
+    .umodal-body{padding:1rem 1.2rem;}
+    .umodal-section{margin-bottom:1rem;}
+    .umodal-sec-title{font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+    /* Skins row */
+    .skins-row{display:flex;gap:.5rem;flex-wrap:wrap;}
+    .skin-thumb{width:52px;height:74px;border-radius:6px;object-fit:cover;object-position:top;border:2px solid var(--border);cursor:pointer;transition:all .2s;opacity:.5;}
+    .skin-thumb.unlocked{opacity:1;}
+    .skin-thumb.active{border-color:var(--pink);box-shadow:0 0 10px var(--pink-dim);}
+    .skin-thumb.locked{filter:grayscale(1) brightness(.4);cursor:default;}
+    .skin-lock{width:52px;height:74px;border-radius:6px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--muted);opacity:.4;}
+    /* Passives list */
+    .passive-list{display:flex;flex-direction:column;gap:.4rem;}
+    .passive-item{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.5rem .7rem;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:.5rem;}
+    .passive-item:hover{border-color:var(--rose);}
+    .passive-item.active{border-color:#a78bfa;background:rgba(167,139,250,.08);}
+    .passive-item.locked{opacity:.4;cursor:default;}
+    .passive-radio{width:12px;height:12px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:.15rem;}
+    .passive-item.active .passive-radio{border-color:#a78bfa;background:#a78bfa;}
+    .passive-name{font-size:.78rem;font-weight:700;color:var(--text);}
+    .passive-desc{font-size:.68rem;color:var(--muted);line-height:1.45;margin-top:.1rem;}
+    .passive-lock-tag{font-size:.6rem;color:var(--muted);background:var(--bg);border-radius:4px;padding:.05rem .3rem;margin-left:auto;}
+    /* Upgrade button */
+    .umodal-upgrade-btn{width:100%;background:var(--pink);border:none;color:#fff;border-radius:6px;padding:.55rem;font-family:var(--font-h);font-size:1rem;letter-spacing:2px;cursor:pointer;transition:opacity .2s;margin-top:.3rem;}
+    .umodal-upgrade-btn:hover:not(:disabled){opacity:.85;}
+    .umodal-upgrade-btn:disabled{opacity:.35;cursor:default;background:var(--bg3);color:var(--muted);border:1px solid var(--border);}
+    .umodal-close-btn{width:100%;background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.45rem;font-family:var(--font-b);cursor:pointer;margin-top:.4rem;transition:all .2s;font-size:.82rem;}
+    .umodal-close-btn:hover{border-color:var(--pink);color:var(--pink);}
+    /* Level bar */
+    .level-bar-wrap{background:rgba(255,255,255,.06);border-radius:4px;height:6px;margin:.5rem 0;}
+    .level-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--pink),#a78bfa);transition:width .4s;}
 
     /* ── RESPONSIVE ── */
     @media (max-width:600px) {
@@ -1550,19 +1590,24 @@
     const RCOLS={5:'#fbbf24',4:'#c084fc',3:'#38bdf8',2:'#86efac',1:'#94a3b8'};
 
     grid.innerHTML='';
-    list.forEach(ch => {
+    for (const ch of list) {
       const p = findPvpG(ch.name);
       const col = RCOLS[ch.stars]||'#94a3b8';
       const el = document.createElement('div');
       el.className = `coll-card-g r${ch.stars}${p?' pvp-ok':''}`;
-      el.innerHTML=`<div class="coll-face"><div class="coll-face-bg" style="background:${RGRADS[ch.stars]||RGRADS[1]}"></div><div class="coll-face-sym">${RSYMS[ch.stars]||'─'}</div>${ch.image?`<img src="${ch.image}" loading="lazy" onerror="this.style.display='none'"/>`:''}${ch.count>1?`<div class="coll-dupes">×${ch.count}</div>`:''}${p?'<div class="coll-pvp-icon">⚔</div>':''}</div><div class="coll-info"><div class="card-stars-row">${starsHTML(ch.stars,'stars-r'+ch.stars)}</div><div class="coll-name">${ch.name}</div><div class="coll-meta">${ch.anime}</div></div>`;
-      el.onclick = () => {
-        // Open the existing openModal if available, else show toast
-        const collForModal = { ...ch };
-        openModal(collForModal, collForModal);
-      };
-      grid.appendChild(el);
-    });
+      // Get upgrade level (async, show after)
+      const upgEl = document.createElement('div');
+      upgEl.className = 'coll-card-g r'+ch.stars+(p?' pvp-ok':'');
+      upgEl.innerHTML=`<div class="coll-face"><div class="coll-face-bg" style="background:${RGRADS[ch.stars]||RGRADS[1]}"></div><div class="coll-face-sym">${RSYMS[ch.stars]||'─'}</div>${ch.image?`<img src="${ch.image}" loading="lazy" onerror="this.style.display='none'"/>`:''}${ch.count>1?`<div class="coll-dupes">×${ch.count}</div>`:''}${p?'<div class="coll-pvp-icon">⚔</div>':''}<div class="coll-lv-badge" id="lv-${ch.name.replace(/\s/g,'_')}"></div></div><div class="coll-info"><div class="card-stars-row">${starsHTML(ch.stars,'stars-r'+ch.stars)}</div><div class="coll-name">${ch.name}</div><div class="coll-meta">${ch.anime}</div></div>`;
+      upgEl.onclick = () => openUpgradeModal(ch);
+      grid.appendChild(upgEl);
+      if (window.ReAnimeDB) window.ReAnimeDB.getCharUpgrade(ch.name).then(up => {
+        const badge = document.getElementById('lv-'+ch.name.replace(/\s/g,'_'));
+        if (badge && up.level > 1) badge.innerHTML = `<span style="background:var(--pink);color:#fff;font-size:.55rem;border-radius:10px;padding:.05rem .35rem;font-weight:700;">Nv ${up.level}</span>`;
+      });
+      continue; // skip el.appendChild below
+      // card appended above
+    };
   }
 
   /* ══════════════════════════════════════
@@ -1580,5 +1625,160 @@
   /* Render personaje destacado guardado */
   renderFeatured();
   </script>
+<!-- UPGRADE MODAL -->
+<div id="upgrade-modal" onclick="closeUpgradeModal()">
+  <div class="umodal-box" onclick="event.stopPropagation()">
+    <div class="umodal-header">
+      <img class="umodal-cover" id="um-cover" src="" alt=""/>
+      <div>
+        <div class="umodal-name" id="um-name">—</div>
+        <div id="um-stars"></div>
+        <div class="umodal-level">Nv <span id="um-level">1</span> / 10</div>
+        <div class="level-bar-wrap"><div class="level-bar" id="um-level-bar" style="width:10%"></div></div>
+        <div style="font-size:.65rem;color:var(--muted);" id="um-dupes-txt"></div>
+      </div>
+    </div>
+    <div class="umodal-body">
+      <!-- Skins -->
+      <div class="umodal-section">
+        <div class="umodal-sec-title">🎨 Skins desbloqueadas</div>
+        <div class="skins-row" id="um-skins"></div>
+      </div>
+      <!-- Passives -->
+      <div class="umodal-section">
+        <div class="umodal-sec-title">⭐ Pasivas — elige 1 activa</div>
+        <div class="passive-list" id="um-passives"></div>
+      </div>
+      <!-- Upgrade btn -->
+      <button class="umodal-upgrade-btn" id="um-upgrade-btn" onclick="doUpgrade()">⬆ MEJORAR (usa 1 duplicado)</button>
+      <button class="umodal-close-btn" onclick="closeUpgradeModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   UPGRADE MODAL
+══════════════════════════════════════ */
+let _umChar = null;
+let _umPvpChar = null;
+
+async function openUpgradeModal(ch) {
+  _umChar = ch;
+  // Find pvp data
+  let pvpData = null;
+  try { const r = await fetch('pvp_chars.json'); const j = await r.json(); pvpData = j; } catch {}
+  _umPvpChar = pvpData?.characters?.find(p => p.name.toLowerCase().trim() === ch.name.toLowerCase().trim()) || null;
+
+  // Get upgrade data
+  const up = window.ReAnimeDB ? await window.ReAnimeDB.getCharUpgrade(ch.name) : { level:1, unlockedSkins:[0], selectedPassive:null, selectedSkin:0 };
+  const coll = window.ReAnimeDB ? await window.ReAnimeDB.getCollection() : [];
+  const copies = coll.filter(c => c.name === ch.name);
+  const dupes  = copies.length - 1; // first copy is the base
+
+  // Fill header
+  const skins = _umPvpChar?.skins || [ch.image];
+  const curSkinIdx = up.selectedSkin || 0;
+  const curImg = skins[curSkinIdx] || ch.image || '';
+
+  document.getElementById('um-cover').src = curImg;
+  document.getElementById('um-name').textContent  = ch.name;
+  document.getElementById('um-stars').innerHTML   = '<span style="color:var(--r'+ch.stars+')">' + '★'.repeat(ch.stars) + '</span>';
+  document.getElementById('um-level').textContent = up.level;
+  document.getElementById('um-level-bar').style.width = (up.level * 10) + '%';
+  document.getElementById('um-dupes-txt').textContent = `${dupes} duplicado${dupes!==1?'s':''} disponible${dupes!==1?'s':''}`;
+
+  // Upgrade button state
+  const btn = document.getElementById('um-upgrade-btn');
+  btn.disabled = dupes < 1 || up.level >= 10;
+  btn.textContent = up.level >= 10 ? '✦ Nivel máximo' : `⬆ MEJORAR (usa 1 duplicado) — Nv ${up.level} → ${up.level+1}`;
+
+  // Skins row
+  const skinsEl = document.getElementById('um-skins');
+  skinsEl.innerHTML = '';
+  const totalSkins = skins.length;
+  for (let i = 0; i < Math.max(totalSkins, 3); i++) {
+    const unlocked = (up.unlockedSkins || [0]).includes(i) && i < totalSkins;
+    const isActive = (up.selectedSkin || 0) === i && unlocked;
+    if (i >= totalSkins) {
+      const lock = document.createElement('div');
+      lock.className = 'skin-lock';
+      lock.innerHTML = '🔒';
+      lock.title = `Desbloquea con más copias`;
+      skinsEl.appendChild(lock);
+      continue;
+    }
+    const img = document.createElement('img');
+    img.className = 'skin-thumb' + (unlocked?' unlocked':'') + (isActive?' active':'') + (!unlocked?' locked':'');
+    img.src = skins[i] || '';
+    img.title = unlocked ? (isActive ? 'Skin activa' : 'Haz click para equipar') : `Desbloquea en Nv ${(i*2)+1}`;
+    if (unlocked) {
+      img.onclick = async () => {
+        if (!window.ReAnimeDB) return;
+        await window.ReAnimeDB.setActiveSkin(ch.name, i);
+        openUpgradeModal(ch); // refresh
+      };
+    }
+    skinsEl.appendChild(img);
+  }
+
+  // Passives list
+  const passivesEl = document.getElementById('um-passives');
+  passivesEl.innerHTML = '';
+  const passivePool = _umPvpChar?.passive_pool || [];
+  const unlockedPassives = Math.min(up.level, passivePool.length); // unlock 1 per level up to pool size
+
+  passivePool.forEach((p, i) => {
+    const isUnlocked = i < unlockedPassives;
+    const isActive   = up.selectedPassive === p.id && isUnlocked;
+    const item = document.createElement('div');
+    item.className = 'passive-item' + (isActive?' active':'') + (!isUnlocked?' locked':'');
+    item.innerHTML = `
+      <div class="passive-radio"></div>
+      <div style="flex:1;">
+        <div class="passive-name">${p.name}</div>
+        <div class="passive-desc">${p.desc}</div>
+      </div>
+      ${!isUnlocked ? `<span class="passive-lock-tag">🔒 Nv ${i+1}</span>` : ''}`;
+    if (isUnlocked) {
+      item.onclick = async () => {
+        if (!window.ReAnimeDB) return;
+        await window.ReAnimeDB.setActivePassive(ch.name, p.id);
+        openUpgradeModal(ch);
+      };
+    }
+    passivesEl.appendChild(item);
+  });
+  if (!passivePool.length) {
+    passivesEl.innerHTML = '<div style="color:var(--muted);font-size:.8rem;">Este personaje no tiene pasivas PVP disponibles.</div>';
+  }
+
+  document.getElementById('upgrade-modal').classList.add('open');
+}
+
+async function doUpgrade() {
+  if (!_umChar || !window.ReAnimeDB) return;
+  const btn = document.getElementById('um-upgrade-btn');
+  btn.disabled = true;
+  btn.textContent = 'Mejorando...';
+  const result = await window.ReAnimeDB.upgradeChar(_umChar.name);
+  if (result.ok) {
+    showToast(`✦ ${_umChar.name} mejorado a Nivel ${result.newLevel}!`);
+    // Refresh collection tab data
+    _collLoaded = false;
+    await loadCollectionG();
+    openUpgradeModal(_umChar);
+  } else {
+    showToast(result.error || 'No se pudo mejorar.', 3000);
+    btn.disabled = false;
+    btn.textContent = '⬆ MEJORAR (usa 1 duplicado)';
+  }
+}
+
+function closeUpgradeModal() {
+  document.getElementById('upgrade-modal').classList.remove('open');
+  _umChar = null;
+}
+</script>
 </body>
 </html>

@@ -88,6 +88,90 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .skill-btn .sk-type{font-size:.6rem;color:var(--rose);}
 #target-hint{font-size:.75rem;color:var(--rose);margin-top:.5rem;text-align:center;min-height:1.2em;}
 
+/* ── ARENA SIDE-BY-SIDE ── */
+.arena-wrap{position:relative;display:flex;align-items:stretch;gap:0;margin-bottom:.8rem;border-radius:var(--radius);overflow:hidden;min-height:260px;border:1px solid var(--border);}
+.arena-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(135deg,#0a0015 0%,#0d0d0d 50%,#001020 100%);transition:background 1s;}
+.arena-bg.scene-forest{background:linear-gradient(135deg,#001a05 0%,#002b08 50%,#000d03 100%);}
+.arena-bg.scene-fire{background:linear-gradient(135deg,#1a0000 0%,#2b0800 50%,#1a0500 100%);}
+.arena-bg.scene-sky{background:linear-gradient(135deg,#000d1a 0%,#001433 50%,#00050d 100%);}
+.arena-bg.scene-void{background:linear-gradient(135deg,#0d0014 0%,#14001f 50%,#080008 100%);}
+.arena-center-line{position:absolute;left:50%;top:10%;bottom:10%;width:1px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.08),transparent);z-index:1;}
+.arena-vs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--font-h);font-size:1.6rem;letter-spacing:4px;color:rgba(255,255,255,.12);z-index:1;pointer-events:none;user-select:none;}
+.arena-side{flex:1;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:.8rem .5rem;}
+.ally-side{border-right:1px solid rgba(255,255,255,.04);}
+.side-label{font-family:var(--font-h);font-size:.55rem;letter-spacing:4px;text-transform:uppercase;margin-bottom:.6rem;padding:.15rem .5rem;border-radius:20px;}
+.ally-lbl{color:#4ade80;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);}
+.enemy-lbl{color:#f87171;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);}
+.team-col{display:flex;flex-direction:row;gap:.5rem;flex-wrap:wrap;justify-content:center;align-items:flex-start;}
+
+/* ── FIGHTER — updated ── */
+.fighter{width:100px;border-radius:var(--radius);background:var(--surface);border:2px solid var(--border);overflow:visible;cursor:default;transition:transform .25s,border-color .25s,opacity .25s,filter .25s,box-shadow .25s;position:relative;user-select:none;}
+.fighter.mine{cursor:default;}
+.fighter.targeting{cursor:crosshair !important;border-color:#ef4444 !important;box-shadow:0 0 16px rgba(239,68,68,.5) !important;animation:targetPulse .8s ease infinite;}
+@keyframes targetPulse{0%,100%{box-shadow:0 0 16px rgba(239,68,68,.5);}50%{box-shadow:0 0 28px rgba(239,68,68,.8);}}
+.fighter.selected{border-color:var(--pink) !important;box-shadow:0 0 16px var(--pink-dim) !important;}
+.fighter.acting{animation:actPulse .35s ease;z-index:10;}
+@keyframes actPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12);}}
+.fighter.dead{opacity:.3;filter:grayscale(1);pointer-events:none;}
+.fighter.dimmed{opacity:.45;filter:brightness(.55);}
+.fighter.stunned-vis{filter:hue-rotate(200deg) brightness(.7);}
+
+/* Shield indicator on fighter */
+.f-shield{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#3b82f6;color:#fff;font-size:.55rem;border-radius:10px;padding:.1rem .4rem;white-space:nowrap;z-index:5;border:1px solid #60a5fa;}
+/* Buff icon row */
+.f-buffs{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);display:flex;gap:2px;z-index:5;}
+.f-buff-icon{font-size:.7rem;background:rgba(0,0,0,.8);border-radius:4px;padding:1px 3px;border:1px solid rgba(255,255,255,.1);}
+
+/* ── SYNERGY BONUSES ── */
+function applySynergies(team, isEnemy) {
+  if (!pvpData.synergies) return;
+  const seriesCount = {};
+  fighters.filter(f => f.isEnemy === isEnemy).forEach(f => {
+    const pvp = (pvpData.characters||[]).find(c=>c.name===f.name);
+    if (pvp?.series) seriesCount[pvp.series] = (seriesCount[pvp.series]||0)+1;
+  });
+  pvpData.synergies.forEach(syn => {
+    if ((seriesCount[syn.series]||0) >= 2) {
+      fighters.filter(f=>f.isEnemy===isEnemy).forEach(f=>{
+        const pvp = (pvpData.characters||[]).find(c=>c.name===f.name);
+        if (pvp?.series !== syn.series) return;
+        if (syn.bonus==='atk') f.atk = Math.round(f.atk*(1+syn.value));
+        if (syn.bonus==='spd') f.spd = Math.round(f.spd*(1+syn.value));
+        if (syn.bonus==='cr')  f.cr  = Math.round(f.cr +syn.value);
+      });
+      logMsg(`✨ Sinergia ${syn.series}: ${syn.desc}`, 'buff');
+    }
+  });
+}
+
+/* ── SKILL TOOLTIP ── */
+#skill-tooltip{position:fixed;background:#1a0030;border:1px solid #a78bfa55;border-radius:8px;padding:.6rem .85rem;font-size:.75rem;color:#e9d5ff;max-width:220px;z-index:9999;pointer-events:none;opacity:0;transition:opacity .15s;line-height:1.55;box-shadow:0 4px 20px rgba(0,0,0,.6);}
+#skill-tooltip.show{opacity:1;}
+#skill-tooltip .tt-name{font-family:var(--font-h);font-size:.95rem;letter-spacing:1px;color:#c4b5fd;margin-bottom:.3rem;}
+#skill-tooltip .tt-effect{font-size:.65rem;color:#7c6a9a;margin-top:.25rem;}
+
+/* ── BUFF/DEBUFF ICONS in log ── */
+.log-buff{color:#4ade80;}
+.log-shield{color:#60a5fa;}
+.log-debuff{color:#f97316;}
+.log-dodge{color:#a78bfa;}
+.log-block{color:#94a3b8;}
+
+/* ── DAMAGE FLOATIES — improved ── */
+.dmg-float{position:absolute;font-family:var(--font-h);font-size:1.1rem;letter-spacing:1px;pointer-events:none;z-index:20;text-shadow:0 2px 8px rgba(0,0,0,.8);animation:floatUp .9s ease forwards;}
+.dmg-float.crit{font-size:1.5rem;color:#fbbf24 !important;}
+.dmg-float.dodge{color:#a78bfa !important;font-size:.9rem;}
+.dmg-float.block{color:#94a3b8 !important;font-size:.9rem;}
+.dmg-float.heal{color:#4ade80 !important;}
+.dmg-float.shield{color:#60a5fa !important;}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}60%{opacity:1;}100%{opacity:0;transform:translateY(-55px) scale(.8);}}
+
+/* ── SCENARIO SELECTOR ── */
+.scene-btns{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem;}
+.scene-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.25rem .6rem;font-size:.68rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;}
+.scene-btn:hover{border-color:var(--rose);color:var(--rose);}
+.scene-btn.active{background:var(--pink);border-color:var(--pink);color:#fff;}
+
 /* ── RIVAL CARD ── */
 .rival-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:all .2s;}
 .rival-card:hover{border-color:var(--pink);}
@@ -193,11 +277,23 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
     <div class="conquest-bar">
       <div class="cq-icon">⚔</div>
       <div><div class="cq-val" id="cq-display">0</div><div class="cq-label">Puntos de Conquista</div></div>
-      <a href="pvp.html" style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.4rem .9rem;font-size:.78rem;text-decoration:none;transition:all .2s;font-family:var(--font-b);" onmouseover="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙ Editar Equipos</a>
+      <a href="arena.html" style="margin-left:auto;background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(255,45,120,.1));border:1px solid rgba(251,191,36,.4);color:#fbbf24;border-radius:6px;padding:.4rem .9rem;font-size:.78rem;text-decoration:none;transition:all .2s;font-family:var(--font-b);" onmouseover="this.style.borderColor='#fbbf24'" onmouseout="this.style.borderColor='rgba(251,191,36,.4)'">🌐 Arena Mundial</a>
+      <a href="pvp.html" style="margin-left:0;background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.4rem .9rem;font-size:.78rem;text-decoration:none;transition:all .2s;font-family:var(--font-b);" onmouseover="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">⚙ Editar Equipos</a>
     </div>
 
     <!-- MATCHMAKING -->
     <div id="matchmaking-panel" style="margin-bottom:1.5rem;">
+      <!-- Scenario selector -->
+      <div style="margin-bottom:.8rem;">
+        <div style="font-size:.65rem;color:var(--muted);letter-spacing:2px;margin-bottom:.4rem;text-transform:uppercase;">🎭 Escenario de batalla</div>
+        <div class="scene-btns">
+          <button class="scene-btn active" onclick="setScene('default',this)">⚔ Clásico</button>
+          <button class="scene-btn" onclick="setScene('forest',this)">🌿 Bosque</button>
+          <button class="scene-btn" onclick="setScene('fire',this)">🔥 Infierno</button>
+          <button class="scene-btn" onclick="setScene('sky',this)">💧 Abismo</button>
+          <button class="scene-btn" onclick="setScene('void',this)">🌑 Vacío</button>
+        </div>
+      </div>
       <button class="start-btn" id="search-btn" onclick="searchOpponent()" style="margin-bottom:.8rem;background:linear-gradient(135deg,#1e3a5f,#2563eb);box-shadow:0 0 20px rgba(37,99,235,.4);">🔍 Buscar Rival</button>
       <div style="text-align:center;color:var(--muted);font-size:.78rem;" id="search-msg">Busca un rival con puntos similares a los tuyos.</div>
       
@@ -229,17 +325,35 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 
   <!-- BATTLE SCREEN -->
   <div id="battle-screen">
-    <!-- Turn order -->
-    <div style="display:flex;align-items:center;margin-bottom:.5rem;">
-      <div class="turn-label">Turno</div>
+    <!-- Turn order bar -->
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;overflow-x:auto;padding:.2rem 0;">
+      <div class="turn-label">Turno:</div>
       <div class="turn-row" id="turn-row"></div>
     </div>
 
-    <!-- Field -->
-    <div class="field">
-      <div class="team-row" id="enemy-row"></div>
-      <div class="team-row" id="ally-row"></div>
+    <!-- Scenario + side-by-side field -->
+    <div class="arena-wrap" id="arena-wrap">
+      <div class="arena-bg" id="arena-bg"></div>
+      <div class="arena-center-line"></div>
+
+      <!-- Ally side (left) -->
+      <div class="arena-side ally-side">
+        <div class="side-label ally-lbl">TU EQUIPO</div>
+        <div class="team-col" id="ally-row"></div>
+      </div>
+
+      <!-- VS badge -->
+      <div class="arena-vs">VS</div>
+
+      <!-- Enemy side (right) -->
+      <div class="arena-side enemy-side">
+        <div class="side-label enemy-lbl">RIVAL</div>
+        <div class="team-col" id="enemy-row"></div>
+      </div>
     </div>
+
+    <!-- Skill tooltip (hidden by default) -->
+    <div id="skill-tooltip"></div>
 
     <!-- Battle log -->
     <div class="battle-log" id="battle-log"></div>
@@ -289,16 +403,33 @@ let selectedSkill   = null;
 let phase = 'setup'; // setup | ally_pick | target_pick | enemy_turn | done
 
 const AFFINITIES = {
-  fuego:{ strong_vs:'tierra', weak_vs:'agua' },
-  agua: { strong_vs:'fuego',  weak_vs:'rayo' },
-  tierra:{strong_vs:'rayo',  weak_vs:'fuego'},
-  rayo: { strong_vs:'agua',  weak_vs:'tierra'},
-  luz:  { strong_vs:'oscuridad', weak_vs:'oscuridad'},
-  oscuridad:{strong_vs:'luz', weak_vs:'luz'}
+  tierra:    { strong_vs:'agua',      weak_vs:'oscuridad' },  // verde > azul
+  agua:      { strong_vs:'fuego',     weak_vs:'tierra'    },  // azul  > rojo
+  fuego:     { strong_vs:'rayo',      weak_vs:'agua'      },  // rojo  > amarillo
+  rayo:      { strong_vs:'oscuridad', weak_vs:'fuego'     },  // amarillo > morado
+  oscuridad: { strong_vs:'tierra',    weak_vs:'rayo'      },  // morado > verde
+  luz:       { strong_vs:'oscuridad', weak_vs:'oscuridad' }   // luz <> oscuridad
+};
+const AFF_LABELS = {
+  tierra:'Verde', agua:'Azul', fuego:'Rojo', rayo:'Amarillo', oscuridad:'Morado', luz:'Luz'
 };
 const AFF_ICONS = { fuego:'🔥', agua:'💧', tierra:'🌿', rayo:'⚡', luz:'✦', oscuridad:'🌑' };
 const RC = { 5:'#fbbf24', 4:'#c084fc', 3:'#38bdf8', 2:'#86efac', 1:'#94a3b8' };
 const RG = { 5:'linear-gradient(160deg,#1a0a00,#3d1900 50%)',4:'linear-gradient(160deg,#0d001a,#1e003d 50%)',3:'linear-gradient(160deg,#001220,#002444 50%)',2:'linear-gradient(160deg,#001a0a,#003018 60%)',1:'linear-gradient(160deg,#0d0d0d,#181818)'};
+
+/* ── SCENARIO ── */
+let currentScene = 'default';
+function setScene(scene, btn) {
+  currentScene = scene;
+  document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+function applyScene() {
+  const bg = document.getElementById('arena-bg');
+  if (!bg) return;
+  bg.className = 'arena-bg';
+  if (currentScene !== 'default') bg.classList.add('scene-' + currentScene);
+}
 
 /* ══════════════════════════════════════
    TABS
@@ -563,6 +694,9 @@ function buildFighter(charData, isEnemy, idx) {
     stars: charData.stars || 3,
     affinity: charData.affinity || '',
     role: charData.role || '',
+    dodge:  pvp?.stats?.dodge || 0,
+    shield: 0,
+    activePassive: charData.selectedPassive || pvp?.passive_pool?.[0]?.id || null,
     skills: pvp?.skills || [{ name:'Ataque Básico', desc:'Ataque físico.', type:'activa', cooldown:0 }],
     isEnemy,
     // Battle stats
@@ -598,6 +732,9 @@ function startBattle() {
   ];
   turnQueue = [...fighters].sort((a,b)=>b.spd - a.spd);
   currentTurn = 0;
+
+  // Apply synergy bonuses
+  applySynergies(myAtkTeam.map(c=>c), false);
 
   document.getElementById('setup-screen').style.display  = 'none';
   document.getElementById('battle-screen').style.display = 'block';
@@ -641,7 +778,11 @@ function nextTurn() {
   if (currentTurn >= turnQueue.length) { nextTurn(); return; }
 
   renderTurnOrder();
+  clearDimming();
   const actor = turnQueue[currentTurn];
+
+  // Remove stun visual if cleared
+  document.getElementById('f-'+actor?.id)?.classList.remove('stunned-vis');
 
   if (actor.isEnemy) {
     phase = 'enemy_turn';
@@ -659,8 +800,9 @@ function selectFighter(f) {
   selectedSkill   = null;
   phase = 'ally_pick';
 
-  document.querySelectorAll('.fighter').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.fighter').forEach(el => { el.classList.remove('selected'); el.classList.remove('targeting'); });
   document.getElementById('f-' + f.id)?.classList.add('selected');
+  applyDimming(f.id); // dim other allies, not enemies
 
   renderSkills(f);
   document.getElementById('target-hint').textContent = 'Selecciona una habilidad.';
@@ -676,7 +818,11 @@ function renderSkills(f) {
     btn.className = 'skill-btn';
     const cd = f.cooldowns[i] || 0;
     btn.disabled = cd > 0 || phase !== 'ally_pick';
-    btn.innerHTML = `<span class="sk-name">${sk.name}</span><span class="sk-cd">${cd > 0 ? `CD: ${cd}` : (sk.cooldown===0?'Básico':'Disponible')}</span><span class="sk-type">${sk.type==='pasiva'?'Pasiva':''}</span>`;
+    const affLabel = AFF_LABELS[f.affinity] || '';
+    btn.innerHTML = `<span class="sk-name">${sk.name}</span><span class="sk-cd">${cd > 0 ? 'CD: '+cd : (sk.cooldown===0?'Básico':'Lista')}</span>`;
+    btn.title = sk.desc;
+    btn.addEventListener('mouseenter', (e) => showTooltip(e, sk));
+    btn.addEventListener('mouseleave', hideTooltip);
     if (sk.type !== 'pasiva') {
       btn.onclick = () => chooseSkill(i, sk);
     } else {
@@ -689,8 +835,23 @@ function renderSkills(f) {
 function chooseSkill(idx, skill) {
   selectedSkill = { idx, skill };
   phase = 'target_pick';
-  document.getElementById('target-hint').textContent = '→ Haz click en un enemigo para atacar.';
-  // Highlight enemies
+  const eff = skill.effect || 'damage';
+  const isSelfTarget = ['buff_spd_team','heal_team','shield_team','double_atk','buff_luck'].includes(eff);
+  const isAllyTarget = ['heal','shield','cleanse','taunt'].includes(eff);
+
+  if (isSelfTarget) {
+    // Auto-execute, no target needed
+    executeAction(selectedFighter, selectedSkill, selectedFighter);
+    return;
+  }
+  if (isAllyTarget) {
+    document.getElementById('target-hint').textContent = '→ Haz click en un ALIADO para usar.';
+    fighters.filter(f=>!f.isEnemy&&f.hp>0).forEach(f=>{
+      document.getElementById('f-'+f.id)?.classList.add('targeting');
+    });
+    return;
+  }
+  document.getElementById('target-hint').textContent = '→ Haz click en un ENEMIGO para atacar.';
   fighters.filter(f=>f.isEnemy&&f.hp>0).forEach(f=>{
     document.getElementById('f-'+f.id)?.classList.add('targeting');
   });
@@ -700,21 +861,77 @@ function onFighterClick(id) {
   const f = fighters.find(x=>x.id===id);
   if (!f) return;
 
-  if (phase === 'ally_pick' && !f.isEnemy && f.hp > 0) {
-    selectFighter(f);
+  // In ally_pick: only the CURRENT actor can be interacted — clicking others does nothing
+  if (phase === 'ally_pick') {
+    const actor = turnQueue[currentTurn];
+    if (!f.isEnemy && f.hp > 0 && f.id === actor?.id) {
+      selectFighter(f);
+    } else if (!f.isEnemy && f.id !== actor?.id) {
+      document.getElementById('target-hint').textContent = '→ No es el turno de ese personaje.';
+    } else if (f.isEnemy) {
+      document.getElementById('target-hint').textContent = '→ Primero selecciona una habilidad.';
+    }
     return;
   }
-  if (phase === 'target_pick' && f.isEnemy && f.hp > 0) {
-    fighters.forEach(x => document.getElementById('f-'+x.id)?.classList.remove('targeting'));
-    executeAction(selectedFighter, selectedSkill, f);
-    return;
+
+  if (phase === 'target_pick') {
+    const eff = selectedSkill?.skill?.effect || 'damage';
+    const isAllyTarget = ['heal','shield','cleanse','taunt'].includes(eff);
+
+    if (isAllyTarget && !f.isEnemy && f.hp > 0) {
+      fighters.forEach(x => document.getElementById('f-'+x.id)?.classList.remove('targeting'));
+      clearDimming();
+      executeAction(selectedFighter, selectedSkill, f);
+      return;
+    }
+    if (!isAllyTarget && f.isEnemy && f.hp > 0) {
+      fighters.forEach(x => document.getElementById('f-'+x.id)?.classList.remove('targeting'));
+      clearDimming();
+      executeAction(selectedFighter, selectedSkill, f);
+      return;
+    }
+    if (!isAllyTarget && !f.isEnemy) {
+      document.getElementById('target-hint').textContent = '→ Selecciona un ENEMIGO para atacar.';
+    }
+    if (isAllyTarget && f.isEnemy) {
+      document.getElementById('target-hint').textContent = '→ Selecciona un ALIADO para usar la habilidad.';
+    }
   }
-  if (phase === 'target_pick' && !f.isEnemy) {
-    document.getElementById('target-hint').textContent = '→ Selecciona un ENEMIGO (arriba) para atacar.';
-  }
-  if (phase === 'ally_pick' && f.isEnemy) {
-    document.getElementById('target-hint').textContent = '→ Primero selecciona una habilidad.';
-  }
+}
+
+/* ── SYNERGY BONUSES ── */
+function applySynergies(team, isEnemy) {
+  if (!pvpData.synergies) return;
+  const seriesCount = {};
+  fighters.filter(f => f.isEnemy === isEnemy).forEach(f => {
+    const pvp = (pvpData.characters||[]).find(c=>c.name===f.name);
+    if (pvp?.series) seriesCount[pvp.series] = (seriesCount[pvp.series]||0)+1;
+  });
+  pvpData.synergies.forEach(syn => {
+    if ((seriesCount[syn.series]||0) >= 2) {
+      fighters.filter(f=>f.isEnemy===isEnemy).forEach(f=>{
+        const pvp = (pvpData.characters||[]).find(c=>c.name===f.name);
+        if (pvp?.series !== syn.series) return;
+        if (syn.bonus==='atk') f.atk = Math.round(f.atk*(1+syn.value));
+        if (syn.bonus==='spd') f.spd = Math.round(f.spd*(1+syn.value));
+        if (syn.bonus==='cr')  f.cr  = Math.round(f.cr +syn.value);
+      });
+      logMsg(`✨ Sinergia ${syn.series}: ${syn.desc}`, 'buff');
+    }
+  });
+}
+
+/* ── SKILL TOOLTIP ── */
+function showTooltip(e, skill) {
+  const tt = document.getElementById('skill-tooltip');
+  if (!tt) return;
+  tt.innerHTML = `<div class="tt-name">${skill.name}</div>${skill.desc}<div class="tt-effect">${skill.cooldown===0?'Sin cooldown':'CD: '+skill.cooldown+' turnos'}</div>`;
+  tt.style.left = (e.clientX + 12) + 'px';
+  tt.style.top  = (e.clientY - 8) + 'px';
+  tt.classList.add('show');
+}
+function hideTooltip() {
+  document.getElementById('skill-tooltip')?.classList.remove('show');
 }
 
 /* ── COMBAT MATH ── */
@@ -736,7 +953,242 @@ function calcDamage(attacker, target, skillMult = 1) {
   return { dmg: Math.round(raw), isCrit, affMult };
 }
 
-function applyDamage(target, dmg) {
+// applyDamage replaced by applyDamageWithShield
+
+function executeAction(actor, skillChoice, target) {
+  const skill  = skillChoice.skill;
+  const sk_idx = skillChoice.idx;
+  const eff    = skill.effect || 'damage';
+  const mult   = skill.mult   ?? 1.0;
+
+  // Set cooldown
+  if (skill.cooldown > 0) actor.cooldowns[sk_idx] = skill.cooldown;
+
+  // ── EFFECT DISPATCH ──
+  if (eff === 'heal' || eff === 'heal_team') {
+    // Find heal target: ally with least HP
+    const healTargets = eff === 'heal_team'
+      ? fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0)
+      : [fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0).sort((a,b)=>a.hp/a.maxHp - b.hp/b.maxHp)[0]];
+    healTargets.forEach(t => {
+      if (!t) return;
+      const healAmt = Math.round(t.maxHp * mult);
+      t.hp = Math.min(t.maxHp, t.hp + healAmt);
+      updateFighterHP(t);
+      showDmgFloat('f-'+t.id, '+'+healAmt, false, 'heal');
+      logMsg(`💚 ${actor.name} cura a ${t.name} por ${healAmt} HP.`, 'heal');
+    });
+
+  } else if (eff === 'shield' || eff === 'shield_team') {
+    const shTargets = eff === 'shield_team'
+      ? fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0)
+      : [fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0).sort((a,b)=>a.hp/a.maxHp - b.hp/b.maxHp)[0]];
+    shTargets.forEach(t => {
+      if (!t) return;
+      const shAmt = Math.round(t.maxHp * mult);
+      t.shield = (t.shield || 0) + shAmt;
+      updateFighterHP(t);
+      showDmgFloat('f-'+t.id, '🛡'+shAmt, false, 'shield');
+      logMsg(`🛡 ${actor.name} otorga escudo a ${t.name} (${shAmt}).`, 'shield');
+    });
+
+  } else if (eff === 'buff_spd_team') {
+    const allies = fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0);
+    allies.forEach(f => {
+      f.buffs.push({ type:'spd', value: mult || 0.20, turns: 2 });
+      f.spd = Math.round(f.spd * (1 + (mult||0.20)));
+    });
+    logMsg(`⚡ ${actor.name} aumenta SPD del equipo 20% por 2 turnos.`, 'buff');
+
+  } else if (eff === 'debuff_atk') {
+    const r = calcDamage(actor, target, 1.0);
+    if (!tryDodge(actor, target)) {
+      applyDamageWithShield(target, r.dmg);
+      showDmgFloat('f-'+target.id, r.dmg, r.isCrit);
+      if (Math.random() < 0.30) {
+        target.debuffs.push({ type:'atk', value:-0.20, turns:1 });
+        target.atk = Math.round(target.atk * 0.80);
+        logMsg(`📉 ${actor.name} reduce ATK de ${target.name} 20%.`, 'debuff');
+      }
+      logMsg(`${actor.name} ataca a ${target.name}: ${r.dmg}${r.isCrit?' 💥 CRÍTICO!':''}`, r.isCrit?'crit':'dmg');
+    }
+
+  } else if (eff === 'debuff_def') {
+    if (!tryDodge(actor, target)) {
+      target.debuffs.push({ type:'def', value:-0.20, turns: 2 });
+      target.def = Math.round(target.def * 0.80);
+      showDmgFloat('f-'+target.id, '▼DEF', false, 'debuff');
+      logMsg(`🔍 ${actor.name} reduce DEF de ${target.name} 20% por 2 turnos.`, 'debuff');
+    }
+
+  } else if (eff === 'debuff_aoe') {
+    const enemies = fighters.filter(f => f.isEnemy === actor.isEnemy ? false : f.hp > 0);
+    enemies.forEach(t => {
+      t.debuffs.push({ type:'atk', value:-0.25, turns:2 });
+      t.atk = Math.round(t.atk * 0.75);
+      showDmgFloat('f-'+t.id, '▼ATK', false, 'debuff');
+    });
+    logMsg(`📉 ${actor.name} reduce ATK de todos los enemigos 25%.`, 'debuff');
+
+  } else if (eff === 'cleanse') {
+    const ally = fighters.filter(f => f.isEnemy === actor.isEnemy && f.hp > 0)[0];
+    if (ally) {
+      ally.debuffs = [];
+      const healAmt = Math.round(ally.maxHp * mult);
+      ally.hp = Math.min(ally.maxHp, ally.hp + healAmt);
+      updateFighterHP(ally);
+      showDmgFloat('f-'+ally.id, '✨Purif', false, 'buff');
+      logMsg(`✨ ${actor.name} purifica debuffs de ${ally.name} y cura ${healAmt} HP.`, 'buff');
+    }
+
+  } else if (eff === 'stun') {
+    const r = calcDamage(actor, target, mult);
+    if (!tryDodge(actor, target)) {
+      const blocked = tryBlock(actor, target, r.dmg);
+      if (!blocked.blocked) {
+        applyDamageWithShield(target, blocked.dmg);
+        showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
+        if (Math.random() < 0.50) {
+          target.stunned = true;
+          document.getElementById('f-'+target.id)?.classList.add('stunned-vis');
+          logMsg(`⚡ ${actor.name} aturde a ${target.name}! Pierde el próximo turno.`, 'debuff');
+        }
+        logAff(actor, target, r.affMult);
+        logMsg(`${actor.name} usa ${skill.name}: ${blocked.dmg}${r.isCrit?' 💥 CRÍTICO!':''}`, r.isCrit?'crit':'dmg');
+      }
+    }
+
+  } else if (eff === 'multihit3') {
+    let totalDmg = 0;
+    for (let i=0; i<3; i++) {
+      if (target.hp <= 0) break;
+      if (tryDodge(actor, target)) { showDmgFloat('f-'+target.id,'Esquiva!',false,'dodge'); continue; }
+      const r = calcDamage(actor, target, mult);
+      const blocked = tryBlock(actor, target, r.dmg);
+      applyDamageWithShield(target, blocked.dmg);
+      showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
+      totalDmg += blocked.dmg;
+    }
+    logMsg(`${actor.name} golpea 3 veces a ${target.name} por ${totalDmg} daño total.`, 'dmg');
+
+  } else if (eff === 'aoe') {
+    const enemies = fighters.filter(f => f.isEnemy !== actor.isEnemy && f.hp > 0);
+    enemies.forEach(t => {
+      if (tryDodge(actor, t)) { showDmgFloat('f-'+t.id,'Esquiva!',false,'dodge'); return; }
+      const r = calcDamage(actor, t, mult);
+      const blocked = tryBlock(actor, t, r.dmg);
+      applyDamageWithShield(t, blocked.dmg);
+      showDmgFloat('f-'+t.id, blocked.dmg, r.isCrit);
+    });
+    logMsg(`${actor.name} usa ${skill.name} en todos los enemigos.`, 'dmg');
+
+  } else if (eff === 'double_atk') {
+    // Self ATK doubled for 2 turns
+    actor.buffs.push({ type:'atk', value: 1.0, turns: 2 });
+    actor.atk = Math.round(actor.atk * 2.0);
+    const hpCost = Math.round(actor.maxHp * 0.08);
+    actor.hp = Math.max(1, actor.hp - hpCost);
+    updateFighterHP(actor);
+    showDmgFloat('f-'+actor.id, '⚡×2', false, 'buff');
+    logMsg(`💪 ${actor.name} entra en furia: ATK x2 por 2 turnos. (-${hpCost} HP)`, 'buff');
+
+  } else if (eff === 'lifesteal') {
+    if (!tryDodge(actor, target)) {
+      const r = calcDamage(actor, target, mult);
+      const blocked = tryBlock(actor, target, r.dmg);
+      applyDamageWithShield(target, blocked.dmg);
+      showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
+      const steal = Math.round(blocked.dmg * 0.15);
+      actor.hp = Math.min(actor.maxHp, actor.hp + steal);
+      updateFighterHP(actor);
+      showDmgFloat('f-'+actor.id, '+'+steal, false, 'heal');
+      logMsg(`${actor.name} drena ${steal} HP de ${target.name}.`, 'heal');
+    }
+
+  } else if (eff === 'taunt') {
+    actor.buffs.push({ type:'taunt', turns:1 });
+    showDmgFloat('f-'+actor.id, '🛡Guarda', false, 'shield');
+    logMsg(`🛡 ${actor.name} protegerá al siguiente aliado en ser atacado.`, 'shield');
+
+  } else if (eff === 'damage' || eff === 'damage_light') {
+    // Standard damage
+    if (tryDodge(actor, target)) {
+      showDmgFloat('f-'+target.id, 'Esquiva!', false, 'dodge');
+      logMsg(`💨 ${target.name} esquivó el ataque de ${actor.name}.`, 'dodge');
+    } else {
+      const r = calcDamage(actor, target, mult);
+      const blocked = tryBlock(actor, target, r.dmg);
+      if (blocked.blocked) {
+        showDmgFloat('f-'+target.id, 'Bloqueado!', false, 'block');
+        logMsg(`🛡 ${target.name} bloqueó el ataque de ${actor.name}.`, 'block');
+      } else {
+        applyDamageWithShield(target, blocked.dmg);
+        showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
+        const affTxt = r.affMult > 1 ? ' ✦ ¡Super efectivo!' : r.affMult < 1 ? ' ▼ No muy efectivo.' : '';
+        logMsg(`${actor.name} usa ${skill.name} → ${target.name}: ${blocked.dmg}${r.isCrit?' 💥 CRÍTICO!':''}${affTxt}`, r.isCrit?'crit':'dmg');
+        // Double hit passive
+        if (actor.activePassive === 'double_hit' && Math.random() < 0.30) {
+          const r2 = calcDamage(actor, target, mult*0.7);
+          const b2 = tryBlock(actor, target, r2.dmg);
+          if (!b2.blocked && target.hp > 0) {
+            applyDamageWithShield(target, b2.dmg);
+            showDmgFloat('f-'+target.id, b2.dmg, r2.isCrit);
+            logMsg(`⚡ ${actor.name} ataca de nuevo por doble hit: ${b2.dmg}`, 'crit');
+          }
+        }
+      }
+    }
+  } else {
+    // Fallback: generic damage
+    if (!tryDodge(actor, target)) {
+      const r = calcDamage(actor, target, mult||1.0);
+      const blocked = tryBlock(actor, target, r.dmg);
+      if (!blocked.blocked) {
+        applyDamageWithShield(target, blocked.dmg);
+        showDmgFloat('f-'+target.id, blocked.dmg, r.isCrit);
+        logMsg(`${actor.name} usa ${skill.name}: ${blocked.dmg}`, r.isCrit?'crit':'dmg');
+      }
+    }
+  }
+
+  // ── Acting animation ──
+  const actEl = document.getElementById('f-'+actor.id);
+  if (actEl) { actEl.classList.add('acting'); setTimeout(()=>actEl.classList.remove('acting'), 350); }
+
+  selectedFighter = null; selectedSkill = null;
+  clearDimming();
+  currentTurn++;
+  setTimeout(() => nextTurn(), 700);
+}
+
+/* ── DODGE CHECK ── */
+function tryDodge(attacker, target) {
+  const dodgeChance = (target.dodge || 0) + (target.buffs.some(b=>b.type==='dodge')?15:0);
+  return Math.random() * 100 < dodgeChance;
+}
+
+/* ── BLOCK CHECK ── */
+function tryBlock(attacker, target, dmg) {
+  // Block: high DEF units have chance to halve damage
+  const blockChance = Math.min(25, target.def / 200);
+  if (Math.random() * 100 < blockChance) {
+    return { blocked: false, dmg: Math.round(dmg * 0.5), wasBlock: true };
+  }
+  // Shield absorption
+  if (target.shield > 0) {
+    const absorbed = Math.min(target.shield, dmg);
+    target.shield -= absorbed;
+    updateFighterHP(target);
+    const remainder = dmg - absorbed;
+    if (absorbed > 0) showDmgFloat('f-'+target.id, '🛡-'+absorbed, false, 'shield');
+    return { blocked: remainder <= 0, dmg: remainder, wasBlock: false };
+  }
+  return { blocked: false, dmg, wasBlock: false };
+}
+
+/* ── APPLY DAMAGE WITH SHIELD ── */
+function applyDamageWithShield(target, dmg) {
+  if (dmg <= 0) return;
   target.hp = Math.max(0, target.hp - dmg);
   updateFighterHP(target);
   if (target.hp <= 0) {
@@ -745,49 +1197,23 @@ function applyDamage(target, dmg) {
   }
 }
 
-function executeAction(actor, skillChoice, target) {
-  const skill = skillChoice.skill;
-  const sk_idx = skillChoice.idx;
+/* ── AFFINITY LOG HELPER ── */
+function logAff(actor, target, affMult) {
+  if (affMult > 1) logMsg(`✦ ¡${AFF_LABELS[actor.affinity]||actor.affinity} es super efectivo contra ${AFF_LABELS[target.affinity]||target.affinity}!`, 'buff');
+  else if (affMult < 1) logMsg(`▼ ${AFF_LABELS[actor.affinity]||actor.affinity} no es muy efectivo.`, 'sys');
+}
 
-  // Set cooldown
-  if (skill.cooldown > 0) actor.cooldowns[sk_idx] = skill.cooldown;
-
-  // Check if skill hits all enemies
-  if (skill.name.includes('todo') || skill.desc.toLowerCase().includes('todo el equipo enemigo') || skill.desc.toLowerCase().includes('todos')) {
-    // AoE
-    const targets = fighters.filter(f => f.isEnemy !== actor.isEnemy && f.hp > 0);
-    const r = calcDamage(actor, target, 0.65); // AoE reduced
-    targets.forEach(t => {
-      applyDamage(t, r.dmg);
-      showDmgFloat('f-'+t.id, r.dmg, r.isCrit);
-    });
-    logMsg(`${actor.name} usa ${skill.name} en todo el equipo. ${r.dmg} de daño cada uno.${r.affMult>1?' Super efectivo!':r.affMult<1?' No muy efectivo.':''}`, r.isCrit?'crit':'dmg');
-  } else {
-    // Single target
-    const r = calcDamage(actor, target, 1.2);
-    applyDamage(target, r.dmg);
-    showDmgFloat('f-'+target.id, r.dmg, r.isCrit);
-    const affTxt = r.affMult > 1 ? ' ✦ Super efectivo!' : r.affMult < 1 ? ' ▼ No muy efectivo.' : '';
-    logMsg(`${actor.name} usa ${skill.name} en ${target.name}: ${r.dmg}${r.isCrit?' CRÍTICO!':''}${affTxt}`, r.isCrit?'crit':'dmg');
-  }
-
-  // Special passive: Rem's Oni Awakening — already in calcDamage (def ignore)
-  // Special: multi-hit (3 veces)
-  if (skill.desc.includes('3 veces')) {
-    for (let i=0;i<2;i++) {
-      if (target.hp > 0) {
-        const r2 = calcDamage(actor, target, 0.4);
-        applyDamage(target, r2.dmg);
-        showDmgFloat('f-'+target.id, r2.dmg, r2.isCrit);
-      }
-    }
-  }
-
-  document.getElementById('f-'+actor.id)?.classList.add('acting');
-  setTimeout(()=>document.getElementById('f-'+actor.id)?.classList.remove('acting'), 400);
-
-  currentTurn++;
-  setTimeout(() => nextTurn(), 600);
+/* ── DIMMING ── */
+function applyDimming(activeId) {
+  fighters.forEach(f => {
+    const el = document.getElementById('f-'+f.id);
+    if (!el) return;
+    if (f.id === activeId) { el.classList.remove('dimmed'); }
+    else if (!f.isEnemy) { el.classList.add('dimmed'); }
+  });
+}
+function clearDimming() {
+  fighters.forEach(f => document.getElementById('f-'+f.id)?.classList.remove('dimmed'));
 }
 
 /* ── ENEMY AI ── */
@@ -954,7 +1380,8 @@ function updateActionPanel(txt) {
 function logMsg(txt, type='') {
   const log = document.getElementById('battle-log');
   const div = document.createElement('div');
-  div.className = `log-entry ${type==='dmg'?'log-dmg':type==='crit'?'log-crit':type==='heal'?'log-heal':'log-sys'}`;
+  const classMap = {dmg:'log-dmg',crit:'log-crit',heal:'log-heal',buff:'log-buff',shield:'log-shield',debuff:'log-debuff',dodge:'log-dodge',block:'log-block'};
+  div.className = `log-entry ${classMap[type]||'log-sys'}`;
   div.textContent = txt;
   log.appendChild(div);
   log.scrollTop = log.scrollHeight;
