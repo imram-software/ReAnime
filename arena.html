@@ -306,8 +306,14 @@ async function findMatch(){
   // Load active skins
   const teamWithSkins=await Promise.all(team.map(async(c)=>{
     const pvp=pvpData?.characters?.find(p=>p.name.toLowerCase()===c.name.toLowerCase());
-    let image=pvp?.skins?.[0]||c.image||''; // always start with default pvp skin
-    if(pvp?.skins?.length&&window.ReAnimeDB){try{const up=await window.ReAnimeDB.getCharUpgrade(c.name);const si=up?.selectedSkin||0;if(pvp.skins[si])image=pvp.skins[si];}catch(e){}}
+    let image=c.image||pvp?.skins?.[0]||''; // default: collection image
+    if(pvp?.skins?.length&&window.ReAnimeDB){
+      try{
+        const up=await window.ReAnimeDB.getCharUpgrade(c.name);
+        const si=up?.selectedSkin??-1;
+        if(si>=0&&pvp.skins[si])image=pvp.skins[si]; // only use skin if explicitly chosen
+      }catch(e){}
+    }
     return{...c,image};
   }));
   const playerDoc={id:SELF.id,name:ud.displayName||ud.discordUsername||SELF.username,avatar:ud.discordAvatar?`https://cdn.discordapp.com/avatars/${SELF.id}/${ud.discordAvatar}.png`:'',conquest:myConquest,team:teamWithSkins.map(c=>({name:c.name,anime:c.anime,image:c.image||'',stars:c.stars,affinity:c.affinity||'',role:c.role||''})),ts:Date.now()};

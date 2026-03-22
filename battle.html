@@ -753,21 +753,25 @@ async function startBattle() {
   // Load active skins — always prefer pvp_chars skins over gacha image
   const allyWithSkins = await Promise.all(myAtkTeam.map(async (char, i) => {
     const pvp = findPvpStats(char.name);
-    let image = pvp?.skins?.[0] || char.image || '';  // default: skin[0]
+    // Default: use collection image (char.image), fallback to pvp skin[0]
+    let image = char.image || pvp?.skins?.[0] || '';
     if (pvp?.skins?.length && window.ReAnimeDB) {
       try {
         const up = await window.ReAnimeDB.getCharUpgrade(char.name);
-        const skinIdx = up?.selectedSkin || 0;
-        if (pvp.skins[skinIdx]) image = pvp.skins[skinIdx];
+        const skinIdx = up?.selectedSkin ?? -1;
+        // -1 = default (collection image). >=0 = use pvp skin if it exists
+        if (skinIdx >= 0 && pvp.skins[skinIdx]) {
+          image = pvp.skins[skinIdx];
+        }
       } catch(e) {}
     }
     return { ...char, image };
   }));
 
-  // Enemies: always use pvp skin[0] (or selected if known)
+  // Enemies: use collection image, fallback to pvp skin[0]
   const enemyWithSkins = enemyDefTeam.map(char => {
     const pvp = findPvpStats(char.name);
-    const image = pvp?.skins?.[0] || char.image || '';
+    const image = char.image || pvp?.skins?.[0] || '';
     return { ...char, image };
   });
 

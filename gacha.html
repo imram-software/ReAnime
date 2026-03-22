@@ -1613,21 +1613,42 @@
       // Get upgrade level (async, show after)
       const upgEl = document.createElement('div');
       upgEl.className = 'coll-card-g r'+ch.stars+(p?' pvp-ok':'');
-      // Build card — image will be updated once upgrades load
-      upgEl.innerHTML=`<div class="coll-face"><div class="coll-face-bg" style="background:${RGRADS[ch.stars]||RGRADS[1]}"></div><div class="coll-face-sym">${RSYMS[ch.stars]||'─'}</div><img id="cimg-${ch.name.replace(/[^a-z0-9]/gi,'_')}" src="${ch.image||''}" loading="lazy" onerror="this.style.display='none'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;z-index:2;"/>${ch.count>1?`<div class="coll-dupes">×${ch.count}</div>`:''}${p?'<div class="coll-pvp-icon">⚔</div>':''}<div class="coll-lv-badge" id="lv-${ch.name.replace(/\s/g,'_')}"></div></div><div class="coll-info"><div class="card-stars-row">${starsHTML(ch.stars,'stars-r'+ch.stars)}</div><div class="coll-name">${ch.name}</div><div class="coll-meta">${ch.anime}</div></div>`;
+      // Determine image to show: default = ch.image, or active skin from upgrades
+      // We'll set the image after getting upgrade data
+      const imgEl = document.createElement('img');
+      imgEl.src = ch.image || '';
+      imgEl.loading = 'lazy';
+      imgEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;z-index:2;';
+      imgEl.onerror = function(){ this.style.display='none'; };
+
+      const lvBadgeEl = document.createElement('div');
+      lvBadgeEl.className = 'coll-lv-badge';
+
+      const faceEl = document.createElement('div');
+      faceEl.className = 'coll-face';
+      faceEl.innerHTML = `<div class="coll-face-bg" style="background:${RGRADS[ch.stars]||RGRADS[1]}"></div><div class="coll-face-sym">${RSYMS[ch.stars]||'─'}</div>`;
+      faceEl.appendChild(imgEl);
+      if(ch.count>1){ const d=document.createElement('div');d.className='coll-dupes';d.textContent='×'+ch.count;faceEl.appendChild(d); }
+      if(p){ const pi=document.createElement('div');pi.className='coll-pvp-icon';pi.textContent='⚔';faceEl.appendChild(pi); }
+      faceEl.appendChild(lvBadgeEl);
+
+      upgEl.appendChild(faceEl);
+      upgEl.insertAdjacentHTML('beforeend', `<div class="coll-info"><div class="card-stars-row">${starsHTML(ch.stars,'stars-r'+ch.stars)}</div><div class="coll-name">${ch.name}</div><div class="coll-meta">${ch.anime}</div></div>`);
       upgEl.onclick = () => openUpgradeModal(ch);
       grid.appendChild(upgEl);
-      // Load upgrade data → apply active skin + level badge
-      if (window.ReAnimeDB) window.ReAnimeDB.getCharUpgrade(ch.name).then(up => {
-        const badge = document.getElementById('lv-'+ch.name.replace(/\s/g,'_'));
-        if (badge && up.level > 1) badge.innerHTML = `<span style="background:var(--pink);color:#fff;font-size:.55rem;border-radius:10px;padding:.05rem .35rem;font-weight:700;">Nv ${up.level}</span>`;
-        // Apply active skin
-        const imgEl = document.getElementById('cimg-'+ch.name.replace(/[^a-z0-9]/gi,'_'));
-        if (imgEl && up.selectedSkin != null && up.selectedSkin >= 0) {
-          const pvpSkins = p?.skins;
-          if (pvpSkins?.[up.selectedSkin]) imgEl.src = pvpSkins[up.selectedSkin];
-        }
-      });
+
+      // Load upgrade data now — update image and badge with closure references
+      if (window.ReAnimeDB) {
+        const _imgEl = imgEl, _lvEl = lvBadgeEl, _pvpChar = p;
+        window.ReAnimeDB.getCharUpgrade(ch.name).then(up => {
+          if (up.level > 1) _lvEl.innerHTML = `<span style="background:var(--pink);color:#fff;font-size:.55rem;border-radius:10px;padding:.05rem .35rem;font-weight:700;">Nv ${up.level}</span>`;
+          // Apply active skin: -1 or undefined = use default (ch.image)
+          if (up.selectedSkin != null && up.selectedSkin >= 0 && _pvpChar?.skins?.[up.selectedSkin]) {
+            _imgEl.src = _pvpChar.skins[up.selectedSkin];
+          }
+          // else keep ch.image (default)
+        });
+      }
       continue;
     };
   }
