@@ -97,12 +97,12 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .arena-bg.scene-void{background:linear-gradient(135deg,#0d0014 0%,#14001f 50%,#080008 100%);}
 .arena-center-line{position:absolute;left:50%;top:10%;bottom:10%;width:1px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.08),transparent);z-index:1;}
 .arena-vs{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--font-h);font-size:1.6rem;letter-spacing:4px;color:rgba(255,255,255,.12);z-index:1;pointer-events:none;user-select:none;}
-.arena-side{flex:1;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:.5rem .4rem;overflow:visible;}
+.arena-side{flex:1;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:.5rem .4rem .8rem;overflow:visible;}
 .ally-side{border-right:1px solid rgba(255,255,255,.04);}
 .side-label{font-family:var(--font-h);font-size:.55rem;letter-spacing:4px;text-transform:uppercase;margin-bottom:.6rem;padding:.15rem .5rem;border-radius:20px;}
 .ally-lbl{color:#4ade80;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);}
 .enemy-lbl{color:#f87171;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);}
-.team-col{display:flex;flex-direction:row;gap:.5rem;flex-wrap:wrap;justify-content:center;align-items:flex-start;padding:.3rem 0;}
+.team-col{display:flex;flex-direction:row;gap:.5rem;flex-wrap:wrap;justify-content:center;align-items:flex-start;padding:.3rem .2rem;width:100%;}
 
 /* ── FIGHTER — updated ── */
 .fighter{width:90px;border-radius:var(--radius);background:var(--surface);border:2px solid var(--border);overflow:visible;cursor:default;transition:transform .25s,border-color .25s,opacity .25s,filter .25s,box-shadow .25s;position:relative;user-select:none;}
@@ -129,8 +129,8 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .f-shield{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#3b82f6;color:#fff;font-size:.55rem;border-radius:10px;padding:.1rem .4rem;white-space:nowrap;z-index:5;border:1px solid #60a5fa;}
 /* Buff icon row */
 .f-buffs{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);display:flex;gap:2px;z-index:5;}
-.f-buff-icon{font-size:.55rem;background:rgba(0,0,0,.82);border-radius:3px;padding:0 3px;border:1px solid rgba(255,255,255,.12);white-space:nowrap;cursor:default;line-height:1.4;}
-.f-buffs{position:absolute;top:2px;left:0;right:0;display:flex;gap:2px;z-index:6;flex-wrap:wrap;justify-content:center;padding:0 2px;}
+.f-buff-icon{font-size:.5rem;background:rgba(0,0,0,.85);border-radius:3px;padding:0 2px;border:1px solid rgba(255,255,255,.1);white-space:nowrap;cursor:default;line-height:1.3;}
+.f-buffs{display:none;}
 /* Fighter hover tooltip */
 .fighter-tooltip{z-index:9999;pointer-events:none;}
 .fighter-tooltip .ft-title{font-family:var(--font-h);font-size:.85rem;color:#c4b5fd;margin-bottom:.25rem;letter-spacing:1px;}
@@ -258,7 +258,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 <div class="page">
   <!-- TABS -->
   <div class="btabs">
-    <button class="btab active" onclick="showTab('battle')">Batalla</button>
+    <button class="btab active" id="battle-tab-btn" onclick="showTab('battle')">Batalla</button>
     <button class="btab" id="log-tab-btn" onclick="showTab('log')">Registro</button>
   </div>
 
@@ -446,13 +446,11 @@ function showTab(t) {
 }
 
 function updateTabVisibility() {
-  const logBtn = document.getElementById('log-tab-btn');
-  if (!logBtn) return;
-  if (phase === 'battle') {
-    logBtn.style.display = 'none';
-  } else {
-    logBtn.style.display = '';
-  }
+  const logBtn    = document.getElementById('log-tab-btn');
+  const battleBtn = document.getElementById('battle-tab-btn');
+  const isBattle  = phase === 'battle';
+  if (logBtn)    logBtn.style.display    = isBattle ? 'none' : '';
+  if (battleBtn) battleBtn.style.display = isBattle ? 'none' : '';
 }
 
 /* ══════════════════════════════════════
@@ -1462,27 +1460,50 @@ const DEBUFF_ICONS_MAP = { atk:'⚔↓', def:'🛡↓', spd:'⚡↓', stun:'💫
 function renderBuffIcons(f) {
   const el = document.getElementById('f-'+f.id);
   if (!el) return;
-  let row = el.querySelector('.f-buffs');
-  if (!row) { row = document.createElement('div'); row.className='f-buffs'; el.appendChild(row); }
-  row.innerHTML = '';
+
+  // Remove old buff row for this fighter from arena-wrap
+  const arena = document.getElementById('arena-wrap');
+  document.getElementById('buffs-'+f.id)?.remove();
+
   const all = [...(f.buffs||[]).map(b=>({...b,isDebuff:false})), ...(f.debuffs||[]).map(b=>({...b,isDebuff:true}))];
   if (f.shield > 0) all.unshift({type:'shield',turns:1,isDebuff:false});
   if (f.bleed > 0)  all.push({type:'bleed',turns:f.bleedTurns||1,isDebuff:true});
   if (f.frozen)     all.push({type:'freeze',turns:1,isDebuff:true});
-  if (f.burning)    all.push({type:'burn',turns:f.burnTurns||1,isDebuff:true});
-  all.slice(0,5).forEach(b => {
+  if (all.length === 0) return;
+
+  const row = document.createElement('div');
+  row.id = 'buffs-'+f.id;
+  row.style.cssText = 'position:absolute;display:flex;gap:2px;flex-wrap:wrap;z-index:10;pointer-events:none;max-width:80px;';
+
+  all.slice(0,4).forEach(b => {
     const ic = document.createElement('span');
-    ic.className = 'f-buff-icon';
     const icon = b.isDebuff ? (DEBUFF_ICONS_MAP[b.type]||'▼') : (BUFF_ICONS_MAP[b.type]||'▲');
     ic.textContent = icon + (b.turns>1?b.turns:'');
-    ic.style.color = b.isDebuff ? '#f97316' : '#4ade80';
-    ic.title = '';
+    ic.style.cssText = `font-size:.5rem;background:rgba(0,0,0,.85);border-radius:3px;padding:0 2px;line-height:1.4;color:${b.isDebuff?'#f97316':'#4ade80'};border:1px solid rgba(255,255,255,.1);`;
     row.appendChild(ic);
   });
+
+  // Position above the fighter card using getBoundingClientRect
+  if (arena) {
+    arena.appendChild(row);
+    const elRect    = el.getBoundingClientRect();
+    const arenaRect = arena.getBoundingClientRect();
+    const x = elRect.left - arenaRect.left + elRect.width/2 - 40; // center above card
+    const y = elRect.top  - arenaRect.top  - 22; // just above card
+    row.style.left = x + 'px';
+    row.style.top  = y + 'px';
+  }
 }
 
 function renderAllBuffIcons() {
-  fighters.forEach(f => renderBuffIcons(f));
+  // Clean up buff rows for dead fighters
+  fighters.forEach(f => {
+    if (f.hp <= 0) {
+      document.getElementById('buffs-'+f.id)?.remove();
+    } else {
+      renderBuffIcons(f);
+    }
+  });
 }
 
 /* Fighter hover tooltip */
