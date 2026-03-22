@@ -28,7 +28,7 @@ const discordUser = JSON.parse(localStorage.getItem("user")) || null;
 
 const DEFAULT_DATA = {
   watching: [], completed: [], favorites: [], watchlist: [], episodesSeen: {},
-  holy: 0,
+  holy: 5000,
   collection: [],
   featured: null,
   displayName: "",
