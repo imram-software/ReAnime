@@ -750,27 +750,24 @@ async function startBattle() {
   if (myAtkTeam.length===0 || enemyDefTeam.length===0) return;
   phase = 'battle';
 
-  // Load active skins for ally team
+  // Load active skins — always prefer pvp_chars skins over gacha image
   const allyWithSkins = await Promise.all(myAtkTeam.map(async (char, i) => {
     const pvp = findPvpStats(char.name);
-    let image = char.image || '';
+    let image = pvp?.skins?.[0] || char.image || '';  // default: skin[0]
     if (pvp?.skins?.length && window.ReAnimeDB) {
       try {
         const up = await window.ReAnimeDB.getCharUpgrade(char.name);
         const skinIdx = up?.selectedSkin || 0;
         if (pvp.skins[skinIdx]) image = pvp.skins[skinIdx];
       } catch(e) {}
-    } else if (pvp?.skins?.[0]) {
-      image = pvp.skins[0];
     }
     return { ...char, image };
   }));
 
-  // For enemies: use first skin from pvp_chars if no image
+  // Enemies: always use pvp skin[0] (or selected if known)
   const enemyWithSkins = enemyDefTeam.map(char => {
     const pvp = findPvpStats(char.name);
-    let image = char.image || '';
-    if (!image && pvp?.skins?.[0]) image = pvp.skins[0];
+    const image = pvp?.skins?.[0] || char.image || '';
     return { ...char, image };
   });
 

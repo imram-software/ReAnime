@@ -133,8 +133,8 @@
       "role": "soporte",
       "rarity": 3,
       "skins": [
-        "https://cdn.myanimelist.net/images/characters/15/271553.jpg",
-        "https://cdn.myanimelist.net/images/characters/9/276232.jpg"
+        "https://imgs.search.brave.com/jdVMWDuOOJ8hhlyIhAy3lW7MRdxCG3qxRBqkZXuULZc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS50ZW5vci5jb20v/d0J6WFgxYmx5M3NB/QUFBTS9zdWJhcnUt/bmF0c3VraS1zdWJh/cnUuZ2lm.gif",
+        "https://myanimelist.net/images/characters/16/438175.jpg"
       ],
       "stats": {
         "hp": 4200,
@@ -202,9 +202,9 @@
       "role": "guerrero",
       "rarity": 5,
       "skins": [
-        "https://cdn.myanimelist.net/images/characters/15/266065.jpg",
-        "https://cdn.myanimelist.net/images/characters/14/280396.jpg",
-        "https://cdn.myanimelist.net/images/characters/11/309076.jpg"
+        "https://imgs.search.brave.com/e7YCBdohsnSkA_-F1_hCGlnxNsue5W09kY01p4l5EEE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzBhLzUz/Lzc0LzBhNTM3NDEz/ZGU3YzcxMjZlOWJi/MjQ2ZWIzYzc2MmYy/LmpwZw",
+        "https://myanimelist.net/images/characters/7/585332.jpg",
+        "https://steamartwork.com/wp-content/uploads/2024/03/Rem.gif"
       ],
       "stats": {
         "hp": 5100,
@@ -264,7 +264,7 @@
         }
       ]
     },
-    {
+    { "pj": "Ram",
       "name": "Ram",
       "series": "Re:Zero",
       "affinity": "rayo",
@@ -332,15 +332,15 @@
         }
       ]
     },
-    {
+    { "pj": "Emilia",
       "name": "Emilia",
       "series": "Re:Zero",
       "affinity": "luz",
       "role": "sanador",
       "rarity": 5,
       "skins": [
-        "https://cdn.myanimelist.net/images/characters/10/265177.jpg",
-        "https://cdn.myanimelist.net/images/characters/9/289519.jpg"
+        "https://imgs.search.brave.com/SHXepJOJJhXxZ_-VQWzlyVWvpfuJ3HzkOD2t6vjCPwY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzL2RlLzA5/LzcwL2RlMDk3MDYx/MGQ2Y2M5ZjIzNGVk/ODI5YzY4NzEzZmQ4/LmpwZw",
+        "https://images.steamusercontent.com/ugc/1002557245586583279/B6A7B608FF3AB77FAA7C0C43832E400C950EEA33/?imw=512&&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false"
       ],
       "stats": {
         "hp": 4600,
@@ -400,14 +400,14 @@
         }
       ]
     },
-    {
+    { "pj": "Aqua",
       "name": "Aqua",
       "series": "KonoSuba",
       "affinity": "agua",
       "role": "sanador",
       "rarity": 4,
       "skins": [
-        "https://cdn.myanimelist.net/images/characters/7/289130.jpg"
+        "https://myanimelist.net/images/characters/11/320203.jpg"
       ],
       "stats": {
         "hp": 4200,
@@ -467,14 +467,14 @@
         }
       ]
     },
-    {
+    { "pj": "Megumin",
       "name": "Megumin",
       "series": "KonoSuba",
       "affinity": "fuego",
       "role": "mago",
       "rarity": 5,
       "skins": [
-        "https://cdn.myanimelist.net/images/characters/9/289128.jpg"
+        "https://myanimelist.net/images/characters/5/301301.jpg"
       ],
       "stats": {
         "hp": 2900,
@@ -534,14 +534,14 @@
         }
       ]
     },
-    {
+    { "pj": "Kazuma Satou",
       "name": "Kazuma Satou",
       "series": "KonoSuba",
       "affinity": "tierra",
       "role": "soporte",
       "rarity": 3,
       "skins": [
-        "https://cdn.myanimelist.net/images/characters/7/289131.jpg"
+        "https://myanimelist.net/images/characters/8/301302.jpg"
       ],
       "stats": {
         "hp": 4100,
@@ -601,14 +601,14 @@
         }
       ]
     },
-    {
+    { "pj": "Otonashi",
       "name": "Otonashi",
       "series": "Angel Beats",
       "affinity": "luz",
       "role": "tanque",
       "rarity": 4,
       "skins": [
-        "https://cdn.myanimelist.net/images/characters/14/66484.jpg"
+        "https://myanimelist.net/images/characters/16/318156.jpg"
       ],
       "stats": {
         "hp": 6200,
@@ -668,15 +668,15 @@
         }
       ]
     },
-    {
-      "name": "Satoru Gojo",
+    { "pj": "Satoru Gojou",
+      "name": "Satoru Gojou",
       "series": "Jujutsu Kaisen",
       "affinity": "luz",
       "role": "mago",
       "rarity": 5,
       "skins": [
-        "https://cdn.myanimelist.net/images/characters/10/431252.jpg",
-        "https://cdn.myanimelist.net/images/characters/2/431253.jpg"
+        "https://myanimelist.net/images/characters/11/474147.jpg",
+        "https://images.steamusercontent.com/ugc/2004717401575471759/B510F111995A136FC96991EC42FF56F5974667C6/?imw=637&imh=358&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
       ],
       "stats": {
         "hp": 4800,
@@ -736,7 +736,7 @@
         }
       ]
     },
-    {
+    { "pj": "Levi Ackerman",
       "name": "Levi Ackerman",
       "series": "Attack on Titan",
       "affinity": "rayo",
