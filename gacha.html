@@ -615,6 +615,9 @@
     .coll-meta { font-size:.58rem; color:var(--muted); margin-top:.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .coll-lv-badge{position:absolute;bottom:5px;left:5px;z-index:4;}
     .coll-filter-row { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; align-items:center; }
+    .filter-chip { background:var(--bg3); border:1px solid var(--border); color:var(--muted); border-radius:20px; padding:.3rem .85rem; font-size:.75rem; cursor:pointer; font-family:var(--font-b); transition:all .2s; white-space:nowrap; }
+    .filter-chip:hover { border-color:var(--rose); color:var(--rose); }
+    .filter-chip.active { background:var(--pink); border-color:var(--pink); color:#fff; }
     .coll-search-g { background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:.4rem .8rem; font-size:.82rem; font-family:var(--font-b); outline:none; min-width:180px; }
     .coll-search-g:focus { border-color:var(--pink); }
     .page-tab-g { font-family:var(--font-h); font-size:1.1rem; letter-spacing:2px; padding:.5rem 1.5rem; cursor:pointer; color:var(--muted); border-bottom:3px solid transparent; transition:all .2s; background:none; border-top:none; border-left:none; border-right:none; }
@@ -1378,7 +1381,7 @@
     try { return JSON.parse(localStorage.getItem(FEATURED_KEY)); } catch { return null; }
   }
 
-  function setFeatured() {
+  async function setFeatured() {
     if (!_modalChar) return;
     const cur = getFeatured();
     const isThis = cur && cur.id == _modalChar.id && cur.name === _modalChar.name;
@@ -1388,12 +1391,24 @@
       localStorage.removeItem(FEATURED_KEY);
       if (window.ReAnimeDB) window.ReAnimeDB.setFeatured(null).catch(()=>{});
     } else {
+      /* Buscar skin activa del personaje */
+      let image = _modalChar.image || '';
+      try {
+        const pvpR = await fetch('pvp_chars.json');
+        const pvpJ = await pvpR.json();
+        const pvpChar = (pvpJ.characters||[]).find(p => p.name.toLowerCase().trim() === _modalChar.name.toLowerCase().trim());
+        if (pvpChar?.skins?.length) {
+          const up = window.ReAnimeDB ? await window.ReAnimeDB.getCharUpgrade(_modalChar.name) : { selectedSkin: 0 };
+          const skinIdx = up?.selectedSkin || 0;
+          if (pvpChar.skins[skinIdx]) image = pvpChar.skins[skinIdx];
+        }
+      } catch(e) {}
       /* Guardar en localStorage y Firestore */
       const data = {
         id:          _modalChar.id,
         name:        _modalChar.name,
         anime:       _modalChar.anime,
-        image:       _modalChar.image || '',
+        image:       image,
         stars:       _modalChar.stars,
         description: _modalChar.description || '',
       };
@@ -1651,6 +1666,7 @@
       </div>
       <!-- Upgrade btn -->
       <button class="umodal-upgrade-btn" id="um-upgrade-btn" onclick="doUpgrade()">⬆ MEJORAR (usa 1 duplicado)</button>
+      <button id="um-featured-btn" style="width:100%;background:none;border:1px solid #a78bfa;color:#a78bfa;border-radius:6px;padding:.5rem;font-family:var(--font-b);font-size:.82rem;cursor:pointer;margin-top:.3rem;transition:all .2s;" onmouseover="this.style.background='#a78bfa22'" onmouseout="this.style.background='none'" onclick="doSetFeatured()">✦ Destacar en perfil</button>
       <button class="umodal-close-btn" onclick="closeUpgradeModal()">Cerrar</button>
     </div>
   </div>
@@ -1682,6 +1698,8 @@ async function openUpgradeModal(ch) {
   const curImg = skins[curSkinIdx] || ch.image || '';
 
   document.getElementById('um-cover').src = curImg;
+  document.getElementById('um-cover').style.objectFit = 'cover';
+  document.getElementById('um-cover').style.objectPosition = 'top';
   document.getElementById('um-name').textContent  = ch.name;
   document.getElementById('um-stars').innerHTML   = '<span style="color:var(--r'+ch.stars+')">' + '★'.repeat(ch.stars) + '</span>';
   document.getElementById('um-level').textContent = up.level;
@@ -1773,6 +1791,31 @@ async function doUpgrade() {
     btn.disabled = false;
     btn.textContent = '⬆ MEJORAR (usa 1 duplicado)';
   }
+}
+
+async function doSetFeatured() {
+  if (!_umChar) return;
+  // Use selected skin if available
+  let image = _umChar.image || '';
+  if (_umPvpChar?.skins?.length) {
+    const up = window.ReAnimeDB ? await window.ReAnimeDB.getCharUpgrade(_umChar.name) : { selectedSkin: 0 };
+    const skinIdx = up.selectedSkin || 0;
+    if (_umPvpChar.skins[skinIdx]) image = _umPvpChar.skins[skinIdx];
+  }
+  const data = {
+    id:          _umChar.id,
+    name:        _umChar.name,
+    anime:       _umChar.anime,
+    image:       image,
+    stars:       _umChar.stars,
+    description: _umChar.description || '',
+  };
+  localStorage.setItem('gacha_featured', JSON.stringify(data));
+  if (window.ReAnimeDB) window.ReAnimeDB.setFeatured(data).catch(()=>{});
+  showToast(`✦ ${data.name} destacado en tu perfil`);
+  // Update button feedback
+  const btn = document.getElementById('um-featured-btn');
+  if (btn) { btn.textContent = '✦ ¡Destacado!'; btn.style.background='#a78bfa'; btn.style.color='#fff'; setTimeout(()=>{ btn.textContent='✦ Destacar en perfil'; btn.style.background='none'; btn.style.color='#a78bfa'; }, 2000); }
 }
 
 function closeUpgradeModal() {

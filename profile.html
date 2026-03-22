@@ -273,7 +273,7 @@
     /* Carta de tamaño fijo */
     .featured-profile-card {
       width: 240px;
-      height: 427px; /* 240 * 16/9 → no, 240*(3/2)=360, but user wants 427 ≈ 240*1.78 */
+      height: 427px;
       flex-shrink: 0;
       border-radius: var(--radius);
       overflow: hidden;
@@ -313,7 +313,7 @@
     /* Gradient overlay encima de la imagen */
     .featured-profile-card .fp-overlay {
       position: absolute; inset: 0; z-index: 3;
-      background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%);
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 30%, transparent 55%);
     }
 
     /* Info al lado */
