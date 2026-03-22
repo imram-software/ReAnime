@@ -125,7 +125,8 @@
     "dupes_per_level": 1
   },
   "characters": [
-    {
+    { 
+      "pj": "Subaru Natsuki",
       "name": "Subaru Natsuki",
       "series": "Re:Zero",
       "affinity": "oscuridad",
@@ -193,7 +194,8 @@
         }
       ]
     },
-    {
+    { "pj": "Rem",
+
       "name": "Rem",
       "series": "Re:Zero",
       "affinity": "agua",
@@ -269,8 +271,8 @@
       "role": "mago",
       "rarity": 4,
       "skins": [
-        "https://cdn.myanimelist.net/images/characters/15/266067.jpg",
-        "https://cdn.myanimelist.net/images/characters/10/271555.jpg"
+        "https://cdn.donmai.us/sample/51/22/__ram_goddess_of_victory_nikke_and_1_more_drawn_by_ikkia__sample-51229bf2cf0c93bded7b133e69852328.jpg",
+        "https://i.imgur.com/i4VQlwR.gif"
       ],
       "stats": {
         "hp": 3800,
