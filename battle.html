@@ -111,6 +111,8 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 @keyframes targetPulse{0%,100%{box-shadow:0 0 16px rgba(239,68,68,.5);}50%{box-shadow:0 0 28px rgba(239,68,68,.8);}}
 .fighter.selected{border-color:var(--pink) !important;box-shadow:0 0 16px var(--pink-dim) !important;}
 .fighter.acting{animation:actPulse .35s ease;z-index:10;}
+.fighter.ally-glow{border-color:#4ade80 !important;box-shadow:0 0 14px rgba(74,222,128,.5) !important;animation:allyGlow 1s ease infinite;}
+@keyframes allyGlow{0%,100%{box-shadow:0 0 14px rgba(74,222,128,.4);}50%{box-shadow:0 0 24px rgba(74,222,128,.8);}}
 @keyframes actPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12);}}
 @keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-8px)}30%{transform:translateX(8px)}45%{transform:translateX(-6px)}60%{transform:translateX(6px)}75%{transform:translateX(-3px)}90%{transform:translateX(3px)}}
 @keyframes hitFlash{0%,100%{filter:brightness(1)}20%{filter:brightness(2.5) saturate(0)}60%{filter:brightness(1.2)}}
@@ -315,7 +317,17 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
   </div>
 
   <!-- BATTLE SCREEN -->
-  <div id="battle-screen">
+  <div id="battle-screen" style="position:relative;">
+    <!-- Affinity chart -->
+    <div id="aff-chart" style="position:absolute;top:0;right:0;background:rgba(8,8,8,.92);border:1px solid var(--border);border-radius:8px 0 0 8px;padding:.4rem .6rem;font-size:.6rem;z-index:50;line-height:1.7;min-width:130px;">
+      <div style="font-family:var(--font-h);font-size:.7rem;letter-spacing:2px;color:var(--muted);margin-bottom:.25rem;">AFINIDADES</div>
+      <div>🌿<b style="color:#86efac">Verde</b> → 💧 Azul</div>
+      <div>💧<b style="color:#38bdf8">Azul</b> → 🔥 Rojo</div>
+      <div>🔥<b style="color:#ef4444">Rojo</b> → ⚡ Amarillo</div>
+      <div>⚡<b style="color:#fbbf24">Amarillo</b> → 🌑 Morado</div>
+      <div>🌑<b style="color:#a78bfa">Morado</b> → 🌿 Verde</div>
+      <div>✦<b style="color:#fef9c3">Luz</b> ⇄ 🌑 Oscuridad</div>
+    </div>
     <!-- Turn order bar -->
     <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem;overflow-x:auto;padding:.1rem 0;">
       <div class="turn-label">Turno:</div>
@@ -731,13 +743,37 @@ function calcTurnOrder(ftrs) {
   return [...ftrs].filter(f=>f.hp>0).sort((a,b)=>(b.spd - a.spd) || Math.random()-0.5);
 }
 
-function startBattle() {
+async function startBattle() {
   if (myAtkTeam.length===0 || enemyDefTeam.length===0) return;
   phase = 'battle';
 
+  // Load active skins for ally team
+  const allyWithSkins = await Promise.all(myAtkTeam.map(async (char, i) => {
+    const pvp = findPvpStats(char.name);
+    let image = char.image || '';
+    if (pvp?.skins?.length && window.ReAnimeDB) {
+      try {
+        const up = await window.ReAnimeDB.getCharUpgrade(char.name);
+        const skinIdx = up?.selectedSkin || 0;
+        if (pvp.skins[skinIdx]) image = pvp.skins[skinIdx];
+      } catch(e) {}
+    } else if (pvp?.skins?.[0]) {
+      image = pvp.skins[0];
+    }
+    return { ...char, image };
+  }));
+
+  // For enemies: use first skin from pvp_chars if no image
+  const enemyWithSkins = enemyDefTeam.map(char => {
+    const pvp = findPvpStats(char.name);
+    let image = char.image || '';
+    if (!image && pvp?.skins?.[0]) image = pvp.skins[0];
+    return { ...char, image };
+  });
+
   fighters = [
-    ...myAtkTeam.map((c,i) => buildFighter(c, false, i)),
-    ...enemyDefTeam.map((c,i) => buildFighter(c, true, i)),
+    ...allyWithSkins.map((c,i) => buildFighter(c, false, i)),
+    ...enemyWithSkins.map((c,i) => buildFighter(c, true, i)),
   ];
   turnQueue = [...fighters].sort((a,b)=>b.spd - a.spd);
   currentTurn = 0;
@@ -872,12 +908,28 @@ function chooseSkill(idx, skill) {
   selectedSkill = { idx, skill };
   phase = 'target_pick';
   const eff = skill.effect || 'damage';
-  const isSelfTarget = ['buff_spd_team','heal_team','shield_team','double_atk','buff_luck'].includes(eff);
-  const isAllyTarget = ['heal','shield','cleanse','taunt'].includes(eff);
 
-  if (isSelfTarget) {
-    // Auto-execute, no target needed
-    executeAction(selectedFighter, selectedSkill, selectedFighter);
+  // Team-wide buffs: highlight ALL allies with a glow (not targeting cursor)
+  const isTeamBuff = ['buff_spd_team','heal_team','shield_team','buff_luck','cd_reduce_team','debuff_aoe','team_def_skill'].includes(eff);
+  // Self-only buff: only the actor highlights
+  const isSelfBuff = ['double_atk','dmg_reduce_self','buff','counter','taunt'].includes(eff);
+  // Ally single target
+  const isAllyTarget = ['heal','shield','cleanse'].includes(eff);
+
+  // Clear previous targeting
+  fighters.forEach(f => document.getElementById('f-'+f.id)?.classList.remove('targeting','ally-glow'));
+
+  if (isTeamBuff) {
+    // Show all allies glowing — player clicks any one of them (or actor) to confirm
+    document.getElementById('target-hint').textContent = '→ Afecta a TODOS tus aliados. Click en cualquier aliado para confirmar.';
+    fighters.filter(f=>!f.isEnemy&&f.hp>0).forEach(f=>{
+      document.getElementById('f-'+f.id)?.classList.add('ally-glow');
+    });
+    return;
+  }
+  if (isSelfBuff) {
+    document.getElementById('target-hint').textContent = '→ Click en tu personaje para confirmar.';
+    document.getElementById('f-'+selectedFighter.id)?.classList.add('targeting');
     return;
   }
   if (isAllyTarget) {
@@ -912,21 +964,42 @@ function onFighterClick(id) {
 
   if (phase === 'target_pick') {
     const eff = selectedSkill?.skill?.effect || 'damage';
-    const isAllyTarget = ['heal','shield','cleanse','taunt'].includes(eff);
+    const isTeamBuff   = ['buff_spd_team','heal_team','shield_team','buff_luck','cd_reduce_team','debuff_aoe','team_def_skill'].includes(eff);
+    const isSelfBuff   = ['double_atk','dmg_reduce_self','buff','counter','taunt'].includes(eff);
+    const isAllyTarget = ['heal','shield','cleanse'].includes(eff);
 
+    const clearAll = () => {
+      fighters.forEach(x => {
+        document.getElementById('f-'+x.id)?.classList.remove('targeting','ally-glow');
+      });
+      clearDimming();
+    };
+
+    if (isTeamBuff && !f.isEnemy && f.hp > 0) {
+      clearAll();
+      executeAction(selectedFighter, selectedSkill, selectedFighter);
+      return;
+    }
+    if (isSelfBuff && !f.isEnemy && f.id === selectedFighter.id) {
+      clearAll();
+      executeAction(selectedFighter, selectedSkill, selectedFighter);
+      return;
+    }
+    if (isSelfBuff && !f.isEnemy && f.id !== selectedFighter.id) {
+      document.getElementById('target-hint').textContent = '→ Esta habilidad solo se aplica a ti mismo.';
+      return;
+    }
     if (isAllyTarget && !f.isEnemy && f.hp > 0) {
-      fighters.forEach(x => document.getElementById('f-'+x.id)?.classList.remove('targeting'));
-      clearDimming();
+      clearAll();
       executeAction(selectedFighter, selectedSkill, f);
       return;
     }
-    if (!isAllyTarget && f.isEnemy && f.hp > 0) {
-      fighters.forEach(x => document.getElementById('f-'+x.id)?.classList.remove('targeting'));
-      clearDimming();
+    if (!isTeamBuff && !isSelfBuff && !isAllyTarget && f.isEnemy && f.hp > 0) {
+      clearAll();
       executeAction(selectedFighter, selectedSkill, f);
       return;
     }
-    if (!isAllyTarget && !f.isEnemy) {
+    if (!isAllyTarget && !isTeamBuff && !isSelfBuff && !f.isEnemy) {
       document.getElementById('target-hint').textContent = '→ Selecciona un ENEMIGO para atacar.';
     }
     if (isAllyTarget && f.isEnemy) {
@@ -1394,6 +1467,7 @@ async function executeAction(actor, skillChoice, target) {
   if (actEl) { actEl.classList.add('acting'); setTimeout(()=>actEl.classList.remove('acting'), 350); }
 
   selectedFighter = null; selectedSkill = null;
+  fighters.forEach(f => document.getElementById('f-'+f.id)?.classList.remove('ally-glow','targeting'));
   clearDimming();
   renderAllBuffIcons();
   currentTurn++;
