@@ -1201,6 +1201,8 @@
     // Guardar en historial local
     pullHistory = [...chars, ...pullHistory].slice(0, 50);
     localStorage.setItem('gacha_history', JSON.stringify(pullHistory));
+    // Invalidate collection cache so new chars appear immediately
+    _collLoaded = false; _collData = [];
 
     // Mostrar resultados
     await showResults(chars, n);
@@ -1642,9 +1644,14 @@
         const _imgEl = imgEl, _lvEl = lvBadgeEl, _pvpChar = p;
         window.ReAnimeDB.getCharUpgrade(ch.name).then(up => {
           if (up.level > 1) _lvEl.innerHTML = `<span style="background:var(--pink);color:#fff;font-size:.55rem;border-radius:10px;padding:.05rem .35rem;font-weight:700;">Nv ${up.level}</span>`;
-          // Apply active skin: -1 or undefined = use default (ch.image)
-          if (up.selectedSkin != null && up.selectedSkin >= 0 && _pvpChar?.skins?.[up.selectedSkin]) {
-            _imgEl.src = _pvpChar.skins[up.selectedSkin];
+          // Apply active skin: only if explicitly chosen (>=0) AND pvp has multiple skins
+          // If pvp has only 1 skin, that IS the default — selectedSkin 0 = same as -1
+          const pvpSkins = _pvpChar?.skins || [];
+          const si = up.selectedSkin ?? -1;
+          if (si >= 0 && pvpSkins.length > 1 && pvpSkins[si]) {
+            _imgEl.src = pvpSkins[si];
+          } else if (si >= 0 && pvpSkins.length === 1 && si === 0) {
+            // skin[0] when only 1 skin = the default, keep ch.image
           }
           // else keep ch.image (default)
         });
@@ -1782,6 +1789,8 @@ async function openUpgradeModal(ch) {
         if (!window.ReAnimeDB) return;
         await window.ReAnimeDB.setActiveSkin(ch.name, i);
         openUpgradeModal(ch);
+        const pvpSkins = _umPvpChar?.skins;
+        refreshCollectionCard(ch.name, i, pvpSkins?.[i] || ch.image || '');
       };
     }
     const lbl = document.createElement('span');
@@ -1875,6 +1884,20 @@ async function doSetFeatured() {
 function closeUpgradeModal() {
   document.getElementById('upgrade-modal').classList.remove('open');
   _umChar = null;
+}
+
+// Update a single card's image in the collection grid without full re-render
+function refreshCollectionCard(name, skinIdx, newSrc) {
+  // Find the card in the grid by iterating coll-card-g elements
+  const cards = document.querySelectorAll('.coll-card-g');
+  for (const card of cards) {
+    const nameEl = card.querySelector('.coll-name');
+    if (nameEl?.textContent?.trim() === name) {
+      const img = card.querySelector('img');
+      if (img && newSrc) img.src = newSrc;
+      break;
+    }
+  }
 }
 </script>
 </body>
