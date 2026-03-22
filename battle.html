@@ -82,11 +82,12 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .skill-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;}
 .skill-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:.4rem .4rem;font-size:.7rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;text-align:left;}
 .skill-btn:hover:not(:disabled){border-color:var(--pink);color:var(--pink);}
+.skill-btn.selected{border-color:var(--pink) !important;background:var(--pink-dim) !important;color:var(--pink) !important;box-shadow:0 0 10px var(--pink-glow);}
 .skill-btn:disabled{opacity:.35;cursor:default;}
 .skill-btn .sk-name{font-weight:700;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .skill-btn .sk-cd{font-size:.6rem;color:var(--muted);margin-top:.1rem;}
 .skill-btn .sk-type{font-size:.6rem;color:var(--rose);}
-#target-hint{font-size:.75rem;color:var(--rose);margin-top:.5rem;text-align:center;min-height:1.2em;}
+#target-hint{font-size:.78rem;color:var(--rose);margin-top:.5rem;text-align:center;min-height:1.4em;font-weight:500;letter-spacing:.3px;}
 
 /* ── ARENA SIDE-BY-SIDE ── */
 .arena-wrap{position:relative;display:flex;align-items:flex-start;gap:0;margin-bottom:1.2rem;border-radius:var(--radius);overflow:visible;min-height:200px;border:1px solid var(--border);}
@@ -110,8 +111,10 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 .fighter.targeting{cursor:crosshair !important;border-color:#ef4444 !important;box-shadow:0 0 16px rgba(239,68,68,.5) !important;animation:targetPulse .8s ease infinite;}
 @keyframes targetPulse{0%,100%{box-shadow:0 0 16px rgba(239,68,68,.5);}50%{box-shadow:0 0 28px rgba(239,68,68,.8);}}
 .fighter.selected{border-color:var(--pink) !important;box-shadow:0 0 16px var(--pink-dim) !important;}
+.fighter.turn-active::after{content:"▶ TU TURNO";position:absolute;bottom:0;left:0;right:0;background:var(--pink);color:#fff;font-size:.48rem;font-family:var(--font-h);letter-spacing:2px;text-align:center;padding:.1rem 0;z-index:5;opacity:.9;}
 .fighter.acting{animation:actPulse .35s ease;z-index:10;}
 .fighter.ally-glow{border-color:#4ade80 !important;box-shadow:0 0 14px rgba(74,222,128,.5) !important;animation:allyGlow 1s ease infinite;}
+.fighter.enemy-turn-active{border-color:#f87171 !important;box-shadow:0 0 14px rgba(248,113,113,.4) !important;}
 @keyframes allyGlow{0%,100%{box-shadow:0 0 14px rgba(74,222,128,.4);}50%{box-shadow:0 0 24px rgba(74,222,128,.8);}}
 @keyframes actPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12);}}
 @keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-8px)}30%{transform:translateX(8px)}45%{transform:translateX(-6px)}60%{transform:translateX(6px)}75%{transform:translateX(-3px)}90%{transform:translateX(3px)}}
@@ -792,7 +795,8 @@ async function startBattle() {
   sessionStorage.setItem('battle_ongoing', JSON.stringify({
     enemyId, enemyName, time: Date.now()
   }));
-  logMsg('⚔ Batalla comenzando — orden por velocidad.', 'sys');
+  _roundNum = 1;
+  logMsg('⚔ Ronda 1 — orden por velocidad.', 'sys');
   logMsg(`${turnQueue.map(f=>f.name).join(', ')}`, 'sys');
   nextTurn();
 }
@@ -813,7 +817,8 @@ function nextTurn() {
     currentTurn = 0;
     // Rebuild with alive fighters sorted by spd
     turnQueue = fighters.filter(f=>f.hp>0).sort((a,b)=>b.spd - a.spd);
-    logMsg('── Nueva ronda ──', 'sys');
+    _roundNum = (_roundNum||1) + 1;
+    logMsg(`── Ronda ${_roundNum} ──`, 'sys');
     fighters.forEach(f => {
       if (f.hp <= 0) return;
       // Bleed
@@ -852,6 +857,7 @@ function nextTurn() {
 
   renderTurnOrder();
   clearDimming();
+  document.querySelectorAll('.fighter').forEach(el => el.classList.remove('enemy-turn-active','turn-active'));
   const actor = turnQueue[currentTurn];
 
   // Remove stun visual if cleared
@@ -859,7 +865,9 @@ function nextTurn() {
 
   if (actor.isEnemy) {
     phase = 'enemy_turn';
-    updateActionPanel(`${actor.name} está pensando...`);
+    document.querySelectorAll('.fighter').forEach(el => el.classList.remove('turn-active'));
+    document.getElementById('f-'+actor.id)?.classList.add('enemy-turn-active');
+    updateActionPanel(`⚡ ${actor.name} está pensando...`);
     setTimeout(() => enemyAI(actor), 900);
   } else {
     phase = 'ally_pick';
@@ -873,8 +881,9 @@ function selectFighter(f) {
   selectedSkill   = null;
   phase = 'ally_pick';
 
-  document.querySelectorAll('.fighter').forEach(el => { el.classList.remove('selected'); el.classList.remove('targeting'); });
-  document.getElementById('f-' + f.id)?.classList.add('selected');
+  document.querySelectorAll('.fighter').forEach(el => { el.classList.remove('selected','turn-active'); el.classList.remove('targeting'); });
+  const activeEl = document.getElementById('f-' + f.id);
+  if (activeEl) { activeEl.classList.add('selected','turn-active'); }
   applyDimming(f.id); // dim other allies, not enemies
 
   renderSkills(f);
@@ -884,15 +893,21 @@ function selectFighter(f) {
 function renderSkills(f) {
   const container = document.getElementById('skill-btns');
   container.innerHTML = '';
-  updateActionPanel(`Turno de ${f.name} — elige habilidad:`);
+  updateActionPanel(`⚔ Turno de ${f.name}`);
 
+  // Clear selected state when new turn renders
+  document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('selected'));
   f.skills.forEach((sk, i) => {
     const btn = document.createElement('button');
     btn.className = 'skill-btn';
     const cd = f.cooldowns[i] || 0;
     btn.disabled = cd > 0 || phase !== 'ally_pick';
     const affLabel = AFF_LABELS[f.affinity] || '';
-    btn.innerHTML = `<span class="sk-name">${sk.name}</span><span class="sk-cd">${cd > 0 ? 'CD: '+cd : (sk.cooldown===0?'Básico':'Lista')}</span>`;
+    const typeTag = sk.type === 'pasiva' ? '<span class="sk-type" style="color:var(--muted);">Pasiva</span>' :
+                   sk.cooldown === 0 ? '<span class="sk-type" style="color:#4ade80;">Básico</span>' :
+                   cd > 0 ? `<span class="sk-type" style="color:#f97316;">CD: ${cd}</span>` :
+                   '<span class="sk-type" style="color:#a78bfa;">Lista</span>';
+    btn.innerHTML = `<span class="sk-name">${sk.name}</span>${typeTag}`;
     btn.addEventListener('mouseenter', (e) => showTooltip(e, sk));
     btn.addEventListener('mouseleave', hideTooltip);
     if (sk.type !== 'pasiva') {
@@ -908,6 +923,9 @@ function chooseSkill(idx, skill) {
   selectedSkill = { idx, skill };
   phase = 'target_pick';
   const eff = skill.effect || 'damage';
+  // Highlight selected skill button
+  document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.skill-btn')[idx]?.classList.add('selected');
 
   // Team-wide buffs: highlight ALL allies with a glow (not targeting cursor)
   const isTeamBuff = ['buff_spd_team','heal_team','shield_team','buff_luck','cd_reduce_team','debuff_aoe','team_def_skill'].includes(eff);
