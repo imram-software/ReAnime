@@ -267,7 +267,7 @@ async function fsPatch(path,fields){try{const body={fields:toFirestore(fields)};
 async function fsSet(path,fields){try{const r=await fetch(`${REST}/${path}?key=${FB_KEY}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:toFirestore(fields)})});return r.ok;}catch{return false;}}
 async function fsDelete(path){try{await fetch(`${REST}/${path}?key=${FB_KEY}`,{method:'DELETE'});}catch{} }
 
-async function waitForBattleDocument(bid,attempts=8){for(let i=0;i<attempts;i++){const state=await fsGet(`arena_battles/${bid}`);if(state?.id===bid)return state;await new Promise(r=>setTimeout(r,400));}return null;}
+async function waitForBattleDocument(bid,attempts=15){for(let i=0;i<attempts;i++){const state=await fsGet(`arena_battles/${bid}`);if(state?.id===bid)return state;await new Promise(r=>setTimeout(r,400));}return null;}
 function toFirestore(obj){const f={};for(const[k,v]of Object.entries(obj)){f[k]=toFirestoreVal(v);}return f;}
 function toFirestoreVal(v){if(v===null||v===undefined)return{nullValue:null};if(typeof v==='boolean')return{booleanValue:v};if(typeof v==='number'&&Number.isInteger(v))return{integerValue:v};if(typeof v==='number')return{doubleValue:v};if(typeof v==='string')return{stringValue:v};if(Array.isArray(v))return{arrayValue:{values:v.map(toFirestoreVal)}};if(typeof v==='object')return{mapValue:{fields:toFirestore(v)}};return{stringValue:String(v)};}
 function firestoreDocToObj(doc){if(!doc?.fields)return{};const out={};for(const[k,v]of Object.entries(doc.fields))out[k]=parseFireVal(v);return out;}
@@ -282,7 +282,7 @@ const RG={5:'linear-gradient(160deg,#1a0a00,#3d1900 50%)',4:'linear-gradient(160
 let myConquest=0,pvpData=null,battleId=null,battleState=null,myRole=null;
 let pollInterval=null,phase='lobby',selectedFighter=null,selectedSkill=null;
 let localFighters=[],lastLogCount=0,queueDoc=null,actionLock=false,_roundNum=1;
-const QUEUE_TIMEOUT=45000,POLL_MS=1500,TURN_TIMEOUT_MS=10000;
+const QUEUE_TIMEOUT=45000,POLL_MS=1500,TURN_TIMEOUT_MS=15000;
 
 /* ══════════════════════════════════════ INIT ══════════════════════════════════════ */
 async function init(){
@@ -472,6 +472,7 @@ function renderBattle(state){
   const logEl=document.getElementById('battle-log');
   if(log.length>lastLogCount){
     log.slice(lastLogCount).forEach(entry=>{
+      playLogAnimation(entry,fighters);
       const div=document.createElement('div');
       const cm={dmg:'log-dmg',crit:'log-crit',heal:'log-heal',buff:'log-buff',debuff:'log-debuff',dodge:'log-dodge',enemy:'log-enemy',sys:'log-sys'};
       div.className=`log-entry ${cm[entry.type]||'log-sys'}`;
@@ -684,25 +685,31 @@ async function submitAction(actor,skillChoice,target,isTeamAction){
 
   let logMsg='',logType='sys';
 
+  let affectedTargets=[];
   if(eff==='heal'||eff==='heal_team'){
     const targets=eff==='heal_team'?fighters.filter(f=>f.side===mySide&&f.hp>0):[targetF];
     targets.forEach(t=>{const h=Math.round(t.maxHp*mult);t.hp=Math.min(t.maxHp,t.hp+h);showDmgFloat('f-'+t.id,'+'+h,false,'heal');shakeEl('f-'+t.id,'heal');});
+    affectedTargets=targets.map(t=>t.id);
     logMsg=`💚 ${actorF.name} cura${eff==='heal_team'?' al equipo':' a '+targetF.name}.`;logType='heal';
   } else if(eff==='shield'||eff==='shield_team'){
     const targets=eff==='shield_team'?fighters.filter(f=>f.side===mySide&&f.hp>0):[targetF];
     targets.forEach(t=>{const s=Math.round(t.maxHp*mult);t.shield=(t.shield||0)+s;showDmgFloat('f-'+t.id,'🛡+'+s,false,'shield');});
+    affectedTargets=targets.map(t=>t.id);
     logMsg=`🛡 ${actorF.name} otorga escudo.`;logType='buff';
   } else if(['buff_spd_team','buff','buff_luck','double_atk','dmg_reduce_self','cd_reduce_team','team_def_skill'].includes(eff)){
     actorF.buffs=actorF.buffs||[];actorF.buffs.push({type:'atk',turns:2});
     showDmgFloat('f-'+actorF.id,'⬆ BUFF',false,'buff');
+    affectedTargets=[actorF.id];
     logMsg=`⬆ ${actorF.name} activa ${sk.name}.`;logType='buff';
   } else if(eff==='cleanse'){
     targetF.debuffs=[];const h=Math.round(targetF.maxHp*mult);targetF.hp=Math.min(targetF.maxHp,targetF.hp+h);
     showDmgFloat('f-'+targetF.id,'✨ Puro',false,'buff');
+    affectedTargets=[targetF.id];
     logMsg=`✨ ${actorF.name} purifica a ${targetF.name}.`;logType='buff';
   } else if(eff==='taunt'||eff==='counter'){
     actorF.buffs=actorF.buffs||[];actorF.buffs.push({type:'taunt',turns:1});
     showDmgFloat('f-'+actorF.id,'🎯',false,'buff');
+    affectedTargets=[actorF.id];
     logMsg=`🎯 ${actorF.name} provoca.`;logType='buff';
   } else {
     // Damage-based
@@ -723,13 +730,14 @@ async function submitAction(actor,skillChoice,target,isTeamAction){
       const affTxt=affMult>1?' ✦ Super efectivo!':affMult<1?' ▼ Poco efectivo.':'';
       logMsg=`${actorF.name} → ${targetF.name}: ${totalDmg}${isCrit?' 💥 CRÍTICO!':''}${affTxt}`;
       logType=isCrit?'crit':'dmg';
+      affectedTargets=[targetF.id];
       if(targetF.dead)log.push({msg:`💀 ${targetF.name} fue derrotado.`,type:'sys',ts:Date.now()});
       // Lifesteal
       if(eff==='lifesteal'){const steal=Math.round(totalDmg*0.15);actorF.hp=Math.min(actorF.maxHp,actorF.hp+steal);showDmgFloat('f-'+actorF.id,'+'+steal+'🩸',false,'heal');}
     }
   }
 
-  log.push({msg:logMsg,type:logType,ts:Date.now()});
+  log.push({msg:logMsg,type:logType,ts:Date.now(),actorId:actorF.id,targetIds:affectedTargets,effect:eff,damage:typeof totalDmg==='number'?totalDmg:undefined,value:typeof totalDmg==='number'?undefined:undefined,isCrit:logType==='crit'});
 
   // Check winner
   const p1Alive=fighters.filter(f=>f.side==='p1'&&f.hp>0).length;
@@ -783,7 +791,7 @@ async function skipCurrentTurn(state){
     log.push({msg:`── Ronda ${_roundNum} ──`,type:'sys',ts:Date.now()});
     fighters.forEach(f=>{if(!f.cooldowns)return;for(const k in f.cooldowns){if(f.cooldowns[k]>0)f.cooldowns[k]--;}});
   }
-  log.push({msg:`⏱ ${actor?.name||'Turno'} se saltó por inactividad.`,type:'sys',ts:Date.now()});
+  log.push({msg:`⏱ ${actor?.name||'Turno'} se saltó por inactividad.`,type:'sys',ts:Date.now(),actorId:actor?.id,targetIds:[],effect:'skip'});
 
   await fsPatch(`arena_battles/${battleId}`,{fighters:JSON.stringify(fighters),log:JSON.stringify(log),turnIndex:newIdx,status:newStatus,winner,lastAction:Date.now()});
   actionLock=false;
@@ -800,6 +808,33 @@ function calcDamage(a,t,mult=1){
 }
 
 /* ══════════════════════════════════════ VISUAL HELPERS ══════════════════════════════════════ */
+function playLogAnimation(entry,fighters){
+  if(!entry||!fighters?.length)return;
+  const actor=fighters.find(f=>f.id===entry.actorId);
+  const targets=(entry.targetIds||[]).map(id=>fighters.find(f=>f.id===id)).filter(Boolean);
+  if(actor){const actorEl=document.getElementById('f-'+actor.id); if(actorEl){actorEl.classList.add('acting'); setTimeout(()=>actorEl.classList.remove('acting'),350);} }
+
+  if(entry.effect==='heal'||entry.effect==='heal_team'){
+    targets.forEach(t=>{shakeEl('f-'+t.id,'heal'); showDmgFloat('f-'+t.id,entry.value!=null?`+${entry.value}`:'+0',false,'heal');});
+    return;
+  }
+  if(entry.effect==='shield'||entry.effect==='shield_team'){
+    targets.forEach(t=>showDmgFloat('f-'+t.id,entry.value!=null?`🛡+${entry.value}`:'🛡',false,'shield'));
+    return;
+  }
+  if(['buff_spd_team','buff','buff_luck','double_atk','dmg_reduce_self','cd_reduce_team','team_def_skill','cleanse','taunt','counter'].includes(entry.effect)){
+    if(actor){showDmgFloat('f-'+actor.id,entry.effect==='cleanse'?'✨':entry.effect==='taunt'||entry.effect==='counter'?'🎯':'⬆',false,'buff');}
+    targets.filter(t=>t.id!==actor?.id).forEach(t=>{shakeEl('f-'+t.id,'heal'); showDmgFloat('f-'+t.id,entry.effect==='cleanse'?'✨':'',false,'buff');});
+    return;
+  }
+  if(entry.effect==='skip'){if(actor){shakeEl('f-'+actor.id,'dmg');} return;}
+  if(entry.type==='dodge'){targets.forEach(t=>showDmgFloat('f-'+t.id,'Esquiva!',false,'dodge')); return;}
+  if(entry.type==='crit'||entry.type==='dmg'||entry.effect==='damage'||entry.effect==='multihit3'||entry.effect==='nuke'){
+    targets.forEach(t=>{shakeEl('f-'+t.id,entry.type==='crit'?'crit':'dmg'); showDmgFloat('f-'+t.id,entry.damage ?? 0, entry.type==='crit', entry.type==='crit'?'crit':'dmg');});
+    if(entry.type==='crit')screenFlash('#fbbf24');
+  }
+}
+
 function showDmgFloat(elId,dmg,isCrit,type='dmg'){
   const arena=document.getElementById('arena-wrap');
   const parent=document.getElementById(elId);
