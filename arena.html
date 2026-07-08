@@ -262,10 +262,12 @@ const REST=`https://firestore.googleapis.com/v1/projects/${FB_PROJECT}/databases
 const SELF=JSON.parse(localStorage.getItem('user'));
 
 /* ── REST helpers ── */
-async function fsGet(path){const r=await fetch(`${REST}/${path}?key=${FB_KEY}`);if(!r.ok)return null;return firestoreDocToObj(await r.json());}
-async function fsPatch(path,fields){const body={fields:toFirestore(fields)};const fm=Object.keys(fields).map(k=>`updateMask.fieldPaths=${k}`).join('&');const r=await fetch(`${REST}/${path}?key=${FB_KEY}&${fm}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.ok;}
-async function fsSet(path,fields){const r=await fetch(`${REST}/${path}?key=${FB_KEY}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:toFirestore(fields)})});return r.ok;}
-async function fsDelete(path){await fetch(`${REST}/${path}?key=${FB_KEY}`,{method:'DELETE'});}
+async function fsGet(path){try{const r=await fetch(`${REST}/${path}?key=${FB_KEY}`);if(!r.ok)return null;return firestoreDocToObj(await r.json());}catch{return null;}}
+async function fsPatch(path,fields){try{const body={fields:toFirestore(fields)};const fm=Object.keys(fields).map(k=>`updateMask.fieldPaths=${k}`).join('&');const r=await fetch(`${REST}/${path}?key=${FB_KEY}&${fm}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.ok;}catch{return false;}}
+async function fsSet(path,fields){try{const r=await fetch(`${REST}/${path}?key=${FB_KEY}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:toFirestore(fields)})});return r.ok;}catch{return false;}}
+async function fsDelete(path){try{await fetch(`${REST}/${path}?key=${FB_KEY}`,{method:'DELETE'});}catch{} }
+
+async function waitForBattleDocument(bid,attempts=8){for(let i=0;i<attempts;i++){const state=await fsGet(`arena_battles/${bid}`);if(state?.id===bid)return state;await new Promise(r=>setTimeout(r,400));}return null;}
 function toFirestore(obj){const f={};for(const[k,v]of Object.entries(obj)){f[k]=toFirestoreVal(v);}return f;}
 function toFirestoreVal(v){if(v===null||v===undefined)return{nullValue:null};if(typeof v==='boolean')return{booleanValue:v};if(typeof v==='number'&&Number.isInteger(v))return{integerValue:v};if(typeof v==='number')return{doubleValue:v};if(typeof v==='string')return{stringValue:v};if(Array.isArray(v))return{arrayValue:{values:v.map(toFirestoreVal)}};if(typeof v==='object')return{mapValue:{fields:toFirestore(v)}};return{stringValue:String(v)};}
 function firestoreDocToObj(doc){if(!doc?.fields)return{};const out={};for(const[k,v]of Object.entries(doc.fields))out[k]=parseFireVal(v);return out;}
@@ -332,7 +334,15 @@ async function findMatch(){
 
 async function checkForMatch(myTeam){
   const myBattle=await fsGet(`arena_battles_pending/${SELF.id}`);
-  if(myBattle?.battleId){clearInterval(pollInterval);await fsDelete(`arena_battles_pending/${SELF.id}`);await joinBattle(myBattle.battleId,'player2');return;}
+  if(myBattle?.battleId){
+    clearInterval(pollInterval);
+    await fsDelete(`arena_battles_pending/${SELF.id}`);
+    const battleDoc=await waitForBattleDocument(myBattle.battleId,8);
+    if(battleDoc){await joinBattle(myBattle.battleId,'player2');return;}
+    phase='lobby';
+    setQueueStatus('No se pudo abrir la batalla. Intenta de nuevo.');
+    return;
+  }
   const r=await fetch(`${REST}/arena_queue?key=${FB_KEY}&pageSize=20`);
   if(!r.ok)return;
   const j=await r.json();const docs=j.documents||[];
@@ -344,6 +354,7 @@ async function checkForMatch(myTeam){
     await createBattle(bid,queueDoc,data,myTeam);
     await fsSet(`arena_battles_pending/${data.id}`,{battleId:bid});
     await fsDelete(`arena_queue/${SELF.id}`);
+    await waitForBattleDocument(bid,8);
     await joinBattle(bid,'player1');
     return;
   }
