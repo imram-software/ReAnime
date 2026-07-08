@@ -119,6 +119,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 /* Action panel */
 #action-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem;}
 .action-title{font-family:var(--font-h);font-size:.85rem;letter-spacing:2px;color:var(--muted);margin-bottom:.4rem;}
+.turn-timer{display:inline-block;margin-bottom:.45rem;padding:.3rem .55rem;border-radius:999px;border:1px solid rgba(251,191,36,.25);background:rgba(251,191,36,.08);color:var(--gold);font-size:.68rem;letter-spacing:1px;}
 .skill-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem;}
 .skill-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:.4rem .35rem;font-size:.68rem;cursor:pointer;font-family:var(--font-b);transition:all .2s;text-align:left;}
 .skill-btn:hover:not(:disabled){border-color:var(--pink);color:var(--pink);}
@@ -233,6 +234,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;
 
     <div id="action-panel">
       <div class="action-title" id="action-title">Cargando batalla...</div>
+      <div class="turn-timer" id="turn-timer">⏱ Esperando turno</div>
       <div class="skill-btns" id="skill-btns"></div>
       <div id="target-hint"></div>
     </div>
@@ -278,7 +280,7 @@ const RG={5:'linear-gradient(160deg,#1a0a00,#3d1900 50%)',4:'linear-gradient(160
 let myConquest=0,pvpData=null,battleId=null,battleState=null,myRole=null;
 let pollInterval=null,phase='lobby',selectedFighter=null,selectedSkill=null;
 let localFighters=[],lastLogCount=0,queueDoc=null,actionLock=false,_roundNum=1;
-const QUEUE_TIMEOUT=45000,POLL_MS=1500;
+const QUEUE_TIMEOUT=45000,POLL_MS=1500,TURN_TIMEOUT_MS=10000;
 
 /* ══════════════════════════════════════ INIT ══════════════════════════════════════ */
 async function init(){
@@ -409,11 +411,6 @@ async function pollBattle(){
   if(!state)return;
   battleState=state;
   if(state.status==='done'){clearInterval(pollInterval);await handleBattleEnd(state);return;}
-  if(Date.now()-(state.lastAction||0)>30000){
-    const mySide=myRole==='player1'?'p1':'p2';
-    const curFId=JSON.parse(state.turnOrder)[state.turnIndex];
-    if(!curFId?.startsWith(mySide)){await finishBattle(state,myRole);return;}
-  }
   renderBattle(state);
 }
 
@@ -430,6 +427,18 @@ function renderBattle(state){
   const curFId=turnOrder[state.turnIndex];
   const isMyTurn=curFId?.startsWith(mySide);
   localFighters=fighters;
+
+  const turnTimerEl=document.getElementById('turn-timer');
+  if(turnTimerEl){
+    if(isMyTurn){
+      const remaining=Math.max(0,Math.ceil(((state.lastAction||0)+TURN_TIMEOUT_MS-Date.now())/1000));
+      turnTimerEl.textContent=`⏱ ${remaining}s para actuar`;
+      turnTimerEl.style.display='inline-block';
+    } else {
+      turnTimerEl.textContent='⏱ Esperando turno';
+      turnTimerEl.style.display='inline-block';
+    }
+  }
 
   // VS bar
   document.getElementById('vs-me-name').textContent=state[myRole+'Name']||'Tú';
@@ -472,6 +481,7 @@ function renderBattle(state){
       document.querySelectorAll('.fighter').forEach(el=>el.classList.remove('turn-active','enemy-turn-active'));
       document.getElementById('f-'+curFId)?.classList.add('turn-active');
     }
+    void maybeAutoSkipTurn(state);
   } else if(!isMyTurn){
     document.getElementById('action-title').textContent='Esperando al rival...';
     document.getElementById('skill-btns').innerHTML='<div class="waiting-overlay"><span class="waiting-dot"></span><span class="waiting-dot"></span><span class="waiting-dot"></span></div>';
@@ -481,6 +491,24 @@ function renderBattle(state){
     document.querySelectorAll('.fighter').forEach(el=>el.classList.remove('turn-active','enemy-turn-active'));
     document.getElementById('f-'+curFId)?.classList.add('enemy-turn-active');
   }
+}
+
+async function maybeAutoSkipTurn(state){
+  if(actionLock||phase!=='battle'||!battleId)return;
+  const mySide=myRole==='player1'?'p1':'p2';
+  const turnOrder=JSON.parse(state.turnOrder||'[]');
+  const curFId=turnOrder[state.turnIndex];
+  if(!curFId?.startsWith(mySide))return;
+  if(Date.now()-(state.lastAction||0)<=TURN_TIMEOUT_MS)return;
+
+  const fresh=await fsGet(`arena_battles/${battleId}`);
+  if(!fresh||fresh.status==='done')return;
+  const freshTurnOrder=JSON.parse(fresh.turnOrder||'[]');
+  const freshCurFId=freshTurnOrder[fresh.turnIndex];
+  if(freshCurFId!==curFId||fresh.turnIndex!==state.turnIndex)return;
+  if(Date.now()-(fresh.lastAction||0)<=TURN_TIMEOUT_MS)return;
+
+  await skipCurrentTurn(fresh);
 }
 
 function renderFighters(fighters,mySide,themSide,curFId,isMyTurn){
@@ -700,12 +728,10 @@ async function submitAction(actor,skillChoice,target,isTeamAction){
   else if(!p2Alive){newStatus='done';winner='player1';}
 
   // Advance turn
-  let newIdx=(state.turnIndex+1)%turnOrder.length;
-  let safety=0;
-  while(fighters.find(f=>f.id===turnOrder[newIdx])?.dead&&safety<20){newIdx=(newIdx+1)%turnOrder.length;safety++;}
+  const newIdx=advanceTurnIndex(fighters,turnOrder,state.turnIndex);
 
   // New round: reduce cooldowns
-  if(newIdx<=state.turnIndex&&newIdx!==state.turnIndex){
+  if(shouldStartNewRound(state.turnIndex,newIdx)){
     _roundNum++;
     log.push({msg:`── Ronda ${_roundNum} ──`,type:'sys',ts:Date.now()});
     fighters.forEach(f=>{if(!f.cooldowns)return;for(const k in f.cooldowns){if(f.cooldowns[k]>0)f.cooldowns[k]--;}});
@@ -714,6 +740,42 @@ async function submitAction(actor,skillChoice,target,isTeamAction){
   await fsPatch(`arena_battles/${battleId}`,{fighters:JSON.stringify(fighters),log:JSON.stringify(log),turnIndex:newIdx,status:newStatus,winner,lastAction:Date.now()});
 
   selectedFighter=null;selectedSkill=null;actionLock=false;
+  if(newStatus==='done'){clearInterval(pollInterval);await handleBattleEnd({...state,winner,status:'done'});}
+}
+
+function advanceTurnIndex(fighters,turnOrder,currentIndex){
+  let newIdx=(currentIndex+1)%turnOrder.length;
+  let safety=0;
+  while(fighters.find(f=>f.id===turnOrder[newIdx])?.dead&&safety<20){newIdx=(newIdx+1)%turnOrder.length;safety++;}
+  return newIdx;
+}
+
+function shouldStartNewRound(currentIndex,newIndex){return newIndex<=currentIndex&&newIndex!==currentIndex;}
+
+async function skipCurrentTurn(state){
+  if(actionLock||phase!=='battle'||!battleId)return;
+  actionLock=true;
+  const fighters=JSON.parse(state.fighters||'[]');
+  const turnOrder=JSON.parse(state.turnOrder||'[]');
+  const log=JSON.parse(state.log||'[]');
+  const actor=fighters.find(f=>f.id===turnOrder[state.turnIndex]);
+  const newIdx=advanceTurnIndex(fighters,turnOrder,state.turnIndex);
+
+  let newStatus='active',winner='';
+  const p1Alive=fighters.filter(f=>f.side==='p1'&&f.hp>0).length;
+  const p2Alive=fighters.filter(f=>f.side==='p2'&&f.hp>0).length;
+  if(!p1Alive){newStatus='done';winner='player2';}
+  else if(!p2Alive){newStatus='done';winner='player1';}
+
+  if(shouldStartNewRound(state.turnIndex,newIdx)){
+    _roundNum++;
+    log.push({msg:`── Ronda ${_roundNum} ──`,type:'sys',ts:Date.now()});
+    fighters.forEach(f=>{if(!f.cooldowns)return;for(const k in f.cooldowns){if(f.cooldowns[k]>0)f.cooldowns[k]--;}});
+  }
+  log.push({msg:`⏱ ${actor?.name||'Turno'} se saltó por inactividad.`,type:'sys',ts:Date.now()});
+
+  await fsPatch(`arena_battles/${battleId}`,{fighters:JSON.stringify(fighters),log:JSON.stringify(log),turnIndex:newIdx,status:newStatus,winner,lastAction:Date.now()});
+  actionLock=false;
   if(newStatus==='done'){clearInterval(pollInterval);await handleBattleEnd({...state,winner,status:'done'});}
 }
 
